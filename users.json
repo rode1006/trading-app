@@ -26,5 +26,31 @@
         "realizedPL": 2.2971195470280183
       }
     ]
+  },
+  "tiger": {
+    "password": "$2a$08$LqA6Xy.TbVjTFX.oCocgXOTDUXfFmcpVAPedi11DrL6ZI0jPtQecW",
+    "virtualBalance": 99997.41054654574,
+    "balance": 99997.41054654574,
+    "privateKey": "key121",
+    "address": "0xsef8se8fsefnf84h44n5b3dy8fdds877aasd783d7",
+    "positions": [],
+    "closedPositions": [
+      {
+        "id": 1728315616897,
+        "positionType": "Long",
+        "entryPrice": 63720.01,
+        "amount": 30000,
+        "profitLoss": 0,
+        "exitPrice": 63714.51,
+        "realizedPL": -2.5894534542602865
+      }
+    ]
+  },
+  "lion": {
+    "password": "$2a$08$aM4tci9d72IBX.KIiaGVYO0xdbze1PeEjncv9uAKCPa6q5/t./50O",
+    "virtualBalance": 0,
+    "balance": 0,
+    "privateKey": "key120",
+    "address": "0xfi654lvfi0u56kfg899vbs44ht0fv09gfllekgro0"
   }
 }

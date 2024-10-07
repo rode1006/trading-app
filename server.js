@@ -60,8 +60,8 @@ app.post('/register', (req, res) => {
 
     users[username] = {
         password: hashedPassword,
-        virtualBalance: 100000,
-        balance: 100000, // Initial balance (change if needed)
+        virtualBalance: 0,
+        balance: 0, // Initial balance (change if needed)
         privateKey: selectedKey.privateKey,
         address: selectedKey.address
     }; // Save user with initial balance
