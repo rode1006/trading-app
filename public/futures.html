@@ -706,7 +706,10 @@
         <div class="open-position">
             <span id="balance" class="balance-value">0</span>
             <div id="credit" class="credit">Credit: <span id="credit-value">Loading...</span></div>
-            <input type="number" id="bet-amount" placeholder="Enter bet amount" min="1" max="100">
+            <label>Bet Amount: </label>
+            <input type="number" id="bet-amount" min="1" max="100" style="width: 150px;font-size: 20px;">
+            <label>Leverage: </label>
+            <input type="number" id="bet-leverage" min="1" max="300" value="1" style="font-size: 20px;">
             <button id="long-button" class="playbutttton" style="margin-top: 15px;">Long</button>
             <button id="short-button" class="playbutttton" style="margin-top: 15px;">Short</button>
             <div id="positions"></div>
@@ -760,11 +763,11 @@
                         let totalPositionAmount = 0;
         
                         data.positions.forEach(position => {
-                            const unrealizedPL = calculateUnrealizedPL(position.entryPrice, currentPrice, position.amount, position.positionType);
+                            const unrealizedPL = calculateUnrealizedPL(position.entryPrice, currentPrice, position.amount, position.leverage, position.positionType);
                             const positionDiv = document.createElement('div');
 
                             totalUnrealizedPL += unrealizedPL;
-                            totalPositionAmount += position.amount;
+                            totalPositionAmount += position.amount*position.leverage;
         
                             // Create close button
                             const closeButton = document.createElement('button');
@@ -773,7 +776,8 @@
         
                             // Display positionType, Amount, Entry, Market Price, and Unrealized P/L
                             positionDiv.textContent = `
-                                ${position.positionType} - Amount: $${position.amount}, 
+                                ${position.positionType} - Amount: $${position.amount},
+                                Leverage: ${position.leverage}X, 
                                 Entry: $${position.entryPrice}, 
                                 Market Price: $${currentPrice.toFixed(2)}, 
                                 Unrealized P/L: $${unrealizedPL.toFixed(2)}
@@ -812,7 +816,7 @@
                 .catch(error => console.error('Error fetching current price:', error));
             }
         
-            function calculateUnrealizedPL(entryPrice, currentPrice, amount, positionType) {
+            function calculateUnrealizedPL(entryPrice, currentPrice, amount, leverage, positionType) {
                 let profitLoss = 0;
                 const priceDifference = (currentPrice - entryPrice) / entryPrice; // Percentage change
         
@@ -822,13 +826,19 @@
                     profitLoss = amount * (-priceDifference); // Short: profit when price goes down
                 }
         
-                return profitLoss;
+                return profitLoss * leverage;
             }
         
             // Place a long or short bet
             function placeBet(positionType) {
                 const betAmount = parseFloat(document.getElementById('bet-amount').value);
+                const leverage = parseFloat(document.getElementById('bet-leverage').value);
                 if (isNaN(betAmount) || betAmount <= 0) {
+                    alert('Please enter a valid bet amount.');
+                    return;
+                }
+
+                if (isNaN(leverage) || leverage < 1) {
                     alert('Please enter a valid bet amount.');
                     return;
                 }
@@ -853,7 +863,8 @@
                         body: JSON.stringify({
                             positionType: positionType === 'long' ? 'Long' : 'Short',
                             entryPrice: entryPrice,
-                            amount: betAmount
+                            amount: betAmount,
+                            leverage : leverage
                         })
                     })
                     .then(response => {

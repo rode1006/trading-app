@@ -135,14 +135,14 @@ async function fetchCurrentMarketPrice() {
 }
 
 app.post('/api/openPosition', authenticateToken, async (req, res) => {
-    const { positionType, amount } = req.body;
+    const { positionType, amount, leverage } = req.body;
     const username = req.user.username;
     const users = loadUsers();
     const user = users[username];
 
     if (!user) return res.status(404).send('User not found');
 
-    if (user.balance < amount) {
+    if (user.balance < amount * leverage) {
         return res.status(400).send('Insufficient balance');
     }
 
@@ -152,15 +152,15 @@ app.post('/api/openPosition', authenticateToken, async (req, res) => {
         return res.status(500).send('Error fetching market price');
     }
 
-    user.balance -= amount; // Deduct the amount from user's balance
+    user.balance -= amount * leverage; // Deduct the amount from user's balance
 
     const positionId = Date.now(); // Unique ID for the position (can be replaced with a more robust method)
     const position = {
         id: positionId,
         positionType,
-        entryPrice: currentMarketPrice,
         amount,
-        profitLoss: 0 // Initially, there's no profit or loss
+        leverage,
+        entryPrice: currentMarketPrice
     };
 
     // Initialize positions array if not exists
@@ -220,10 +220,10 @@ app.post('/api/closePosition', authenticateToken, async (req, res) => {
 
     // Calculate realized profit or loss
     const priceDiff = (currentMarketPrice - closedPosition.entryPrice) * (closedPosition.positionType === 'Long' ? 1 : -1);
-    const profitLoss = closedPosition.amount * (priceDiff/closedPosition.entryPrice);
+    const profitLoss = closedPosition.amount * closedPosition.leverage * (priceDiff/closedPosition.entryPrice);
 
     // Update balance
-    user.balance += closedPosition.amount + profitLoss; // Add the amount and profit/loss
+    user.balance += closedPosition.amount * closedPosition.leverage + profitLoss; // Add the amount and profit/loss
 
     // Log the closed position with realized P/L
     if (!user.closedPositions) {
