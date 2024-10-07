@@ -1,20 +1,107 @@
 {
   "dragon": {
     "password": "$2a$08$u8b8PfJA3KEtZUGdocEukuv1kZ1ukZfDUb.yR/yPW9WuLKzjg5RYu",
-    "virtualBalance": 99867.1284645715,
-    "balance": 99867.1284645715,
+    "virtualBalance": 100419.11033630869,
+    "balance": 100419.11033630869,
     "privateKey": "key124",
     "address": "0xfe4laffaw490s90df6934345ksf4drt6fgsefjli4c",
     "positions": [],
     "closedPositions": [
       {
-        "id": 1728326719578,
+        "id": 1728334895677,
+        "positionType": "Long",
+        "amount": 50000,
+        "leverage": 20,
+        "tp": 63020,
+        "sl": 62980,
+        "liquidation": 100,
+        "entryPrice": 63010.98,
+        "exitPrice": 63004.1,
+        "realizedPL": -109.18731941646767
+      },
+      {
+        "id": 1728335006813,
+        "positionType": "Long",
+        "amount": 50000,
+        "leverage": 20,
+        "tp": 63080,
+        "sl": 63030,
+        "liquidation": 300,
+        "entryPrice": 63059.96,
+        "exitPrice": 63095.14,
+        "realizedPL": 557.8817366836308
+      },
+      {
+        "id": 1728335325145,
         "positionType": "Long",
         "amount": 10000,
-        "leverage": 20,
-        "entryPrice": 63234.01,
-        "exitPrice": 63192,
-        "realizedPL": -132.8715354284887
+        "leverage": 50,
+        "tp": 63230,
+        "sl": 63180,
+        "liquidation": 300,
+        "entryPrice": 63233.99,
+        "exitPrice": 63233.99,
+        "realizedPL": 0
+      },
+      {
+        "id": 1728335294247,
+        "positionType": "Long",
+        "amount": 10000,
+        "leverage": 50,
+        "tp": 63250,
+        "sl": 63150,
+        "liquidation": 300,
+        "entryPrice": 63200,
+        "exitPrice": 63239.99,
+        "realizedPL": 316.3765822784649
+      },
+      {
+        "id": 1728335412808,
+        "positionType": "Long",
+        "amount": 10000,
+        "leverage": 50,
+        "tp": 63250,
+        "sl": 63200,
+        "liquidation": 300,
+        "entryPrice": 63206.87,
+        "exitPrice": 63196,
+        "realizedPL": -85.98748838538135
+      },
+      {
+        "id": 1728335469822,
+        "positionType": "Long",
+        "amount": 10000,
+        "leverage": 50,
+        "tp": 63220,
+        "sl": 63150,
+        "liquidation": 300,
+        "entryPrice": 63194.98,
+        "exitPrice": 63187.36,
+        "realizedPL": -60.289598952342565
+      },
+      {
+        "id": 1728335498622,
+        "positionType": "Long",
+        "amount": 10000,
+        "leverage": 50,
+        "tp": 63220,
+        "sl": 63150,
+        "liquidation": 300,
+        "entryPrice": 63199.99,
+        "exitPrice": 63187.37,
+        "realizedPL": -99.84178794961316
+      },
+      {
+        "id": 1728335510505,
+        "positionType": "Long",
+        "amount": 10000,
+        "leverage": 50,
+        "tp": 63220,
+        "sl": 63150,
+        "liquidation": 300,
+        "entryPrice": 63199.99,
+        "exitPrice": 63187.37,
+        "realizedPL": -99.84178794961316
       }
     ]
   }

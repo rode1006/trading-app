@@ -135,10 +135,12 @@ async function fetchCurrentMarketPrice() {
 }
 
 app.post('/api/openPosition', authenticateToken, async (req, res) => {
-    const { positionType, amount, leverage } = req.body;
+    const { positionType, amount, leverage, tp, sl, liquidation } = req.body;
     const username = req.user.username;
     const users = loadUsers();
     const user = users[username];
+
+    if(user.positions.length==5) return res.status(404).send('Orders limited to 5');
 
     if (!user) return res.status(404).send('User not found');
 
@@ -160,6 +162,9 @@ app.post('/api/openPosition', authenticateToken, async (req, res) => {
         positionType,
         amount,
         leverage,
+        tp,
+        sl,
+        liquidation,
         entryPrice: currentMarketPrice
     };
 
