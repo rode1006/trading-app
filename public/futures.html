@@ -838,7 +838,7 @@
                     return;
                 }
 
-                if (isNaN(leverage) || leverage < 1) {
+                if (isNaN(leverage) || leverage < 1 || leverage > 300) {
                     alert('Please enter a valid bet amount.');
                     return;
                 }
