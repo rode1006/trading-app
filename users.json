@@ -1,0 +1,108 @@
+{
+  "dragon": {
+    "password": "$2a$08$u8b8PfJA3KEtZUGdocEukuv1kZ1ukZfDUb.yR/yPW9WuLKzjg5RYu",
+    "balance": 100000,
+    "privateKey": "key124",
+    "address": "0xfe4laffaw490s90df6934345ksf4drt6fgsefjli4c",
+    "positions": [],
+    "closedPositions": [
+      {
+        "id": 1728293181343,
+        "positionType": "Short",
+        "entryPrice": 63241.97,
+        "amount": 10,
+        "profitLoss": 0,
+        "realizedPL": 24.87000000000262
+      },
+      {
+        "id": 1728293685374,
+        "positionType": "Short",
+        "entryPrice": 63222,
+        "amount": 15,
+        "profitLoss": 0,
+        "realizedPL": -5.989999999997963
+      },
+      {
+        "id": 1728293666353,
+        "positionType": "Long",
+        "entryPrice": 63205.99,
+        "amount": 15,
+        "profitLoss": 0,
+        "realizedPL": -30.700000000004366
+      },
+      {
+        "id": 1728293659168,
+        "positionType": "Short",
+        "entryPrice": 63208.82,
+        "amount": 15,
+        "profitLoss": 0,
+        "realizedPL": -27.30000000000291
+      },
+      {
+        "id": 1728293651698,
+        "positionType": "Long",
+        "entryPrice": 63200.01,
+        "amount": 15,
+        "profitLoss": 0,
+        "realizedPL": -27.669999999998254
+      },
+      {
+        "id": 1728294373131,
+        "positionType": "Short",
+        "entryPrice": 63200.37,
+        "amount": 100,
+        "profitLoss": 0,
+        "realizedPL": 370.63000000000466
+      },
+      {
+        "id": 1728299161933,
+        "positionType": "Short",
+        "entryPrice": 62812,
+        "amount": 100,
+        "profitLoss": 0,
+        "realizedPL": 156.98999999999796
+      }
+    ]
+  },
+  "tiger": {
+    "password": "$2a$08$zdyD3MCox47D0.9j.3t8AueQIXQrFzmygxD3/u.ru5oh5vCTs4Ahm",
+    "balance": 100109.61999999982,
+    "privateKey": "key119",
+    "address": "0xfselj498945kd9f497td67g5j4t9osfrjl8ef239fu",
+    "positions": [],
+    "closedPositions": [
+      {
+        "id": 1728302797236,
+        "positionType": "Short",
+        "entryPrice": 62963.24,
+        "amount": 100,
+        "profitLoss": 0,
+        "realizedPL": 13.5
+      },
+      {
+        "id": 1728302806423,
+        "positionType": "Long",
+        "entryPrice": 62947.4,
+        "amount": 100,
+        "profitLoss": 0,
+        "realizedPL": -8.589999999996508
+      },
+      {
+        "id": 1728306713657,
+        "positionType": "Short",
+        "entryPrice": 62960,
+        "amount": 10000,
+        "profitLoss": 0,
+        "realizedPL": 35.98999999999796
+      },
+      {
+        "id": 1728306784925,
+        "positionType": "Short",
+        "entryPrice": 62913.17,
+        "amount": 10000,
+        "profitLoss": 0,
+        "realizedPL": 4.849999999998545
+      }
+    ]
+  }
+}
