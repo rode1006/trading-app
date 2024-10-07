@@ -218,7 +218,8 @@ app.post('/api/closePosition', authenticateToken, async (req, res) => {
     }
 
     // Calculate realized profit or loss
-    const profitLoss = (currentMarketPrice - closedPosition.entryPrice) * (closedPosition.positionType === 'long' ? 1 : -1);
+    const priceDiff = (currentMarketPrice - closedPosition.entryPrice) * (closedPosition.positionType === 'Long' ? 1 : -1);
+    const profitLoss = closedPosition.amount * (priceDiff/closedPosition.entryPrice);
 
     // Update balance
     user.balance += closedPosition.amount + profitLoss; // Add the amount and profit/loss
@@ -229,6 +230,7 @@ app.post('/api/closePosition', authenticateToken, async (req, res) => {
     }
     user.closedPositions.push({
         ...closedPosition,
+        exitPrice: currentMarketPrice,
         realizedPL: profitLoss
     });
 
