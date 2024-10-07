@@ -1,64 +1,29 @@
 {
   "dragon": {
     "password": "$2a$08$u8b8PfJA3KEtZUGdocEukuv1kZ1ukZfDUb.yR/yPW9WuLKzjg5RYu",
-    "balance": 99978.96150034221,
+    "virtualBalance": 100007.14763574241,
+    "balance": 100007.14763574241,
     "privateKey": "key124",
     "address": "0xfe4laffaw490s90df6934345ksf4drt6fgsefjli4c",
     "positions": [],
     "closedPositions": [
       {
-        "id": 1728312524094,
+        "id": 1728314727554,
         "positionType": "Long",
-        "entryPrice": 64063.56,
-        "amount": 50000,
+        "entryPrice": 63704.56,
+        "amount": 20000,
         "profitLoss": 0,
-        "exitPrice": 64010.72,
-        "realizedPL": -41.240293233779475
+        "exitPrice": 63720.01,
+        "realizedPL": 4.850516195388326
       },
       {
-        "id": 1728312623143,
+        "id": 1728314750826,
         "positionType": "Short",
-        "entryPrice": 64058,
-        "amount": 50000,
-        "profitLoss": 0,
-        "exitPrice": 64024.01,
-        "realizedPL": 26.530644103779355
-      },
-      {
-        "id": 1728312782519,
-        "positionType": "Short",
-        "entryPrice": 64023.99,
+        "entryPrice": 63731.99,
         "amount": 20000,
         "profitLoss": 0,
-        "exitPrice": 63986.07,
-        "realizedPL": 11.845559765955935
-      },
-      {
-        "id": 1728312876177,
-        "positionType": "Short",
-        "entryPrice": 63990.72,
-        "amount": 20000,
-        "profitLoss": 0,
-        "exitPrice": 63968.57,
-        "realizedPL": 6.922878817428982
-      },
-      {
-        "id": 1728312775970,
-        "positionType": "Long",
-        "entryPrice": 64022,
-        "amount": 20000,
-        "profitLoss": 0,
-        "exitPrice": 63973.03,
-        "realizedPL": -15.297866358439649
-      },
-      {
-        "id": 1728312769964,
-        "positionType": "Long",
-        "entryPrice": 64003.77,
-        "amount": 20000,
-        "profitLoss": 0,
-        "exitPrice": 63972.41,
-        "realizedPL": -9.79942275275138
+        "exitPrice": 63724.67,
+        "realizedPL": 2.2971195470280183
       }
     ]
   }

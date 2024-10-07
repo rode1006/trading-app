@@ -60,6 +60,7 @@ app.post('/register', (req, res) => {
 
     users[username] = {
         password: hashedPassword,
+        virtualBalance: 100000,
         balance: 100000, // Initial balance (change if needed)
         privateKey: selectedKey.privateKey,
         address: selectedKey.address
@@ -255,7 +256,10 @@ app.post("/api/updatebalance", authenticateToken, (req, res) => {
     
     if (!user) return res.status(404).send('User not found');
 
-    user.balance = user.balance + parseFloat(req.body.unrealizepl); // Using user.balance directly
+    user.virtualBalance = user.balance + parseFloat(req.body.unrealizepl); // Using user.balance directly
     saveUsers(users);
-    res.json({ balance: user.balance });
+    res.json({ 
+        balance: user.balance ,
+        virtualBalance: user.virtualBalance
+    });
 });

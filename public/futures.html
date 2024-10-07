@@ -793,6 +793,18 @@
                         });
 
                         document.getElementById('balance').textContent = (balance + totalPositionAmount + totalUnrealizedPL).toFixed(2);
+
+                        fetch("/api/updatebalance", {
+                            method: "POST",
+                            headers: {
+                                'Authorization': 'Bearer ' + localStorage.getItem('token'),
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({unrealizepl: (totalPositionAmount + totalUnrealizedPL).toFixed(2)})
+                        })
+                        .then(response => response.json())
+                        .catch(error => console.error());
+
                     })
                     .catch(error => console.error('Error fetching positions:', error));
         
