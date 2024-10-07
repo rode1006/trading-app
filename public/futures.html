@@ -718,8 +718,6 @@
             <input type="number" id="bet-tp" style="width: 100px;font-size: 20px;">&nbsp;&nbsp;
             <label>SL:</label>
             <input type="number" id="bet-sl" style="width: 100px;font-size: 20px;">&nbsp;&nbsp;
-            <label>Liquidation Amount:</label>
-            <input type="number" id="bet-liquidation" style="width: 100px;font-size: 20px;">&nbsp;&nbsp;
             <button id="long-button" class="playbutttton" style="margin-top: 15px;">Long</button>&nbsp;&nbsp;
             <button id="short-button" class="playbutttton" style="margin-top: 15px;">Short</button>&nbsp;&nbsp;
             <div id="positions"></div>
@@ -778,48 +776,51 @@
                             const unrealizedPL = calculateUnrealizedPL(position.entryPrice, currentPrice, position.amount, position.leverage, position.positionType);
                             const positionDiv = document.createElement('div');
                             
-                            totalUnrealizedPL += unrealizedPL;
-                            totalPositionAmount += position.amount;
-
-                            if(Math.abs(unrealizedPL)>=position.liquidation){
-                                closePosition(position, 1);
-                            }
-                            else if(currentPrice > position.tp){
-                                closePosition(position, 2);
-                            }
-                            else if(currentPrice < position.sl){
+                            if(unrealizedPL<0 && Math.abs(unrealizedPL) > position.amount){
+                                totalUnrealizedPL -= position.amount
+                                totalPositionAmount += position.amount
                                 closePosition(position, 3);
+                            }else{
+                                totalUnrealizedPL += unrealizedPL;
+                                totalPositionAmount += position.amount;
+                                if(currentPrice > position.tp){
+                                    closePosition(position, 1);
+                                }
+                                else if(currentPrice < position.sl){
+                                    closePosition(position, 2);
+                                }
+                                else{
+                                    // Create close button
+                                    const closeButton = document.createElement('button');
+                                    closeButton.textContent = 'Close Position';
+                                    closeButton.onclick = () => closePosition(position, 0);
+                
+                                    // Display positionType, Amount, Entry, Market Price, and Unrealized P/L
+                                    positionDiv.textContent = `
+                                        ${position.positionType} - Amount: $${position.amount},
+                                        Leverage: ${position.leverage}X, 
+                                        TP: $${position.tp}, 
+                                        SL: $${position.sl}, 
+                                        Entry: $${position.entryPrice}, 
+                                        Market Price: $${currentPrice.toFixed(2)}, 
+                                        Unrealized P/L: $${unrealizedPL.toFixed(2)}
+                                    `;
+                                    positionDiv.appendChild(closeButton); // Add close button to position div
+                                    positionsDiv.appendChild(positionDiv);
+                                    // fetch("/api/updatebalance", {
+                                    //     method: "POST",
+                                    //     headers: {
+                                    //         'Authorization': 'Bearer ' + localStorage.getItem('token'),
+                                    //         'Content-Type': 'application/json'
+                                    //     },
+                                    //     body: JSON.stringify({unrealizepl: unrealizedPL.toFixed(2)})
+                                    // })
+                                    // .then(response => response.json())
+                                    // .catch(error => console.error());
+                                }
                             }
-                            else{
-                                // Create close button
-                                const closeButton = document.createElement('button');
-                                closeButton.textContent = 'Close Position';
-                                closeButton.onclick = () => closePosition(position, 0);
-            
-                                // Display positionType, Amount, Entry, Market Price, and Unrealized P/L
-                                positionDiv.textContent = `
-                                    ${position.positionType} - Amount: $${position.amount},
-                                    Leverage: ${position.leverage}X, 
-                                    TP: $${position.tp}, 
-                                    SL: $${position.sl}, 
-                                    Liquidation: $${position.liquidation}, 
-                                    Entry: $${position.entryPrice}, 
-                                    Market Price: $${currentPrice.toFixed(2)}, 
-                                    Unrealized P/L: $${unrealizedPL.toFixed(2)}
-                                `;
-                                positionDiv.appendChild(closeButton); // Add close button to position div
-                                positionsDiv.appendChild(positionDiv);
-                                // fetch("/api/updatebalance", {
-                                //     method: "POST",
-                                //     headers: {
-                                //         'Authorization': 'Bearer ' + localStorage.getItem('token'),
-                                //         'Content-Type': 'application/json'
-                                //     },
-                                //     body: JSON.stringify({unrealizepl: unrealizedPL.toFixed(2)})
-                                // })
-                                // .then(response => response.json())
-                                // .catch(error => console.error());
-                            }
+
+                            
                         });
 
                         document.getElementById('balance').textContent = (balance + totalPositionAmount + totalUnrealizedPL).toFixed(2);
@@ -861,7 +862,6 @@
                 const leverage = parseFloat(document.getElementById('bet-leverage').value);
                 const tp = parseFloat(document.getElementById('bet-tp').value);
                 const sl = parseFloat(document.getElementById('bet-sl').value);
-                const liquidation = parseFloat(document.getElementById('bet-liquidation').value);
 
                 if (isNaN(betAmount) || betAmount <= 0) {
                     alert('Please enter a valid bet amount.');
@@ -873,10 +873,6 @@
                 }
                 if(isNaN(tp))tp=10000000000;
                 if(isNaN(sl))sl=0;
-                if(isNaN(liquidation)){
-                    liquidation = betAmount;
-                    document.getElementById('bet-liquidation').value = liquidation;
-                }
         
                 // Fetch current market price before placing a bet
                 fetch('/api/getCurrentPrice', {
@@ -902,7 +898,6 @@
                             leverage : leverage,
                             tp:tp,
                             sl:sl,
-                            liquidation:liquidation
                         })
                     })
                     .then(response => {
@@ -954,13 +949,13 @@
                             alert('Position closed successfully by user.');
                             break;
                         case 1:
-                            alert('Position closed successfully by liquidation.');
-                            break;
-                        case 2:
                             alert('Position closed successfully by TP.');
                             break;
-                        case 3:
+                        case 2:
                             alert('Position closed successfully by SL.');
+                            break;
+                        case 3:
+                            alert('Position closed because you lost all money in the position.');
                             break;
                     }
                     
