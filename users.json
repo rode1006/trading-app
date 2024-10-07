@@ -1,38 +1,20 @@
 {
   "dragon": {
     "password": "$2a$08$u8b8PfJA3KEtZUGdocEukuv1kZ1ukZfDUb.yR/yPW9WuLKzjg5RYu",
-    "virtualBalance": 99988.7231277962,
-    "balance": 99988.7231277962,
+    "virtualBalance": 99867.1284645715,
+    "balance": 99867.1284645715,
     "privateKey": "key124",
     "address": "0xfe4laffaw490s90df6934345ksf4drt6fgsefjli4c",
     "positions": [],
     "closedPositions": [
       {
-        "id": 1728323956824,
+        "id": 1728326719578,
         "positionType": "Long",
-        "amount": 500,
+        "amount": 10000,
         "leverage": 20,
-        "entryPrice": 63759.99,
-        "exitPrice": 63799.99,
-        "realizedPL": 6.273526705383737
-      },
-      {
-        "id": 1728324056516,
-        "positionType": "Long",
-        "amount": 6000,
-        "leverage": 10,
-        "entryPrice": 63817.39,
-        "exitPrice": 63804.01,
-        "realizedPL": -12.579643260243687
-      },
-      {
-        "id": 1728324350976,
-        "positionType": "Long",
-        "amount": 10,
-        "leverage": 5000,
-        "entryPrice": 63773,
-        "exitPrice": 63766.66,
-        "realizedPL": -4.970755648939605
+        "entryPrice": 63234.01,
+        "exitPrice": 63192,
+        "realizedPL": -132.8715354284887
       }
     ]
   }

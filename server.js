@@ -142,7 +142,7 @@ app.post('/api/openPosition', authenticateToken, async (req, res) => {
 
     if (!user) return res.status(404).send('User not found');
 
-    if (user.balance < amount * leverage) {
+    if (user.balance < amount) {
         return res.status(400).send('Insufficient balance');
     }
 
@@ -152,7 +152,7 @@ app.post('/api/openPosition', authenticateToken, async (req, res) => {
         return res.status(500).send('Error fetching market price');
     }
 
-    user.balance -= amount * leverage; // Deduct the amount from user's balance
+    user.balance -= amount; // Deduct the amount from user's balance
 
     const positionId = Date.now(); // Unique ID for the position (can be replaced with a more robust method)
     const position = {
@@ -223,7 +223,7 @@ app.post('/api/closePosition', authenticateToken, async (req, res) => {
     const profitLoss = closedPosition.amount * closedPosition.leverage * (priceDiff/closedPosition.entryPrice);
 
     // Update balance
-    user.balance += closedPosition.amount * closedPosition.leverage + profitLoss; // Add the amount and profit/loss
+    user.balance += closedPosition.amount + profitLoss; // Add the amount and profit/loss
 
     // Log the closed position with realized P/L
     if (!user.closedPositions) {
