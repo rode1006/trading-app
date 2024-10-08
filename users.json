@@ -1,11 +1,36 @@
 {
   "tiger": {
     "password": "$2a$08$Rm9OIRElCg9.I8kmCef4J.U1WzikKfxeAsbkNzSu/H0hpf5G37f/m",
-    "virtualBalance": 100169.5018640623,
-    "balance": 100169.5018640623,
+    "virtualBalance": 100106.9318640623,
+    "balance": 95169.5018640623,
     "privateKey": "key116",
     "address": "0xfe4laffaw490s90df6934345ksf4drt6fgsefjli4c",
-    "positions": [],
+    "positions": [
+      {
+        "id": 1728402827381,
+        "positionType": "Long",
+        "orderType": "market",
+        "orderLimit": 0,
+        "amount": 5000,
+        "leverage": 10,
+        "tp": 100000000,
+        "sl": 0,
+        "limitPrice": 0,
+        "entryPrice": 62338
+      },
+      {
+        "id": 1728402873312,
+        "positionType": "Long",
+        "orderType": "limit",
+        "orderLimit": 1,
+        "amount": 6000,
+        "leverage": 10,
+        "tp": 100000000,
+        "sl": 0,
+        "limitPrice": 62400,
+        "entryPrice": 62366.85
+      }
+    ],
     "closedPositions": [
       {
         "id": 1728398596779,

@@ -790,7 +790,8 @@
                             let positionDiv = document.createElement('div');
                             
                             if(position.orderLimit==1){
-                                if(position.limitPrice==currentPrice){
+                                let startTrading = 0;
+                                if(((position.entryPrice<position.limitPrice)&&(position.limitPrice<currentPrice))||((position.entryPrice>position.limitPrice)&&(position.limitPrice>currentPrice))){
                                     fetch('/api/startTrade', {
                                         method: 'POST',
                                         headers: {
