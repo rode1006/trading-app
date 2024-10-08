@@ -1648,7 +1648,7 @@
                             tpInput.id = "tp" + position.id;
                             tpInput.style.width = "80px";
                             if (position.tp > 0 && position.tp < 10000000)
-                              tpInput.textContent = position.tp;
+                              tpInput.value = position.tp;
                             positionDiv.appendChild(tpInput);
 
                             const slLabel = document.createElement("label");
@@ -1660,7 +1660,7 @@
                             slInput.id = "sl" + position.id;
                             slInput.style.width = "80px";
                             if (position.sl > 0 && position.sl < 10000000)
-                              slInput.textContent = position.sl;
+                              slInput.value = position.sl;
                             positionDiv.appendChild(slInput);
 
                             const saveButton = document.createElement("button");
