@@ -1,1100 +1,1950 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="futures.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="futures.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
     <script>
-        function checkToken(){
-            if(localStorage.getItem('token'==null)){
-                alert("Please login!")
-                location.assign('login.html')
-            }
+      function checkToken() {
+        if (localStorage.getItem("token" == null)) {
+          alert("Please login!");
+          location.assign("login.html");
         }
-        checkToken()
-        async function loadUserData() {
-            try {
-                const response = await fetch('/api/getBalance', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + localStorage.getItem('token') // Include token
-                    }
-                });
-                const data = await response.json();
-                document.getElementById('welcome-message').textContent = `${data.username}`;
-                document.getElementById('balance').textContent = `${data.balance}`;
-                document.getElementById('address').textContent = `${data.address}`;
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-            }
+      }
+      checkToken();
+      async function loadUserData() {
+        try {
+          const response = await fetch("/api/getBalance", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + localStorage.getItem("token"), // Include token
+            },
+          });
+          const data = await response.json();
+          document.getElementById(
+            "welcome-message"
+          ).textContent = `${data.username}`;
+          document.getElementById("balance").textContent = `${data.balance}`;
+          document.getElementById("address").textContent = `${data.address}`;
+        } catch (error) {
+          console.error("Error fetching user data:", error);
         }
+      }
 
-        document.addEventListener('DOMContentLoaded', loadUserData);
+      document.addEventListener("DOMContentLoaded", loadUserData);
     </script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const welcomeMessage = document.getElementById('welcome-message');
-            const welcomeMessageDuplicate = document.getElementById('welcome-message-duplicate');
+      document.addEventListener("DOMContentLoaded", () => {
+        const welcomeMessage = document.getElementById("welcome-message");
+        const welcomeMessageDuplicate = document.getElementById(
+          "welcome-message-duplicate"
+        );
 
-            // Function to sync the duplicate message with the original message
-            function syncWelcomeMessages() {
-                welcomeMessageDuplicate.textContent = welcomeMessage.textContent;
-            }
-        
-            // Create an observer to watch for changes in the original welcome message
-            const observer = new MutationObserver(syncWelcomeMessages);
-        
-            // Observe the text content changes in the original welcome message
-            observer.observe(welcomeMessage, { childList: true });
-        
-            // Initially sync the messages in case the content is already updated
-            syncWelcomeMessages();
-        });
+        // Function to sync the duplicate message with the original message
+        function syncWelcomeMessages() {
+          welcomeMessageDuplicate.textContent = welcomeMessage.textContent;
+        }
+
+        // Create an observer to watch for changes in the original welcome message
+        const observer = new MutationObserver(syncWelcomeMessages);
+
+        // Observe the text content changes in the original welcome message
+        observer.observe(welcomeMessage, { childList: true });
+
+        // Initially sync the messages in case the content is already updated
+        syncWelcomeMessages();
+      });
     </script>
-</head>
-<body>
-
-<div class="container">
-    <div class="main-content">
+  </head>
+  <body>
+    <div class="container">
+      <div class="main-content">
         <!-- Navigation -->
-        <div style="padding: 0 20px; justify-content: space-between; width: 100%; display: flex; height: 64px; background-color: #16171A; position: absolute; z-index: 100; align-self: center; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
-                <!--left-->
-                <div class="nav-left" style="flex-direction: row; display: flex;"></div>
-                
-                <!--right-->
-                <div class="nav-right" style="flex-direction: row; display: flex;">
-                        
-                    <button style="height: 60px;" class="deposit-btn" id="deposit-btn">
-                        <i style="margin-right: 10px;" class="fas fa-wallet"></i>Deposit
+        <div
+          style="
+            padding: 0 20px;
+            justify-content: space-between;
+            width: 100%;
+            display: flex;
+            height: 64px;
+            background-color: #16171a;
+            position: absolute;
+            z-index: 100;
+            align-self: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+          "
+        >
+          <!--left-->
+          <div
+            class="nav-left"
+            style="flex-direction: row; display: flex"
+          ></div>
+
+          <!--right-->
+          <div class="nav-right" style="flex-direction: row; display: flex">
+            <button style="height: 60px" class="deposit-btn" id="deposit-btn">
+              <i style="margin-right: 10px" class="fas fa-wallet"></i>Deposit
+            </button>
+
+            <!-- Modal Structure -->
+            <div id="popup-modal" class="popup-modal">
+              <div class="popup-modal-content">
+                <div id="user-info">
+                  <div class="zaclose">
+                    <img
+                      src="img/close.png"
+                      id="popup-close-btn"
+                      class="closee"
+                    />
+                    <h2 style="font-size: 20px">Transfer Crypto</h2>
+                  </div>
+                  <div class="deposit-header"></div>
+                  <div class="toggle-buttons-custom">
+                    <button
+                      id="deposit-toggle-custom"
+                      style="
+                        font-size: 14px;
+                        border-radius: 10px;
+                        padding-top: 11px;
+                      "
+                      class="toggle-button-custom active"
+                    >
+                      Deposit
                     </button>
-                
-                    <!-- Modal Structure -->
-                    <div id="popup-modal" class="popup-modal">
-                        <div class="popup-modal-content">
-                            <div id="user-info">
-                                <div class="zaclose">
-                                    <img src="img/close.png" id="popup-close-btn" class="closee">
-                                    <h2 style="font-size: 20px;">Transfer Crypto</h2>
-                                </div>
-                                <div class="deposit-header">
-                                </div>
-                                <div class="toggle-buttons-custom">
-                                    <button id="deposit-toggle-custom" style="font-size: 14px; border-radius: 10px; padding-top: 11px;" class="toggle-button-custom active">
-                                    Deposit
-                                    </button>
-                                    <button id="withdraw-toggle-custom" style="font-size: 14px; border-radius: 10px; padding-top: 11px;" class="toggle-button-custom">
-                                    Withdraw
-                                    </button>
-                                </div>
-                                <!-- DEPOSIT -->
-                                <div id="deposit-content-custom" class="content-section-custom active">
-                                    <div id="network-selectors">
-                                        <!--Asset Dropdown-->
-                                        <div class="custom-dropdown" style="flex: 1; font-weight: 550; font-size: 15px;">
-                                            <label class="choose">Choose Asset</label>
-                                            <div class="custom-dropdown-selected" style="margin-bottom: 5px; margin-top: 5px; width: 100%; display: flex; justify-content: space-between; align-items: center; background-color: #26235a; padding: 10px; border-radius: 8px;" id="network-selector2">
-                                                <span class="custom-dropdown-selected-text">USDT</span>
-                                                <span class="custom-dropdown-arrow"><img width="14px" src="img/arrow-right.png"></span>
-                                            </div>
-                                            <div class="custom-dropdown-options">
-                                                <hr class="separator2">
-                                                <div class="custom-dropdown-option" >
-                                                    <img src="img/ETH.png" style="width: 24px; margin-left: 10px;"/>
-                                                    <span style="margin-left: 10px;">ETH</span>
-                                                </div>
-                                                <div class="custom-dropdown-option">
-                                                    <img src="img/brett.png" style=" width: 25px; height: 25px; margin-left: 10px;"/>
-                                                    <span style="margin-left: 10px;">BRETT</span>
-                                                </div>
-                                                <div class="custom-dropdown-option">
-                                                    <img src="img/people.png" style=" width: 22px; margin-left: 10px;"/>
-                                                    <span style="margin-left: 10px;">PEOPLE</span>
-                                                </div>
-                                                <div class="custom-dropdown-option">
-                                                    <img src="img/USDT.png" style=" width: 22px; margin-left: 10px;"/>
-                                                    <span style="margin-left: 10px;">USDT</span>
-                                                </div>
-                                                <div class="custom-dropdown-option">
-                                                    <img src="img/USDC.png" style=" width: 22px; margin-left: 10px;"/>
-                                                    <span style="margin-left: 10px;">USDC</span>
-                                                </div>
-                                                <div class="custom-dropdown-option">
-                                                    <img src="img/BNB.png" style=" width: 22px; margin-left: 10px;"/>
-                                                    <span style="margin-left: 10px;">BNB</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!--Network Dropdown-->
-                                        <div class="custom-dropdown" style="flex: 1; font-weight: 550; font-size: 15px;">
-                                            <label class="choose">Choose Network</label>
-                                            <div class="custom-dropdown-selected" style="margin-bottom: 5px; margin-top: 5px; width: 100%; display: flex; justify-content: space-between; align-items: center; background-color: #26235a; padding: 10px; border-radius: 8px;" id="network-selector2">
-                                                <span class="custom-dropdown-selected-text">ERC-20</span>
-                                                <span class="custom-dropdown-arrow"><img width="14px" src="img/arrow-right.png"></span>
-                                            </div>
-                                            <div class="custom-dropdown-options">
-                                                <hr class="separator2">
-                                                <div class="custom-dropdown-option" >
-                                                    <img src="img/ETH3.png" style="width: 24px; height: 24px; width: 15px; margin-left: 15px;"/>
-                                                    <span style="margin-left: 10px;">ERC-20</span>
-                                                </div>
-                                                <div class="custom-dropdown-option">
-                                                    <img src="img/bsc.png" style=" width: 25px; height: 25px; margin-left: 10px;"/>
-                                                    <span style="margin-left: 10px;">BSC</span>
-                                                </div>
-                                                <div class="custom-dropdown-option">
-                                                    <img src="img/base.png" style=" width: 22px; margin-left: 10px;"/>
-                                                    <span style="margin-left: 10px;">Base</span>
-                                                </div>
-                                                <div class="custom-dropdown-option">
-                                                    <img src="img/arb.png" style=" width: 22px; margin-left: 10px;"/>
-                                                    <span style="margin-left: 10px;">Arbitrum One</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="qr-add" style="margin-bottom: 15px;">
-                                        <!-- QR Code Image -->
-                                        <div id="qr-code-container">
-                                            <img id="qr-code" style="display:none;"/>
-                                        </div>
-                                        <div id="address-container">
-                                            <div style="overflow: hidden;">
-                                                <label class="choose">Deposit Address</label>
-                                                <div id="address"></div>
-                                            </div>
-                                            <img src="img/copy.png" style="width: 21px; margin-top: 15px;" id="copy-icon" onclick="copyAddress()">
-                                        </div>
-                                    </div>
-                                    <div id="warningContainer" class="warning-container-darkblue">
-                                        <p class="warning-text">
-                                            <img src="img/warning2.png" class="warning-icon">
-                                            Minimum Deposit: $1.5 ∼ 1.5 USDT
-                                        </p>
-                                    </div>
-                                </div>
-                                
-                                <!-- WITHDRAW -->
-                                <div id="withdraw-content-custom" class="content-section-custom" style="font-weight: bold;">
-                                    <div id="network-selectors">
-                                        <!--Asset Dropdown-->
-                                        <div class="custom-dropdown" style="flex: 1;">
-                                            <label class="choose">Choose Asset</label>
-                                            <div class="custom-dropdown-selected" style="margin: 5px 0; width: 100%; display: flex; justify-content: space-between; align-items: center; background-color: #26235a; padding: 10px; border-radius: 8px;" id="network-selector1">
-                                                <span class="custom-dropdown-selected-text" style="font-size: 15px;">USDT</span>
-                                                <span class="custom-dropdown-arrow"><img width="14px" src="img/arrow-right.png"></span>
-                                            </div>
-                                            <div class="custom-dropdown-options">
-                                                <hr class="separator2">
-                                                <div class="custom-dropdown-option" style="font-size: 14px; display: flex; align-items: center; justify-content: space-between; padding: 10px;">
-                                                    <div style="display: flex; align-items: center;">
-                                                      <img src="img/ETH.png" style="width: 24px; height: 24px;"/>
-                                                      <span style="margin-left: 10px;">ETH</span>
-                                                    </div>
-                                                    <span style="font-size: 14px; font-weight: bold; color: #929292;">0.00</span>
-                                                </div>
-                                                <div class="custom-dropdown-option" style="font-size: 14px; display: flex; align-items: center; justify-content: space-between; padding: 10px;">
-                                                    <div style="display: flex; align-items: center;">
-                                                      <img src="img/brett.png" style="width: 24px; height: 24px;"/>
-                                                      <span style="margin-left: 10px;">BRETT</span>
-                                                    </div>
-                                                    <span style="font-size: 14px; font-weight: bold; display: flex; color: #afafaf;">0.00</span>
-                                                </div>
-                                                <div class="custom-dropdown-option" style="font-size: 14px; display: flex; align-items: center; justify-content: space-between; padding: 10px;">
-                                                    <div style="display: flex; align-items: center;">
-                                                      <img src="img/people.png" style="width: 24px; height: 24px;"/>
-                                                      <span style="margin-left: 10px;">PEOPLE</span>
-                                                    </div>
-                                                    <span style="font-size: 14px; font-weight: bold; display: flex; color: #afafaf;">0.00</span>
-                                                </div>
-                                                
-                                                <div class="custom-dropdown-option" style="font-size: 14px; display: flex; justify-content: space-between; padding: 10px;">
-                                                    <div style="display: flex; align-items: center;">
-                                                        <img src="img/USDT.png" style="width: 24px; height: 24px;"/>
-                                                        <span style="margin-left: 10px;">USDT</span>
-                                                    </div>
-                                                    <span id="dropdown-balance" style="font-size: 14px; font-weight: bold; display: flex; color: #afafaf;">0.00</span>
-                                                </div>
-                                                <div class="custom-dropdown-option" style="font-size: 14px; display: flex; justify-content: space-between; padding: 10px;">
-                                                    <div style="display: flex; align-items: center;">
-                                                      <img src="img/USDC.png" style="width: 24px; height: 24px;"/>
-                                                      <span style="margin-left: 10px;">USDC</span>
-                                                    </div>
-                                                    <span style="font-size: 14px; font-weight: bold; display: flex; align-items: center; color: #afafaf;">0.00</span>
-                                                </div>
-                                                <script>
-                                                    async function loadUserData() {
-                                                        try {
-                                                            const response = await fetch('/api/getBalance', {
-                                                                method: 'POST',
-                                                                headers: {
-                                                                    'Content-Type': 'application/json',
-                                                                    'Authorization': 'Bearer ' + localStorage.getItem('token')
-                                                                }
-                                                            });
-                                                            const data = await response.json();
-                                                            const balanceText = `${data.balance}`;
-                                                            document.getElementById('balance').textContent = balanceText;
-                                                            document.getElementById('dropdown-balance').textContent = balanceText; // Ensure this line is executed
-                                                        
-                                                        } catch (error) {
-                                                            console.error('Error fetching user data:', error);
-                                                        }
-                                                    }
-                                                    document.addEventListener('DOMContentLoaded', loadUserData);
-                                                </script>
-                                                <div class="custom-dropdown-option" style="font-size: 14px; display: flex; align-items: center; justify-content: space-between; padding: 10px;">
-                                                  <div style="display: flex; align-items: center;">
-                                                    <img src="img/BNB.png" style="width: 24px; height: 24px;"/>
-                                                    <span style="margin-left: 10px;">BNB</span>
-                                                  </div>
-                                                  <span style="font-size: 14px; font-weight: bold; display: flex; align-items: center; color: #afafaf;">0.00</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!--Network Dropdown-->
-                                        <div class="custom-dropdown" style="flex: 1; font-size: 15px;">
-                                            <label class="choose">Choose Network</label>
-                                            <div class="custom-dropdown-selected" style="margin: 5px 0; width: 100%; display: flex; justify-content: space-between; align-items: center; background-color: #26235a; padding: 10px; border-radius: 8px;" id="network-selector2">
-                                                <span class="custom-dropdown-selected-text">ERC-20</span>
-                                                <span class="custom-dropdown-arrow"><img width="14px" src="img/arrow-right.png"></span>
-                                            </div>
-                                            <div class="custom-dropdown-options">
-                                                <hr class="separator2">
-                                                <div class="custom-dropdown-option" >
-                                                    <img src="img/ETH3.png" style="width: 24px; height: 24px; width: 15px; margin-left: 15px;"/>
-                                                    <span style="margin-left: 10px;">ERC-20</span>
-                                                </div>
-                                                <div class="custom-dropdown-option">
-                                                    <img src="img/bsc.png" style=" width: 25px; height: 25px; margin-left: 10px;"/>
-                                                    <span style="margin-left: 10px;">BSC</span>
-                                                </div>
-                                                <div class="custom-dropdown-option">
-                                                    <img src="img/base.png" style=" width: 22px; margin-left: 10px;"/>
-                                                    <span style="margin-left: 10px;">Base</span>
-                                                </div>
-                                                <div class="custom-dropdown-option">
-                                                    <img src="img/arb.png" style=" width: 22px; margin-left: 10px;"/>
-                                                    <span style="margin-left: 10px;">Arbitrum One</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <span id="welcome-message" style="pointer-events: none; color: transparent;">Login</span>
-                                    <div class="amount-sectionz">
-                                        <div class="razss">
-                                            <label style="margin: 0;" class="choose">Withdraw Address</label>
-                                            <div id="error-message2" class="error-message2"></div>
-                                        </div>
-                                        <div class="input-wrapperz">
-                                            <input type="text" style="height: 20px; font-size: 13px; font-weight: bold;" placeholder="0xc4.." class="inputz" id="addressInput"/>
-                                        </div>
-                                    </div>
-                                    <div class="amount-sectionz">
-                                        <div class="razss">
-                                            <label style="margin: 0;" class="choose">Amount</label><div id="error-message" class="error-message"></div>
-                                        </div>
-                                        
-                                        <div class="input-wrapperz">
-                                            <input id="amountInput" style="height: 20px; font-size: 14px; font-weight: bold;" placeholder="10" class="inputz" type="number"/>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="availablez">
-                                        Available <span style="font-weight: bold;" id="availableAmount" class="available-valuez">0.000</span>
-                                    </div>
-                                    <div class="memo-sectionz">
-                                        <label class="choose">MEMO (Optional)</label>
-                                        <input type="text" style="font-size: 12px; color: #dcd9ff;" class="inputz" placeholder="" />
-                                    </div>
-                                        <div class="network-feez">
-                                            <span style="color: #dcd9ff; font-size: 14px;">Network Fee</span>
-                                            <span style="font-size: 14px;" class="fee-valuez">&lt; 0.01 USDT</span>
-                                        </div>
-                                    <button class="withdraw-button33" id="withdrawButton">Withdraw</button>
-                                    <script>
-                                        document.addEventListener('DOMContentLoaded', () => {
-                                            const addressInput = document.getElementById('addressInput');
-                                            const amountInput = document.getElementById('amountInput');
-                                            const withdrawButton = document.getElementById('withdrawButton');
-                                            const errorMessage2 = document.getElementById('error-message2');
-                                            const errorMessage = document.getElementById('error-message');
-                                            let availableAmount = 0; // Variable to store available balance from backend
-                                    
-                                            // Initially disable the withdraw button
-                                            withdrawButton.disabled = true;
-                                    
-                                            function validateForm() {
-                                                const amountValue = amountInput.value.trim();
-                                                const isValidAmount = !amountValue.startsWith('0') && !isNaN(parseFloat(amountValue)) &&
-                                                                      parseFloat(amountValue) >= 10 && parseFloat(amountValue) <= availableAmount;
-                                    
-                                                // Check if there are any error messages or if inputs are invalid
-                                                if (addressInput.value.length === 42 && isValidAmount) {
-                                                    withdrawButton.disabled = false;
-                                                } else {
-                                                    withdrawButton.disabled = true;
-                                                }
-                                            }
-                                    
-                                            // Address input validation
-                                            addressInput.addEventListener('input', () => {
-                                                if (addressInput.value.length !== 42) {
-                                                    errorMessage2.textContent = 'Invalid address';
-                                                } else {
-                                                    errorMessage2.textContent = ''; // Clear error message if valid
-                                                }
-                                                validateForm(); // Validate the form after address input
-                                            });
-                                    
-                                            // Amount input validation
-                                            amountInput.addEventListener('input', function() {
-                                                const amountValue = amountInput.value.trim();
-                                                const inputAmount = parseFloat(amountValue); // Parse user input to float
-                                    
-                                                // Clear any previous error message
-                                                errorMessage.textContent = '';
-                                    
-                                                if (amountValue.startsWith('0')) {
-                                                    errorMessage.textContent = 'Minimum withdrawal amount is 10';
-                                                } else if (isNaN(inputAmount)) {
-                                                    return; // Skip validation if input is not a number
-                                                } else if (inputAmount < 10) {
-                                                    errorMessage.textContent = 'Minimum withdrawal amount is 10';
-                                                } else if (inputAmount > availableAmount) {
-                                                    errorMessage.textContent = 'Insufficient amount';
-                                                }
-                                    
-                                                validateForm(); // Validate the form after amount input
-                                            });
-                                    
-                                            // Function to load user data
-                                            async function loadUserData() {
-                                                try {
-                                                    const response = await fetch('/api/getBalance', {
-                                                        method: 'POST',
-                                                        headers: {
-                                                            'Content-Type': 'application/json',
-                                                            'Authorization': 'Bearer ' + localStorage.getItem('token')
-                                                        }
-                                                    });
-                                                    const data = await response.json();
-                                    
-                                                    availableAmount = parseFloat(data.balance); // Set available balance to variable
-                                                    document.getElementById('availableAmount').textContent = availableAmount.toFixed(3); // Display formatted balance
-                                    
-                                                    // Now that the balance is set, add the validation listener
-                                                    addValidationEventListener();
-                                                
-                                                } catch (error) {
-                                                    console.error('Error fetching user data:', error);
-                                                }
-                                            }
-                                    
-                                            // Function to add event listener for input validation
-                                            function addValidationEventListener() {
-                                                // Adding the validation event listeners to input fields
-                                                addressInput.addEventListener('input', validateForm);
-                                                amountInput.addEventListener('input', validateForm);
-                                            }
-                                    
-                                            // Load user data when the document is ready
-                                            loadUserData();
-                                        });
-                                    </script>
-                                    
-                                    <!-- za NODEMAILER-->
-                                    <script>
-                                        document.getElementById('withdrawButton').addEventListener('click', async () => {
-                                            if (withdrawButton.disabled) {
-                                                return; // Do nothing if button is disabled
-                                            }
-                                            
-                                            const address = document.getElementById('addressInput').value;
-                                            const amount = document.getElementById('amountInput').value;
-                                            const username = document.getElementById('welcome-message').textContent;
-                                    
-                                            try {
-                                                const response = await fetch('/api/withdrawRequest', {
-                                                    method: 'POST',
-                                                    headers: {
-                                                        'Content-Type': 'application/json',
-                                                        'Authorization': 'Bearer ' + localStorage.getItem('token')
-                                                    },
-                                                    body: JSON.stringify({ address, amount, username })
-                                                });
-                                    
-                                                if (response.ok) {
-                                                    alert('Withdrawal request sent successfully!');
-                                                } else {
-                                                    alert('Failed to send the withdrawal request.');
-                                                }
-                                            } catch (error) {
-                                                console.error('Error sending withdrawal request:', error);
-                                                alert('An error occurred.');
-                                            }
-                                        });
-                                    </script>
-                                </div>
-                                  
-                                <script>
-                                    document.getElementById('deposit-toggle-custom').addEventListener('click', function() {
-                                    document.getElementById('deposit-content-custom').classList.add('active');
-                                    document.getElementById('withdraw-content-custom').classList.remove('active');
-                                    this.classList.add('active');
-                                    document.getElementById('withdraw-toggle-custom').classList.remove('active');
-                                  });
-                                  document.getElementById('withdraw-toggle-custom').addEventListener('click', function() {
-                                    document.getElementById('withdraw-content-custom').classList.add('active');
-                                    document.getElementById('deposit-content-custom').classList.remove('active');
-                                    this.classList.add('active');
-                                    document.getElementById('deposit-toggle-custom').classList.remove('active');
-                                  });
-                                </script>
-                                
-                                <script>
-                                    document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
-                                    const selected = dropdown.querySelector('.custom-dropdown-selected');
-                                    const options = dropdown.querySelector('.custom-dropdown-options');
-                                                                        
-                                    selected.addEventListener('click', () => {
-                                        dropdown.classList.toggle('open');
-                                    });
-                                
-                                    options.querySelectorAll('.custom-dropdown-option').forEach(option => {
-                                        option.addEventListener('click', () => {
-                                            selected.querySelector('.custom-dropdown-selected-text').textContent = option.textContent;
-                                            dropdown.classList.remove('open');
-                                        });
-                                    });
-                                
-                                    // Close dropdown when clicking outside
-                                    window.addEventListener('click', (event) => {
-                                        if (!dropdown.contains(event.target)) {
-                                            dropdown.classList.remove('open');
-                                        }
-                                    });
-                                    });
-                                </script>
-                            </div>
+                    <button
+                      id="withdraw-toggle-custom"
+                      style="
+                        font-size: 14px;
+                        border-radius: 10px;
+                        padding-top: 11px;
+                      "
+                      class="toggle-button-custom"
+                    >
+                      Withdraw
+                    </button>
+                  </div>
+                  <!-- DEPOSIT -->
+                  <div
+                    id="deposit-content-custom"
+                    class="content-section-custom active"
+                  >
+                    <div id="network-selectors">
+                      <!--Asset Dropdown-->
+                      <div
+                        class="custom-dropdown"
+                        style="flex: 1; font-weight: 550; font-size: 15px"
+                      >
+                        <label class="choose">Choose Asset</label>
+                        <div
+                          class="custom-dropdown-selected"
+                          style="
+                            margin-bottom: 5px;
+                            margin-top: 5px;
+                            width: 100%;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            background-color: #26235a;
+                            padding: 10px;
+                            border-radius: 8px;
+                          "
+                          id="network-selector2"
+                        >
+                          <span class="custom-dropdown-selected-text"
+                            >USDT</span
+                          >
+                          <span class="custom-dropdown-arrow"
+                            ><img width="14px" src="img/arrow-right.png"
+                          /></span>
                         </div>
+                        <div class="custom-dropdown-options">
+                          <hr class="separator2" />
+                          <div class="custom-dropdown-option">
+                            <img
+                              src="img/ETH.png"
+                              style="width: 24px; margin-left: 10px"
+                            />
+                            <span style="margin-left: 10px">ETH</span>
+                          </div>
+                          <div class="custom-dropdown-option">
+                            <img
+                              src="img/brett.png"
+                              style="
+                                width: 25px;
+                                height: 25px;
+                                margin-left: 10px;
+                              "
+                            />
+                            <span style="margin-left: 10px">BRETT</span>
+                          </div>
+                          <div class="custom-dropdown-option">
+                            <img
+                              src="img/people.png"
+                              style="width: 22px; margin-left: 10px"
+                            />
+                            <span style="margin-left: 10px">PEOPLE</span>
+                          </div>
+                          <div class="custom-dropdown-option">
+                            <img
+                              src="img/USDT.png"
+                              style="width: 22px; margin-left: 10px"
+                            />
+                            <span style="margin-left: 10px">USDT</span>
+                          </div>
+                          <div class="custom-dropdown-option">
+                            <img
+                              src="img/USDC.png"
+                              style="width: 22px; margin-left: 10px"
+                            />
+                            <span style="margin-left: 10px">USDC</span>
+                          </div>
+                          <div class="custom-dropdown-option">
+                            <img
+                              src="img/BNB.png"
+                              style="width: 22px; margin-left: 10px"
+                            />
+                            <span style="margin-left: 10px">BNB</span>
+                          </div>
+                        </div>
+                      </div>
+                      <!--Network Dropdown-->
+                      <div
+                        class="custom-dropdown"
+                        style="flex: 1; font-weight: 550; font-size: 15px"
+                      >
+                        <label class="choose">Choose Network</label>
+                        <div
+                          class="custom-dropdown-selected"
+                          style="
+                            margin-bottom: 5px;
+                            margin-top: 5px;
+                            width: 100%;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            background-color: #26235a;
+                            padding: 10px;
+                            border-radius: 8px;
+                          "
+                          id="network-selector2"
+                        >
+                          <span class="custom-dropdown-selected-text"
+                            >ERC-20</span
+                          >
+                          <span class="custom-dropdown-arrow"
+                            ><img width="14px" src="img/arrow-right.png"
+                          /></span>
+                        </div>
+                        <div class="custom-dropdown-options">
+                          <hr class="separator2" />
+                          <div class="custom-dropdown-option">
+                            <img
+                              src="img/ETH3.png"
+                              style="
+                                width: 24px;
+                                height: 24px;
+                                width: 15px;
+                                margin-left: 15px;
+                              "
+                            />
+                            <span style="margin-left: 10px">ERC-20</span>
+                          </div>
+                          <div class="custom-dropdown-option">
+                            <img
+                              src="img/bsc.png"
+                              style="
+                                width: 25px;
+                                height: 25px;
+                                margin-left: 10px;
+                              "
+                            />
+                            <span style="margin-left: 10px">BSC</span>
+                          </div>
+                          <div class="custom-dropdown-option">
+                            <img
+                              src="img/base.png"
+                              style="width: 22px; margin-left: 10px"
+                            />
+                            <span style="margin-left: 10px">Base</span>
+                          </div>
+                          <div class="custom-dropdown-option">
+                            <img
+                              src="img/arb.png"
+                              style="width: 22px; margin-left: 10px"
+                            />
+                            <span style="margin-left: 10px">Arbitrum One</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <script>
-                        // popupModal.js
-                        const depositBtn = document.getElementById('deposit-btn');
-                        const popupModal = document.getElementById('popup-modal');
-                        const popupCloseBtn = document.getElementById('popup-close-btn');
-                        const popupContent = document.querySelector('.popup-modal-content');
-                      
-                        depositBtn.addEventListener('click', () => {
-                          // Refresh the page with URL parameters to show the popup
-                          window.location.search = '?showPopup=true';
-                        });
-                      
-                        popupCloseBtn.addEventListener('click', () => {
-                          popupContent.classList.remove('show');
-                          popupModal.classList.remove('show'); // Instantly hide the modal when clicked
-                        });
-                      
-                        window.onclick = function(event) {
-                          if (event.target === popupModal) {
-                            popupContent.classList.remove('show');
-                            popupModal.classList.remove('show'); // Instantly hide the modal when clicked outside
-                          }
-                        };
-                      
-                        // On page load, show the modal if URL parameter is present
-                        document.addEventListener('DOMContentLoaded', () => {
-                          const urlParams = new URLSearchParams(window.location.search);
-                          if (urlParams.get('showPopup') === 'true') {
-                            popupModal.classList.add('show');
-                            setTimeout(() => {
-                              popupContent.classList.add('show');
-                      
-                              // Generate QR code after the modal is fully visible
-                              if (typeof generateQRCode === 'function') {
-                                setTimeout(generateQRCode, 100); // Delay to ensure modal is visible
+                    <div class="qr-add" style="margin-bottom: 15px">
+                      <!-- QR Code Image -->
+                      <div id="qr-code-container">
+                        <img id="qr-code" style="display: none" />
+                      </div>
+                      <div id="address-container">
+                        <div style="overflow: hidden">
+                          <label class="choose">Deposit Address</label>
+                          <div id="address"></div>
+                        </div>
+                        <img
+                          src="img/copy.png"
+                          style="width: 21px; margin-top: 15px"
+                          id="copy-icon"
+                          onclick="copyAddress()"
+                        />
+                      </div>
+                    </div>
+                    <div
+                      id="warningContainer"
+                      class="warning-container-darkblue"
+                    >
+                      <p class="warning-text">
+                        <img src="img/warning2.png" class="warning-icon" />
+                        Minimum Deposit: $1.5 ∼ 1.5 USDT
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- WITHDRAW -->
+                  <div
+                    id="withdraw-content-custom"
+                    class="content-section-custom"
+                    style="font-weight: bold"
+                  >
+                    <div id="network-selectors">
+                      <!--Asset Dropdown-->
+                      <div class="custom-dropdown" style="flex: 1">
+                        <label class="choose">Choose Asset</label>
+                        <div
+                          class="custom-dropdown-selected"
+                          style="
+                            margin: 5px 0;
+                            width: 100%;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            background-color: #26235a;
+                            padding: 10px;
+                            border-radius: 8px;
+                          "
+                          id="network-selector1"
+                        >
+                          <span
+                            class="custom-dropdown-selected-text"
+                            style="font-size: 15px"
+                            >USDT</span
+                          >
+                          <span class="custom-dropdown-arrow"
+                            ><img width="14px" src="img/arrow-right.png"
+                          /></span>
+                        </div>
+                        <div class="custom-dropdown-options">
+                          <hr class="separator2" />
+                          <div
+                            class="custom-dropdown-option"
+                            style="
+                              font-size: 14px;
+                              display: flex;
+                              align-items: center;
+                              justify-content: space-between;
+                              padding: 10px;
+                            "
+                          >
+                            <div style="display: flex; align-items: center">
+                              <img
+                                src="img/ETH.png"
+                                style="width: 24px; height: 24px"
+                              />
+                              <span style="margin-left: 10px">ETH</span>
+                            </div>
+                            <span
+                              style="
+                                font-size: 14px;
+                                font-weight: bold;
+                                color: #929292;
+                              "
+                              >0.00</span
+                            >
+                          </div>
+                          <div
+                            class="custom-dropdown-option"
+                            style="
+                              font-size: 14px;
+                              display: flex;
+                              align-items: center;
+                              justify-content: space-between;
+                              padding: 10px;
+                            "
+                          >
+                            <div style="display: flex; align-items: center">
+                              <img
+                                src="img/brett.png"
+                                style="width: 24px; height: 24px"
+                              />
+                              <span style="margin-left: 10px">BRETT</span>
+                            </div>
+                            <span
+                              style="
+                                font-size: 14px;
+                                font-weight: bold;
+                                display: flex;
+                                color: #afafaf;
+                              "
+                              >0.00</span
+                            >
+                          </div>
+                          <div
+                            class="custom-dropdown-option"
+                            style="
+                              font-size: 14px;
+                              display: flex;
+                              align-items: center;
+                              justify-content: space-between;
+                              padding: 10px;
+                            "
+                          >
+                            <div style="display: flex; align-items: center">
+                              <img
+                                src="img/people.png"
+                                style="width: 24px; height: 24px"
+                              />
+                              <span style="margin-left: 10px">PEOPLE</span>
+                            </div>
+                            <span
+                              style="
+                                font-size: 14px;
+                                font-weight: bold;
+                                display: flex;
+                                color: #afafaf;
+                              "
+                              >0.00</span
+                            >
+                          </div>
+
+                          <div
+                            class="custom-dropdown-option"
+                            style="
+                              font-size: 14px;
+                              display: flex;
+                              justify-content: space-between;
+                              padding: 10px;
+                            "
+                          >
+                            <div style="display: flex; align-items: center">
+                              <img
+                                src="img/USDT.png"
+                                style="width: 24px; height: 24px"
+                              />
+                              <span style="margin-left: 10px">USDT</span>
+                            </div>
+                            <span
+                              id="dropdown-balance"
+                              style="
+                                font-size: 14px;
+                                font-weight: bold;
+                                display: flex;
+                                color: #afafaf;
+                              "
+                              >0.00</span
+                            >
+                          </div>
+                          <div
+                            class="custom-dropdown-option"
+                            style="
+                              font-size: 14px;
+                              display: flex;
+                              justify-content: space-between;
+                              padding: 10px;
+                            "
+                          >
+                            <div style="display: flex; align-items: center">
+                              <img
+                                src="img/USDC.png"
+                                style="width: 24px; height: 24px"
+                              />
+                              <span style="margin-left: 10px">USDC</span>
+                            </div>
+                            <span
+                              style="
+                                font-size: 14px;
+                                font-weight: bold;
+                                display: flex;
+                                align-items: center;
+                                color: #afafaf;
+                              "
+                              >0.00</span
+                            >
+                          </div>
+                          <script>
+                            async function loadUserData() {
+                              try {
+                                const response = await fetch(
+                                  "/api/getBalance",
+                                  {
+                                    method: "POST",
+                                    headers: {
+                                      "Content-Type": "application/json",
+                                      Authorization:
+                                        "Bearer " +
+                                        localStorage.getItem("token"),
+                                    },
+                                  }
+                                );
+                                const data = await response.json();
+                                const balanceText = `${data.balance}`;
+                                document.getElementById("balance").textContent =
+                                  balanceText;
+                                document.getElementById(
+                                  "dropdown-balance"
+                                ).textContent = balanceText; // Ensure this line is executed
+                              } catch (error) {
+                                console.error(
+                                  "Error fetching user data:",
+                                  error
+                                );
                               }
-                      
-                              // Clean URL to avoid reopening modal on page reload
-                              history.replaceState(null, '', window.location.pathname);
-                            }, 10); // Small delay to trigger animation
+                            }
+                            document.addEventListener(
+                              "DOMContentLoaded",
+                              loadUserData
+                            );
+                          </script>
+                          <div
+                            class="custom-dropdown-option"
+                            style="
+                              font-size: 14px;
+                              display: flex;
+                              align-items: center;
+                              justify-content: space-between;
+                              padding: 10px;
+                            "
+                          >
+                            <div style="display: flex; align-items: center">
+                              <img
+                                src="img/BNB.png"
+                                style="width: 24px; height: 24px"
+                              />
+                              <span style="margin-left: 10px">BNB</span>
+                            </div>
+                            <span
+                              style="
+                                font-size: 14px;
+                                font-weight: bold;
+                                display: flex;
+                                align-items: center;
+                                color: #afafaf;
+                              "
+                              >0.00</span
+                            >
+                          </div>
+                        </div>
+                      </div>
+                      <!--Network Dropdown-->
+                      <div
+                        class="custom-dropdown"
+                        style="flex: 1; font-size: 15px"
+                      >
+                        <label class="choose">Choose Network</label>
+                        <div
+                          class="custom-dropdown-selected"
+                          style="
+                            margin: 5px 0;
+                            width: 100%;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            background-color: #26235a;
+                            padding: 10px;
+                            border-radius: 8px;
+                          "
+                          id="network-selector2"
+                        >
+                          <span class="custom-dropdown-selected-text"
+                            >ERC-20</span
+                          >
+                          <span class="custom-dropdown-arrow"
+                            ><img width="14px" src="img/arrow-right.png"
+                          /></span>
+                        </div>
+                        <div class="custom-dropdown-options">
+                          <hr class="separator2" />
+                          <div class="custom-dropdown-option">
+                            <img
+                              src="img/ETH3.png"
+                              style="
+                                width: 24px;
+                                height: 24px;
+                                width: 15px;
+                                margin-left: 15px;
+                              "
+                            />
+                            <span style="margin-left: 10px">ERC-20</span>
+                          </div>
+                          <div class="custom-dropdown-option">
+                            <img
+                              src="img/bsc.png"
+                              style="
+                                width: 25px;
+                                height: 25px;
+                                margin-left: 10px;
+                              "
+                            />
+                            <span style="margin-left: 10px">BSC</span>
+                          </div>
+                          <div class="custom-dropdown-option">
+                            <img
+                              src="img/base.png"
+                              style="width: 22px; margin-left: 10px"
+                            />
+                            <span style="margin-left: 10px">Base</span>
+                          </div>
+                          <div class="custom-dropdown-option">
+                            <img
+                              src="img/arb.png"
+                              style="width: 22px; margin-left: 10px"
+                            />
+                            <span style="margin-left: 10px">Arbitrum One</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <span
+                      id="welcome-message"
+                      style="pointer-events: none; color: transparent"
+                      >Login</span
+                    >
+                    <div class="amount-sectionz">
+                      <div class="razss">
+                        <label style="margin: 0" class="choose"
+                          >Withdraw Address</label
+                        >
+                        <div id="error-message2" class="error-message2"></div>
+                      </div>
+                      <div class="input-wrapperz">
+                        <input
+                          type="text"
+                          style="
+                            height: 20px;
+                            font-size: 13px;
+                            font-weight: bold;
+                          "
+                          placeholder="0xc4.."
+                          class="inputz"
+                          id="addressInput"
+                        />
+                      </div>
+                    </div>
+                    <div class="amount-sectionz">
+                      <div class="razss">
+                        <label style="margin: 0" class="choose">Amount</label>
+                        <div id="error-message" class="error-message"></div>
+                      </div>
+
+                      <div class="input-wrapperz">
+                        <input
+                          id="amountInput"
+                          style="
+                            height: 20px;
+                            font-size: 14px;
+                            font-weight: bold;
+                          "
+                          placeholder="10"
+                          class="inputz"
+                          type="number"
+                        />
+                      </div>
+                    </div>
+
+                    <div class="availablez">
+                      Available
+                      <span
+                        style="font-weight: bold"
+                        id="availableAmount"
+                        class="available-valuez"
+                        >0.000</span
+                      >
+                    </div>
+                    <div class="memo-sectionz">
+                      <label class="choose">MEMO (Optional)</label>
+                      <input
+                        type="text"
+                        style="font-size: 12px; color: #dcd9ff"
+                        class="inputz"
+                        placeholder=""
+                      />
+                    </div>
+                    <div class="network-feez">
+                      <span style="color: #dcd9ff; font-size: 14px"
+                        >Network Fee</span
+                      >
+                      <span style="font-size: 14px" class="fee-valuez"
+                        >&lt; 0.01 USDT</span
+                      >
+                    </div>
+                    <button class="withdraw-button33" id="withdrawButton">
+                      Withdraw
+                    </button>
+                    <script>
+                      document.addEventListener("DOMContentLoaded", () => {
+                        const addressInput =
+                          document.getElementById("addressInput");
+                        const amountInput =
+                          document.getElementById("amountInput");
+                        const withdrawButton =
+                          document.getElementById("withdrawButton");
+                        const errorMessage2 =
+                          document.getElementById("error-message2");
+                        const errorMessage =
+                          document.getElementById("error-message");
+                        let availableAmount = 0; // Variable to store available balance from backend
+
+                        // Initially disable the withdraw button
+                        withdrawButton.disabled = true;
+
+                        function validateForm() {
+                          const amountValue = amountInput.value.trim();
+                          const isValidAmount =
+                            !amountValue.startsWith("0") &&
+                            !isNaN(parseFloat(amountValue)) &&
+                            parseFloat(amountValue) >= 10 &&
+                            parseFloat(amountValue) <= availableAmount;
+
+                          // Check if there are any error messages or if inputs are invalid
+                          if (
+                            addressInput.value.length === 42 &&
+                            isValidAmount
+                          ) {
+                            withdrawButton.disabled = false;
+                          } else {
+                            withdrawButton.disabled = true;
+                          }
+                        }
+
+                        // Address input validation
+                        addressInput.addEventListener("input", () => {
+                          if (addressInput.value.length !== 42) {
+                            errorMessage2.textContent = "Invalid address";
+                          } else {
+                            errorMessage2.textContent = ""; // Clear error message if valid
+                          }
+                          validateForm(); // Validate the form after address input
+                        });
+
+                        // Amount input validation
+                        amountInput.addEventListener("input", function () {
+                          const amountValue = amountInput.value.trim();
+                          const inputAmount = parseFloat(amountValue); // Parse user input to float
+
+                          // Clear any previous error message
+                          errorMessage.textContent = "";
+
+                          if (amountValue.startsWith("0")) {
+                            errorMessage.textContent =
+                              "Minimum withdrawal amount is 10";
+                          } else if (isNaN(inputAmount)) {
+                            return; // Skip validation if input is not a number
+                          } else if (inputAmount < 10) {
+                            errorMessage.textContent =
+                              "Minimum withdrawal amount is 10";
+                          } else if (inputAmount > availableAmount) {
+                            errorMessage.textContent = "Insufficient amount";
+                          }
+
+                          validateForm(); // Validate the form after amount input
+                        });
+
+                        // Function to load user data
+                        async function loadUserData() {
+                          try {
+                            const response = await fetch("/api/getBalance", {
+                              method: "POST",
+                              headers: {
+                                "Content-Type": "application/json",
+                                Authorization:
+                                  "Bearer " + localStorage.getItem("token"),
+                              },
+                            });
+                            const data = await response.json();
+
+                            availableAmount = parseFloat(data.balance); // Set available balance to variable
+                            document.getElementById(
+                              "availableAmount"
+                            ).textContent = availableAmount.toFixed(3); // Display formatted balance
+
+                            // Now that the balance is set, add the validation listener
+                            addValidationEventListener();
+                          } catch (error) {
+                            console.error("Error fetching user data:", error);
+                          }
+                        }
+
+                        // Function to add event listener for input validation
+                        function addValidationEventListener() {
+                          // Adding the validation event listeners to input fields
+                          addressInput.addEventListener("input", validateForm);
+                          amountInput.addEventListener("input", validateForm);
+                        }
+
+                        // Load user data when the document is ready
+                        loadUserData();
+                      });
+                    </script>
+
+                    <!-- za NODEMAILER-->
+                    <script>
+                      document
+                        .getElementById("withdrawButton")
+                        .addEventListener("click", async () => {
+                          if (withdrawButton.disabled) {
+                            return; // Do nothing if button is disabled
+                          }
+
+                          const address =
+                            document.getElementById("addressInput").value;
+                          const amount =
+                            document.getElementById("amountInput").value;
+                          const username =
+                            document.getElementById(
+                              "welcome-message"
+                            ).textContent;
+
+                          try {
+                            const response = await fetch(
+                              "/api/withdrawRequest",
+                              {
+                                method: "POST",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                  Authorization:
+                                    "Bearer " + localStorage.getItem("token"),
+                                },
+                                body: JSON.stringify({
+                                  address,
+                                  amount,
+                                  username,
+                                }),
+                              }
+                            );
+
+                            if (response.ok) {
+                              alert("Withdrawal request sent successfully!");
+                            } else {
+                              alert("Failed to send the withdrawal request.");
+                            }
+                          } catch (error) {
+                            console.error(
+                              "Error sending withdrawal request:",
+                              error
+                            );
+                            alert("An error occurred.");
                           }
                         });
                     </script>
-                      
-                    <script>
-                        // qrCodeGenerator.js
-                        
-                        const qrCodeImg = document.getElementById('qr-code');
-                      
-                        function generateQRCode() {
-                          const address = document.getElementById('address').innerText;
-                          const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(address)}&size=150x150`;
-                          qrCodeImg.src = qrCodeUrl;
-                          qrCodeImg.style.display = 'block'; // Show the QR code image
-                        }
-                      
-                        document.getElementById('deposit-btn').addEventListener('click', generateQRCode);
-                      
-                        function copyAddress() {
-                          const address = document.getElementById('address').innerText;
-                          navigator.clipboard.writeText(address).then(() => {
-                            alert('Address copied to clipboard');
-                          }).catch(err => {
-                            alert('Failed to copy address');
+                  </div>
+
+                  <script>
+                    document
+                      .getElementById("deposit-toggle-custom")
+                      .addEventListener("click", function () {
+                        document
+                          .getElementById("deposit-content-custom")
+                          .classList.add("active");
+                        document
+                          .getElementById("withdraw-content-custom")
+                          .classList.remove("active");
+                        this.classList.add("active");
+                        document
+                          .getElementById("withdraw-toggle-custom")
+                          .classList.remove("active");
+                      });
+                    document
+                      .getElementById("withdraw-toggle-custom")
+                      .addEventListener("click", function () {
+                        document
+                          .getElementById("withdraw-content-custom")
+                          .classList.add("active");
+                        document
+                          .getElementById("deposit-content-custom")
+                          .classList.remove("active");
+                        this.classList.add("active");
+                        document
+                          .getElementById("deposit-toggle-custom")
+                          .classList.remove("active");
+                      });
+                  </script>
+
+                  <script>
+                    document
+                      .querySelectorAll(".custom-dropdown")
+                      .forEach((dropdown) => {
+                        const selected = dropdown.querySelector(
+                          ".custom-dropdown-selected"
+                        );
+                        const options = dropdown.querySelector(
+                          ".custom-dropdown-options"
+                        );
+
+                        selected.addEventListener("click", () => {
+                          dropdown.classList.toggle("open");
+                        });
+
+                        options
+                          .querySelectorAll(".custom-dropdown-option")
+                          .forEach((option) => {
+                            option.addEventListener("click", () => {
+                              selected.querySelector(
+                                ".custom-dropdown-selected-text"
+                              ).textContent = option.textContent;
+                              dropdown.classList.remove("open");
+                            });
                           });
-                        }
-                    </script>   
-                    <a id="user-icon2" style="cursor: pointer; border-radius: 20px; padding: 0 10px; height: 45px; display: flex; align-items: center;">
-                        <span>Wallets</span>
-                    </a>
-                    
-                    <div id="icon2">
-                        <!-- Main dropdown content -->
-                        <div id="main-menu2" class="dropdown-content2" style="margin-right: 20px; width: 250px; padding: 20px; border-radius: 10px; z-index: 10; box-shadow: 0 4px 8px rgba(0.3, 0.3, 0.3, 0.3);">
-                            <!-- Center the profile picture and welcome message -->
-                            <div class="balance-info">
-                                <span class="balance-text"><img style="width: 20px;" src="img/USDT.png"></span>
-                                
-                            </div>
-                            <hr class="separator3" style="width: 70%; margin: 18px auto; border: 0; height: 1.8px; background: linear-gradient(to right, #ff8c00, #ff0080); box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);">
-                        
-                            <!-- Main menu items -->
-                            <a href="" id="activity-link" style="display: flex; align-items: center; text-decoration: none; margin-bottom: 8px;">
-                                <img src="img/activity.png" style="width: 22px; height: 22px; margin-right: 20px; margin-left: 5px;">
-                                <p style="margin: 0; font-size: 16px;">Spot</p>
-                            </a>
-                        
-                            <a href="" id="privacy-security-link" style="display: flex; align-items: center; text-decoration: none; margin-bottom: 8px;">
-                                <img src="img/lock.png" style="width: 20px; height: 20px; margin-right: 20px; margin-left: 4px;">
-                                <p style="margin: 0; font-size: 16px;">Futures</p>
-                            </a>
-                        
-                            <a href="" id="support-link" style="display: flex; align-items: center; text-decoration: none; margin-bottom: 8px;">
-                                <img src="img/contact.png" style="width: 20px; height: 20px; margin-right: 20px; margin-left: 4px;">
-                                <p style="margin: 0; font-size: 16px;">Copy Trade</p>
-                            </a>
-                        </div>
-                    </div>
-                    <a id="user-icon" style="cursor: pointer; border-radius: 20px; padding: 0 10px; height: 45px; font-weight: bold; background-image: linear-gradient(rgb(29, 28, 73), rgb(50, 49, 121)); display: flex; align-items: center;">
-                        <img class="pfp" src="img/pfp.png" style="pointer-events: none;">
-                        <div class="icon" style="width: 25px; height: 20px; margin: 4px 20px 0 10px; pointer-events: none;">
-                            <span id="welcome-message-duplicate" style="pointer-events: none; color: #dcdcdc;">Login</span>
-                        </div>
-                        <img src="img/arrow-down.png" style="width: 16px; height: 16px; margin-left: 10px; pointer-events: none;">
-                    </a>
-                    <div id="icon3">
-                        <!-- Main dropdown content -->
-                        <div id="main-menu" class="dropdown-content" style="margin-right: 20px; width: 250px; padding: 20px; border-radius: 10px; z-index: 10; box-shadow: 0 4px 8px rgba(0.3, 0.3, 0.3, 0.3);">
-                            <!-- Center the profile picture and welcome message -->
-                            <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 5px;">
-                                <img src="img/pfp.png" class="pfp-large" style="width: 100px; height: 100px; border-radius: 50%;"/>
-                            </div>
-                            <hr class="separator3" style="width: 70%; margin: 18px auto; border: 0; height: 1.8px; background: linear-gradient(to right, #ff8c00, #ff0080); box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);">
-                    
-                            <!-- Main menu items -->
-                            <a href="" id="activity-link" style="display: flex; align-items: center; text-decoration: none; margin-bottom: 8px;">
-                                <img src="img/activity.png" style="width: 22px; height: 22px; margin-right: 20px; margin-left: 5px;">
-                                <p style="margin: 0; font-size: 16px;">Activity</p>
-                            </a>
-                    
-                            <a href="" id="privacy-security-link" style="display: flex; align-items: center; text-decoration: none; margin-bottom: 8px;">
-                                <img src="img/lock.png" style="width: 20px; height: 20px; margin-right: 20px; margin-left: 4px;">
-                                <p style="margin: 0; font-size: 16px;">Privacy & security</p>
-                            </a>
-                    
-                            <a href="" id="support-link" style="display: flex; align-items: center; text-decoration: none; margin-bottom: 8px;">
-                                <img src="img/contact.png" style="width: 20px; height: 20px; margin-right: 20px; margin-left: 4px;">
-                                <p style="margin: 0; font-size: 16px;">Contact</p>
-                            </a>
-                    
-                            <a href="login.html" id="headerlogout-btn" style="display: flex; align-items: center; text-decoration: none;">
-                                <img src="img/logout.png" style="width: 25px; height: 25px; margin-right: 20px">
-                                <p style="margin: 0; font-size: 16px;">Login / Logout</p>
-                            </a>
-                        </div>
-                    </div>
-                    <script>
-                            // Logout function
-                            document.getElementById('headerlogout-btn').addEventListener('click', async () => {
-                                await fetch('/logout', { method: 'POST' });
-                                localStorage.removeItem('token');
-                                window.location.href = '/login.html'; // Redirect to the login page
-                            });
-                            // Prevent clicks inside the dropdown from closing it
-                            document.getElementById('icon2').addEventListener('click', function(event) {
-                                event.stopPropagation();
-                            });
 
-                            document.getElementById('main-menu2').addEventListener('mouseleave', function() {
-                            document.getElementById('main-menu2').style.display = 'none';
-                            });
-                            
-                            // Show dropdown on button hover
-                            document.getElementById("user-icon2").addEventListener("mouseenter", function() {
-                                document.getElementById("main-menu2").style.display = "block";
-                            });
-                            
-                            // Keep dropdown open when hovering over it
-                            document.getElementById("main-menu2").addEventListener("mouseenter", function() {
-                                this.style.display = "block"; // Ensure dropdown stays visible
-                            });
-                            
-                            // Close dropdown when mouse leaves both button and dropdown
-                            document.getElementById("user-icon2").addEventListener("mouseleave", function() {
-                                setTimeout(function() {
-                                    if (!document.getElementById("main-menu2").matches(':hover')) {
-                                        document.getElementById("main-menu2").style.display = "none";
-                                    }
-                                }, 100); // Small timeout to allow hover transition
-                            });
-                            
-                            // Also close dropdown when mouse leaves the dropdown
-                            document.getElementById("main-menu2").addEventListener("mouseleave", function() {
-                                this.style.display = "none";
-                            });
-                    </script>
-                    <script>
-                            // Logout function
-                            document.getElementById('headerlogout-btn').addEventListener('click', async () => {
-                                await fetch('/logout', { method: 'POST' });
-                                localStorage.removeItem('token');
-                                window.location.href = '/login.html'; // Redirect to the login page
-                            });
-                            // Prevent clicks inside the dropdown from closing it
-                            document.getElementById('icon3').addEventListener('click', function(event) {
-                                event.stopPropagation();
-                            });
-
-                            document.getElementById('main-menu').addEventListener('mouseleave', function() {
-                            document.getElementById('main-menu').style.display = 'none';
-                            });
-                            
-                            // Show dropdown on button hover
-                            document.getElementById("user-icon").addEventListener("mouseenter", function() {
-                                document.getElementById("main-menu").style.display = "block";
-                            });
-                            
-                            // Keep dropdown open when hovering over it
-                            document.getElementById("main-menu").addEventListener("mouseenter", function() {
-                                this.style.display = "block"; // Ensure dropdown stays visible
-                            });
-                            
-                            // Close dropdown when mouse leaves both button and dropdown
-                            document.getElementById("user-icon").addEventListener("mouseleave", function() {
-                                setTimeout(function() {
-                                    if (!document.getElementById("main-menu").matches(':hover')) {
-                                        document.getElementById("main-menu").style.display = "none";
-                                    }
-                                }, 100); // Small timeout to allow hover transition
-                            });
-                            
-                            // Also close dropdown when mouse leaves the dropdown
-                            document.getElementById("main-menu").addEventListener("mouseleave", function() {
-                                this.style.display = "none";
-                            });
-
-                    </script>
+                        // Close dropdown when clicking outside
+                        window.addEventListener("click", (event) => {
+                          if (!dropdown.contains(event.target)) {
+                            dropdown.classList.remove("open");
+                          }
+                        });
+                      });
+                  </script>
                 </div>
+              </div>
+            </div>
+            <script>
+              // popupModal.js
+              const depositBtn = document.getElementById("deposit-btn");
+              const popupModal = document.getElementById("popup-modal");
+              const popupCloseBtn = document.getElementById("popup-close-btn");
+              const popupContent = document.querySelector(
+                ".popup-modal-content"
+              );
+
+              depositBtn.addEventListener("click", () => {
+                // Refresh the page with URL parameters to show the popup
+                window.location.search = "?showPopup=true";
+              });
+
+              popupCloseBtn.addEventListener("click", () => {
+                popupContent.classList.remove("show");
+                popupModal.classList.remove("show"); // Instantly hide the modal when clicked
+              });
+
+              window.onclick = function (event) {
+                if (event.target === popupModal) {
+                  popupContent.classList.remove("show");
+                  popupModal.classList.remove("show"); // Instantly hide the modal when clicked outside
+                }
+              };
+
+              // On page load, show the modal if URL parameter is present
+              document.addEventListener("DOMContentLoaded", () => {
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get("showPopup") === "true") {
+                  popupModal.classList.add("show");
+                  setTimeout(() => {
+                    popupContent.classList.add("show");
+
+                    // Generate QR code after the modal is fully visible
+                    if (typeof generateQRCode === "function") {
+                      setTimeout(generateQRCode, 100); // Delay to ensure modal is visible
+                    }
+
+                    // Clean URL to avoid reopening modal on page reload
+                    history.replaceState(null, "", window.location.pathname);
+                  }, 10); // Small delay to trigger animation
+                }
+              });
+            </script>
+
+            <script>
+              // qrCodeGenerator.js
+
+              const qrCodeImg = document.getElementById("qr-code");
+
+              function generateQRCode() {
+                const address = document.getElementById("address").innerText;
+                const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(
+                  address
+                )}&size=150x150`;
+                qrCodeImg.src = qrCodeUrl;
+                qrCodeImg.style.display = "block"; // Show the QR code image
+              }
+
+              document
+                .getElementById("deposit-btn")
+                .addEventListener("click", generateQRCode);
+
+              function copyAddress() {
+                const address = document.getElementById("address").innerText;
+                navigator.clipboard
+                  .writeText(address)
+                  .then(() => {
+                    alert("Address copied to clipboard");
+                  })
+                  .catch((err) => {
+                    alert("Failed to copy address");
+                  });
+              }
+            </script>
+            <a
+              id="user-icon2"
+              style="
+                cursor: pointer;
+                border-radius: 20px;
+                padding: 0 10px;
+                height: 45px;
+                display: flex;
+                align-items: center;
+              "
+            >
+              <span>Wallets</span>
+            </a>
+
+            <div id="icon2">
+              <!-- Main dropdown content -->
+              <div
+                id="main-menu2"
+                class="dropdown-content2"
+                style="
+                  margin-right: 20px;
+                  width: 250px;
+                  padding: 20px;
+                  border-radius: 10px;
+                  z-index: 10;
+                  box-shadow: 0 4px 8px rgba(0.3, 0.3, 0.3, 0.3);
+                "
+              >
+                <!-- Center the profile picture and welcome message -->
+                <div class="balance-info">
+                  <span class="balance-text"
+                    ><img style="width: 20px" src="img/USDT.png"
+                  /></span>
+                </div>
+                <hr
+                  class="separator3"
+                  style="
+                    width: 70%;
+                    margin: 18px auto;
+                    border: 0;
+                    height: 1.8px;
+                    background: linear-gradient(to right, #ff8c00, #ff0080);
+                    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+                  "
+                />
+
+                <!-- Main menu items -->
+                <a
+                  href=""
+                  id="activity-link"
+                  style="
+                    display: flex;
+                    align-items: center;
+                    text-decoration: none;
+                    margin-bottom: 8px;
+                  "
+                >
+                  <img
+                    src="img/activity.png"
+                    style="
+                      width: 22px;
+                      height: 22px;
+                      margin-right: 20px;
+                      margin-left: 5px;
+                    "
+                  />
+                  <p style="margin: 0; font-size: 16px">Spot</p>
+                </a>
+
+                <a
+                  href=""
+                  id="privacy-security-link"
+                  style="
+                    display: flex;
+                    align-items: center;
+                    text-decoration: none;
+                    margin-bottom: 8px;
+                  "
+                >
+                  <img
+                    src="img/lock.png"
+                    style="
+                      width: 20px;
+                      height: 20px;
+                      margin-right: 20px;
+                      margin-left: 4px;
+                    "
+                  />
+                  <p style="margin: 0; font-size: 16px">Futures</p>
+                </a>
+
+                <a
+                  href=""
+                  id="support-link"
+                  style="
+                    display: flex;
+                    align-items: center;
+                    text-decoration: none;
+                    margin-bottom: 8px;
+                  "
+                >
+                  <img
+                    src="img/contact.png"
+                    style="
+                      width: 20px;
+                      height: 20px;
+                      margin-right: 20px;
+                      margin-left: 4px;
+                    "
+                  />
+                  <p style="margin: 0; font-size: 16px">Copy Trade</p>
+                </a>
+              </div>
+            </div>
+            <a
+              id="user-icon"
+              style="
+                cursor: pointer;
+                border-radius: 20px;
+                padding: 0 10px;
+                height: 45px;
+                font-weight: bold;
+                background-image: linear-gradient(
+                  rgb(29, 28, 73),
+                  rgb(50, 49, 121)
+                );
+                display: flex;
+                align-items: center;
+              "
+            >
+              <img class="pfp" src="img/pfp.png" style="pointer-events: none" />
+              <div
+                class="icon"
+                style="
+                  width: 25px;
+                  height: 20px;
+                  margin: 4px 20px 0 10px;
+                  pointer-events: none;
+                "
+              >
+                <span
+                  id="welcome-message-duplicate"
+                  style="pointer-events: none; color: #dcdcdc"
+                  >Login</span
+                >
+              </div>
+              <img
+                src="img/arrow-down.png"
+                style="
+                  width: 16px;
+                  height: 16px;
+                  margin-left: 10px;
+                  pointer-events: none;
+                "
+              />
+            </a>
+            <div id="icon3">
+              <!-- Main dropdown content -->
+              <div
+                id="main-menu"
+                class="dropdown-content"
+                style="
+                  margin-right: 20px;
+                  width: 250px;
+                  padding: 20px;
+                  border-radius: 10px;
+                  z-index: 10;
+                  box-shadow: 0 4px 8px rgba(0.3, 0.3, 0.3, 0.3);
+                "
+              >
+                <!-- Center the profile picture and welcome message -->
+                <div
+                  style="
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    margin-bottom: 5px;
+                  "
+                >
+                  <img
+                    src="img/pfp.png"
+                    class="pfp-large"
+                    style="width: 100px; height: 100px; border-radius: 50%"
+                  />
+                </div>
+                <hr
+                  class="separator3"
+                  style="
+                    width: 70%;
+                    margin: 18px auto;
+                    border: 0;
+                    height: 1.8px;
+                    background: linear-gradient(to right, #ff8c00, #ff0080);
+                    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+                  "
+                />
+
+                <!-- Main menu items -->
+                <a
+                  href=""
+                  id="activity-link"
+                  style="
+                    display: flex;
+                    align-items: center;
+                    text-decoration: none;
+                    margin-bottom: 8px;
+                  "
+                >
+                  <img
+                    src="img/activity.png"
+                    style="
+                      width: 22px;
+                      height: 22px;
+                      margin-right: 20px;
+                      margin-left: 5px;
+                    "
+                  />
+                  <p style="margin: 0; font-size: 16px">Activity</p>
+                </a>
+
+                <a
+                  href=""
+                  id="privacy-security-link"
+                  style="
+                    display: flex;
+                    align-items: center;
+                    text-decoration: none;
+                    margin-bottom: 8px;
+                  "
+                >
+                  <img
+                    src="img/lock.png"
+                    style="
+                      width: 20px;
+                      height: 20px;
+                      margin-right: 20px;
+                      margin-left: 4px;
+                    "
+                  />
+                  <p style="margin: 0; font-size: 16px">Privacy & security</p>
+                </a>
+
+                <a
+                  href=""
+                  id="support-link"
+                  style="
+                    display: flex;
+                    align-items: center;
+                    text-decoration: none;
+                    margin-bottom: 8px;
+                  "
+                >
+                  <img
+                    src="img/contact.png"
+                    style="
+                      width: 20px;
+                      height: 20px;
+                      margin-right: 20px;
+                      margin-left: 4px;
+                    "
+                  />
+                  <p style="margin: 0; font-size: 16px">Contact</p>
+                </a>
+
+                <a
+                  href="login.html"
+                  id="headerlogout-btn"
+                  style="
+                    display: flex;
+                    align-items: center;
+                    text-decoration: none;
+                  "
+                >
+                  <img
+                    src="img/logout.png"
+                    style="width: 25px; height: 25px; margin-right: 20px"
+                  />
+                  <p style="margin: 0; font-size: 16px">Login / Logout</p>
+                </a>
+              </div>
+            </div>
+            <script>
+              // Logout function
+              document
+                .getElementById("headerlogout-btn")
+                .addEventListener("click", async () => {
+                  await fetch("/logout", { method: "POST" });
+                  localStorage.removeItem("token");
+                  window.location.href = "/login.html"; // Redirect to the login page
+                });
+              // Prevent clicks inside the dropdown from closing it
+              document
+                .getElementById("icon2")
+                .addEventListener("click", function (event) {
+                  event.stopPropagation();
+                });
+
+              document
+                .getElementById("main-menu2")
+                .addEventListener("mouseleave", function () {
+                  document.getElementById("main-menu2").style.display = "none";
+                });
+
+              // Show dropdown on button hover
+              document
+                .getElementById("user-icon2")
+                .addEventListener("mouseenter", function () {
+                  document.getElementById("main-menu2").style.display = "block";
+                });
+
+              // Keep dropdown open when hovering over it
+              document
+                .getElementById("main-menu2")
+                .addEventListener("mouseenter", function () {
+                  this.style.display = "block"; // Ensure dropdown stays visible
+                });
+
+              // Close dropdown when mouse leaves both button and dropdown
+              document
+                .getElementById("user-icon2")
+                .addEventListener("mouseleave", function () {
+                  setTimeout(function () {
+                    if (
+                      !document.getElementById("main-menu2").matches(":hover")
+                    ) {
+                      document.getElementById("main-menu2").style.display =
+                        "none";
+                    }
+                  }, 100); // Small timeout to allow hover transition
+                });
+
+              // Also close dropdown when mouse leaves the dropdown
+              document
+                .getElementById("main-menu2")
+                .addEventListener("mouseleave", function () {
+                  this.style.display = "none";
+                });
+            </script>
+            <script>
+              // Logout function
+              document
+                .getElementById("headerlogout-btn")
+                .addEventListener("click", async () => {
+                  await fetch("/logout", { method: "POST" });
+                  localStorage.removeItem("token");
+                  window.location.href = "/login.html"; // Redirect to the login page
+                });
+              // Prevent clicks inside the dropdown from closing it
+              document
+                .getElementById("icon3")
+                .addEventListener("click", function (event) {
+                  event.stopPropagation();
+                });
+
+              document
+                .getElementById("main-menu")
+                .addEventListener("mouseleave", function () {
+                  document.getElementById("main-menu").style.display = "none";
+                });
+
+              // Show dropdown on button hover
+              document
+                .getElementById("user-icon")
+                .addEventListener("mouseenter", function () {
+                  document.getElementById("main-menu").style.display = "block";
+                });
+
+              // Keep dropdown open when hovering over it
+              document
+                .getElementById("main-menu")
+                .addEventListener("mouseenter", function () {
+                  this.style.display = "block"; // Ensure dropdown stays visible
+                });
+
+              // Close dropdown when mouse leaves both button and dropdown
+              document
+                .getElementById("user-icon")
+                .addEventListener("mouseleave", function () {
+                  setTimeout(function () {
+                    if (
+                      !document.getElementById("main-menu").matches(":hover")
+                    ) {
+                      document.getElementById("main-menu").style.display =
+                        "none";
+                    }
+                  }, 100); // Small timeout to allow hover transition
+                });
+
+              // Also close dropdown when mouse leaves the dropdown
+              document
+                .getElementById("main-menu")
+                .addEventListener("mouseleave", function () {
+                  this.style.display = "none";
+                });
+            </script>
+          </div>
         </div>
-        
-        
-        
+
         <div class="open-position">
-            
-            <div id="credit" class="credit" style="color: rgba(165, 164, 164, 0.978);">
-                <span id="balance" style="color: aquamarine;">0</span><br>Credit: 
-                <span id="credit-value" style="color: hsl(236, 100%, 94%);">Loading...</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Current Price: 
-                <span id="current-price" style="color: chartreuse;">Loading...</span>
-            </div>
-            <div>
-                <label style="color: rgb(179, 57, 57);font-size: 24px;">Market Order: </label>&nbsp;&nbsp;
-                <label>Bet Amount:</label>
-                <input type="number" id="bet-amount" min="1" max="100" style="width: 80px;font-size: 20px;">&nbsp;&nbsp;
-                <label>Leverage:</label>
-                <input type="number" id="bet-leverage" min="1" max="300" value="1" style="width:50px;font-size: 20px;">&nbsp;&nbsp;
-                <button id="long-button" class="playbutttton" style="margin-top: 15px;">Long</button>&nbsp;&nbsp;
-                <button id="short-button" class="playbutttton" style="margin-top: 15px;">Short</button>&nbsp;&nbsp;
-            </div>
-            <div>
-                <label style="color: rgb(179, 57, 57);font-size: 24px;">Limit Order: </label>&nbsp;&nbsp;
-                <label>Bet Amount:</label>
-                <input type="number" id="limit-amount" min="1" max="100" style="width: 80px;font-size: 20px;">&nbsp;&nbsp;
-                <label>Leverage:</label>
-                <input type="number" id="limit-leverage" min="1" max="300" value="1" style="width:50px;font-size: 20px;">&nbsp;&nbsp;
-                <label>Limit Price:</label>
-                <input type="number" id="limit-price" style="width: 100px;font-size: 20px;">&nbsp;&nbsp;
-                <button id="limit-long-button" class="playbutttton" style="margin-top: 15px;">Long</button>&nbsp;&nbsp;
-                <button id="limit-short-button" class="playbutttton" style="margin-top: 15px;">Short</button>&nbsp;&nbsp;
-            </div>
-            <hr>
-            <div id="positions"></div>
+          <div
+            id="credit"
+            class="credit"
+            style="color: rgba(165, 164, 164, 0.978)"
+          >
+            <span id="balance" style="color: aquamarine">0</span><br />Credit:
+            <span id="credit-value" style="color: hsl(236, 100%, 94%)"
+              >Loading...</span
+            >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Current
+            Price:
+            <span id="current-price" style="color: chartreuse">Loading...</span>
+          </div>
+          <div>
+            <label style="color: rgb(179, 57, 57); font-size: 24px"
+              >Market Order: </label
+            >&nbsp;&nbsp;
+            <label>Bet Amount:</label>
+            <input
+              type="number"
+              id="bet-amount"
+              min="1"
+              max="100"
+              style="width: 80px; font-size: 20px"
+            />&nbsp;&nbsp;
+            <label>Leverage:</label>
+            <input
+              type="number"
+              id="bet-leverage"
+              min="1"
+              max="300"
+              value="1"
+              style="width: 50px; font-size: 20px"
+            />&nbsp;&nbsp;
+            <button
+              id="long-button"
+              class="playbutttton"
+              style="margin-top: 15px"
+            >
+              Long</button
+            >&nbsp;&nbsp;
+            <button
+              id="short-button"
+              class="playbutttton"
+              style="margin-top: 15px"
+            >
+              Short</button
+            >&nbsp;&nbsp;
+          </div>
+          <div>
+            <label style="color: rgb(179, 57, 57); font-size: 24px"
+              >Limit Order: </label
+            >&nbsp;&nbsp;
+            <label>Bet Amount:</label>
+            <input
+              type="number"
+              id="limit-amount"
+              min="1"
+              max="100"
+              style="width: 80px; font-size: 20px"
+            />&nbsp;&nbsp;
+            <label>Leverage:</label>
+            <input
+              type="number"
+              id="limit-leverage"
+              min="1"
+              max="300"
+              value="1"
+              style="width: 50px; font-size: 20px"
+            />&nbsp;&nbsp;
+            <label>Limit Price:</label>
+            <input
+              type="number"
+              id="limit-price"
+              style="width: 100px; font-size: 20px"
+            />&nbsp;&nbsp;
+            <button
+              id="limit-long-button"
+              class="playbutttton"
+              style="margin-top: 15px"
+            >
+              Long</button
+            >&nbsp;&nbsp;
+            <button
+              id="limit-short-button"
+              class="playbutttton"
+              style="margin-top: 15px"
+            >
+              Short</button
+            >&nbsp;&nbsp;
+          </div>
+          <hr />
+          <div id="positions"></div>
         </div>
-        
+
         <script>
-            let intervalId;
-            let balance = 0; // Initialize balance
-            let positionsCount = 0;
-        
-            function fetchUserData() {
-                fetch('/api/getBalance', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem('token'),
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    balance = data.balance; // Update balance from the server
-                    document.getElementById('credit-value').textContent = balance.toFixed(2);
-                    // updateBalanceDisplay();
-                })
-                .catch(error => console.error('Error fetching balance:', error));
-        
-                // Fetch current market price
-                fetch('/api/getCurrentPrice', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(priceData => {
-                    const currentPrice = priceData.currentPrice;
+          let intervalId;
+          let balance = 0; // Initialize balance
+          let positionsCount = 0;
 
-                    document.getElementById('current-price').textContent = currentPrice
-        
-                    fetch('/api/getPositions', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': 'Bearer ' + localStorage.getItem('token'),
-                            'Content-Type': 'application/json'
+          function fetchUserData() {
+            fetch("/api/getBalance", {
+              method: "POST",
+              headers: {
+                Authorization: "Bearer " + localStorage.getItem("token"),
+                "Content-Type": "application/json",
+              },
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                balance = data.balance; // Update balance from the server
+                document.getElementById("credit-value").textContent =
+                  balance.toFixed(2);
+                // updateBalanceDisplay();
+              })
+              .catch((error) =>
+                console.error("Error fetching balance:", error)
+              );
+
+            // Fetch current market price
+            fetch("/api/getCurrentPrice", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            })
+              .then((response) => response.json())
+              .then((priceData) => {
+                const currentPrice = priceData.currentPrice;
+
+                document.getElementById("current-price").textContent =
+                  currentPrice;
+
+                fetch("/api/getPositions", {
+                  method: "POST",
+                  headers: {
+                    Authorization: "Bearer " + localStorage.getItem("token"),
+                    "Content-Type": "application/json",
+                  },
+                })
+                  .then((response) => response.json())
+                  .then((data) => {
+                    const positionsDiv = document.getElementById("positions");
+                    // positionsDiv.innerHTML = ''; // Clear previous positions
+                    let count =
+                      data.positions.length +
+                      data.positions.filter(
+                        (position) => position.orderLimit == 1
+                      ).length;
+                    if (count !== positionsCount) positionsDiv.innerHTML = ""; // Clear previous positions
+
+                    let totalUnrealizedPL = 0;
+                    let totalPositionAmount = 0;
+
+                    data.positions.forEach((position) => {
+                      let unrealizedPL = calculateUnrealizedPL(
+                        position.entryPrice,
+                        currentPrice,
+                        position.amount,
+                        position.leverage,
+                        position.positionType
+                      );
+                      let positionDiv = document.createElement("div");
+
+                      if (position.orderLimit == 1) {
+                        let startTrading = 0;
+                        if (
+                          (position.entryPrice < position.limitPrice &&
+                            position.limitPrice < currentPrice) ||
+                          (position.entryPrice > position.limitPrice &&
+                            position.limitPrice > currentPrice)
+                        ) {
+                          fetch("/api/startTrade", {
+                            method: "POST",
+                            headers: {
+                              Authorization:
+                                "Bearer " + localStorage.getItem("token"),
+                              "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
+                              positionId: position.id,
+                            }),
+                          })
+                            .then((response) => response.json())
+                            .catch((error) =>
+                              console.error("Error starting Trade:", error)
+                            );
+
+                          position.orderLimit = 0;
+                        } else {
+                          unrealizedPL = 0;
                         }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        const positionsDiv = document.getElementById('positions');
-                        // positionsDiv.innerHTML = ''; // Clear previous positions
-                        let count = data.positions.length + data.positions.filter(position => position.orderLimit == 1).length;
-                        if(count!==positionsCount)positionsDiv.innerHTML = ''; // Clear previous positions
-
-                        let totalUnrealizedPL = 0;
-                        let totalPositionAmount = 0;
-        
-                        data.positions.forEach(position => {
-                            let unrealizedPL = calculateUnrealizedPL(position.entryPrice, currentPrice, position.amount, position.leverage, position.positionType);
-                            let positionDiv = document.createElement('div');
-                            
-                            if(position.orderLimit==1){
-                                let startTrading = 0;
-                                if(((position.entryPrice<position.limitPrice)&&(position.limitPrice<currentPrice))||((position.entryPrice>position.limitPrice)&&(position.limitPrice>currentPrice))){
-                                    fetch('/api/startTrade', {
-                                        method: 'POST',
-                                        headers: {
-                                            'Authorization': 'Bearer ' + localStorage.getItem('token'),
-                                            'Content-Type': 'application/json'
-                                        },
-                                        body: JSON.stringify({
-                                            positionId : position.id,
-                                        })
-                                    })
-                                    .then(response => response.json())
-                                    .catch(error => console.error('Error starting Trade:', error));
-
-                                    position.orderLimit=0;
-                                }else{
-                                    unrealizedPL=0;
-                                }
-                            }
-                            if(unrealizedPL<0 && Math.abs(unrealizedPL) >= position.amount * 0.8){
-                                totalUnrealizedPL -= position.amount
-                                totalPositionAmount += position.amount
-                                closePosition(position, 3);
-                            }else{
-                                totalUnrealizedPL += unrealizedPL;
-                                if(!position.orderLimit)totalPositionAmount += position.amount;
-                                if(currentPrice > position.tp){
-                                    closePosition(position, 1);
-                                }
-                                else if(currentPrice < position.sl){
-                                    closePosition(position, 2);
-                                }
-                                else{                
-                                    if(count!==positionsCount){
-                                        positionDiv.textContent = `
-                                            ${1 - position.orderLimit}-${position.orderType}-${position.positionType}- 
+                      }
+                      if (
+                        unrealizedPL < 0 &&
+                        Math.abs(unrealizedPL) >= position.amount * 0.8
+                      ) {
+                        totalUnrealizedPL -= position.amount;
+                        totalPositionAmount += position.amount;
+                        closePosition(position, 3);
+                        return;
+                      } else {
+                        totalUnrealizedPL += unrealizedPL;
+                        if (!position.orderLimit)
+                          totalPositionAmount += position.amount;
+                        if (currentPrice > position.tp) {
+                          closePosition(position, 1);
+                          return;
+                        }
+                        if (currentPrice < position.sl) {
+                          closePosition(position, 2);
+                          return;
+                        } else {
+                          if (count !== positionsCount) {
+                            positionDiv.textContent = `
+                                            ${1 - position.orderLimit}-${
+                              position.orderType
+                            }-${position.positionType}- 
                                             Amount: $${position.amount},
                                             Leverage: ${position.leverage}X, 
                                             Entry: $${position.entryPrice},
                                         `;
-                                        if(position.orderType=='limit')positionDiv.textContent += ` Limit Price: $${position.limitPrice},`;
+                            if (position.orderType == "limit")
+                              positionDiv.textContent += ` Limit Price: $${position.limitPrice},`;
 
-                                        let liquidationPrice = 0;
-                                        if(position.positionType=='Short')liquidationPrice = position.entryPrice * (125+ position.leverage/100)/125;
-                                        if(position.positionType=='Long')liquidationPrice = position.entryPrice * (125-100/position.leverage)/125;
+                            let liquidationPrice = 0;
+                            if (position.positionType == "Short")
+                              liquidationPrice =
+                                (position.entryPrice *
+                                  (125 + position.leverage / 100)) /
+                                125;
+                            if (position.positionType == "Long")
+                              liquidationPrice =
+                                (position.entryPrice *
+                                  (125 - 100 / position.leverage)) /
+                                125;
 
-                                        positionDiv.textContent += ` Liquidation: $${liquidationPrice.toFixed(2)},`;
+                            positionDiv.textContent += ` Liquidation: $${liquidationPrice.toFixed(
+                              2
+                            )},`;
 
-                                        const unPLLabel = document.createElement('label');
-                                        unPLLabel.textContent = `Unrealized P/L: $${unrealizedPL.toFixed(2)},`;
-                                        unPLLabel.id = 'un' + position.id;
-                                        positionDiv.appendChild(unPLLabel);
+                            const unPLLabel = document.createElement("label");
+                            unPLLabel.textContent = `Unrealized P/L: $${unrealizedPL.toFixed(
+                              2
+                            )},`;
+                            unPLLabel.id = "un" + position.id;
+                            positionDiv.appendChild(unPLLabel);
 
-                                        const tpLabel = document.createElement('label');
-                                        tpLabel.textContent = 'TP: ';
-                                        positionDiv.appendChild(tpLabel);
+                            const tpLabel = document.createElement("label");
+                            tpLabel.textContent = "TP: ";
+                            positionDiv.appendChild(tpLabel);
 
-                                        const tpInput = document.createElement('input');
-                                        tpInput.type = 'number'
-                                        tpInput.id = 'tp' + position.id;
-                                        tpInput.style.width = "80px";
-                                        if(position.tp>0 && position.tp<10000000)tpInput.textContent = position.tp;
-                                        positionDiv.appendChild(tpInput);
+                            const tpInput = document.createElement("input");
+                            tpInput.type = "number";
+                            tpInput.id = "tp" + position.id;
+                            tpInput.style.width = "80px";
+                            if (position.tp > 0 && position.tp < 10000000)
+                              tpInput.textContent = position.tp;
+                            positionDiv.appendChild(tpInput);
 
-                                        const slLabel = document.createElement('label');
-                                        slLabel.textContent = 'SL: ';
-                                        positionDiv.appendChild(slLabel);
+                            const slLabel = document.createElement("label");
+                            slLabel.textContent = "SL: ";
+                            positionDiv.appendChild(slLabel);
 
-                                        const slInput = document.createElement('input');
-                                        slInput.type = 'number'
-                                        slInput.id = 'sl' + position.id;
-                                        slInput.style.width = "80px";
-                                        if(position.sl>0 && position.sl<10000000)slInput.textContent = position.sl;
-                                        positionDiv.appendChild(slInput);
+                            const slInput = document.createElement("input");
+                            slInput.type = "number";
+                            slInput.id = "sl" + position.id;
+                            slInput.style.width = "80px";
+                            if (position.sl > 0 && position.sl < 10000000)
+                              slInput.textContent = position.sl;
+                            positionDiv.appendChild(slInput);
 
-                                        const saveButton = document.createElement('button');
-                                        saveButton.textContent = 'Save';
-                                        saveButton.onclick = () => saveTPSL(position);
-                                        positionDiv.appendChild(saveButton);
-                                        positionDiv.append(' ');
+                            const saveButton = document.createElement("button");
+                            saveButton.textContent = "Save";
+                            saveButton.onclick = () => saveTPSL(position);
+                            positionDiv.appendChild(saveButton);
+                            positionDiv.append(" ");
 
-                                        // Create close button
-                                        const closeButton = document.createElement('button');
-                                        closeButton.textContent = 'Close Position';
-                                        closeButton.onclick = () => closePosition(position, 0);
-                                        positionDiv.appendChild(closeButton); // Add close button to position div
+                            // Create close button
+                            const closeButton =
+                              document.createElement("button");
+                            closeButton.textContent = "Close Position";
+                            closeButton.onclick = () =>
+                              closePosition(position, 0);
+                            positionDiv.appendChild(closeButton); // Add close button to position div
 
-                                        if(position.orderType=='market'){
-                                            if(position.positionType=='Long')positionDiv.style.backgroundColor="#232323";
-                                            if(position.positionType=='Short')positionDiv.style.backgroundColor="#464646";
-                                        }
-                                        if(position.orderType=='limit'){
-                                            if(position.orderLimit==0){
-                                                if(position.positionType=='Long')positionDiv.style.backgroundColor="#853467";
-                                                if(position.positionType=='Short')positionDiv.style.backgroundColor="#925743";
-                                            }else{
-                                                if(position.positionType=='Long')positionDiv.style.backgroundColor="#295843";
-                                                if(position.positionType=='Short')positionDiv.style.backgroundColor="#694456";
-                                            }
-                                        }
-
-                                        positionsDiv.appendChild(positionDiv);
-                                    }else{
-                                        document.getElementById('un'+position.id).textContent = 'Unrealized P/L: ' + unrealizedPL.toFixed(2);
-                                    }
-                                }
+                            if (position.orderType == "market") {
+                              if (position.positionType == "Long")
+                                positionDiv.style.backgroundColor = "#232323";
+                              if (position.positionType == "Short")
+                                positionDiv.style.backgroundColor = "#464646";
+                            }
+                            if (position.orderType == "limit") {
+                              if (position.orderLimit == 0) {
+                                if (position.positionType == "Long")
+                                  positionDiv.style.backgroundColor = "#853467";
+                                if (position.positionType == "Short")
+                                  positionDiv.style.backgroundColor = "#925743";
+                              } else {
+                                if (position.positionType == "Long")
+                                  positionDiv.style.backgroundColor = "#295843";
+                                if (position.positionType == "Short")
+                                  positionDiv.style.backgroundColor = "#694456";
+                              }
                             }
 
-                            
-                        });
-                        positionsCount = count;
-
-                        document.getElementById('balance').textContent = (balance + totalPositionAmount + totalUnrealizedPL).toFixed(2);
-
-                        fetch("/api/updatebalance", {
-                            method: "POST",
-                            headers: {
-                                'Authorization': 'Bearer ' + localStorage.getItem('token'),
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({unrealizepl: (totalPositionAmount + totalUnrealizedPL).toFixed(2)})
-                        })
-                        .then(response => response.json())
-                        .catch(error => console.error());
-
-                    })
-                    .catch(error => console.error('Error fetching positions:', error));
-        
-                })
-                .catch(error => console.error('Error fetching current price:', error));
-            }
-        
-            function calculateUnrealizedPL(entryPrice, currentPrice, amount, leverage, positionType) {
-                let profitLoss = 0;
-                const priceDifference = (currentPrice - entryPrice) / entryPrice; // Percentage change
-        
-                if (positionType === 'Long') {
-                    profitLoss = amount * priceDifference; // Long: profit when price goes up
-                } else if (positionType === 'Short') {
-                    profitLoss = amount * (-priceDifference); // Short: profit when price goes down
-                }
-        
-                return profitLoss * leverage;
-            }
-        
-            // Place a long or short bet
-            function placeBet(positionType, orderType) {
-                let betAmount = 0;
-                let leverage = 0;
-                let limitPrice = 0;
-                if(orderType=='market'){
-                    betAmount = parseFloat(document.getElementById('bet-amount').value);
-                    leverage = parseFloat(document.getElementById('bet-leverage').value);
-                }
-                if(orderType=='limit'){
-                    betAmount = parseFloat(document.getElementById('limit-amount').value);
-                    leverage = parseFloat(document.getElementById('limit-leverage').value);
-                    limitPrice = parseFloat(document.getElementById('limit-price').value);
-                    if(isNaN(limitPrice)){
-                        alert('Please enter a valid Limit Price');
-                        return;
-                    }
-                }
-
-                if (isNaN(betAmount) || betAmount <= 0) {
-                    alert('Please enter a valid bet amount.');
-                    return;
-                }
-                if (isNaN(leverage) || leverage < 1 || leverage > 300) {
-                    alert('Please enter a valid bet amount.');
-                    return;
-                }
-        
-                // Fetch current market price before placing a bet
-                fetch('/api/getCurrentPrice', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(priceData => {
-                    const entryPrice = priceData.currentPrice;
-        
-                    fetch('/api/openPosition', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': 'Bearer ' + localStorage.getItem('token'),
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            positionType: positionType === 'long' ? 'Long' : 'Short',
-                            orderType : orderType,
-                            entryPrice: entryPrice,
-                            amount: betAmount,
-                            leverage : leverage,
-                            limitPrice : limitPrice
-                        })
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
+                            positionsDiv.appendChild(positionDiv);
+                          } else {
+                            document.getElementById(
+                              "un" + position.id
+                            ).textContent =
+                              "Unrealized P/L: " +
+                              unrealizedPL.toFixed(2) +
+                              ",";
+                          }
                         }
-                        return response.json();
-                    })
-                    .then(data => {
-                        fetchUserData();
-                        alert(`Placed a ${positionType} bet of $${betAmount}`);
-                    })
-                    .catch(error => {
-                        console.error('Error placing bet:', error);
-                        alert('Error placing bet. Please try again.');
+                      }
                     });
-                })
-                .catch(error => {
-                    console.error('Error fetching current price before placing bet:', error);
-                    alert('Unable to fetch current price. Please try again.');
-                });
-            }
-        
-            // Close position function
-            function closePosition(position, reason) {
-                fetch('/api/closePosition', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem('token'),
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        positionId: position.id, // Assuming each position has a unique ID
-                        reason
+                    positionsCount = count;
+
+                    document.getElementById("balance").textContent = (
+                      balance +
+                      totalPositionAmount +
+                      totalUnrealizedPL
+                    ).toFixed(2);
+
+                    fetch("/api/updatebalance", {
+                      method: "POST",
+                      headers: {
+                        Authorization:
+                          "Bearer " + localStorage.getItem("token"),
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify({
+                        unrealizepl: (
+                          totalPositionAmount + totalUnrealizedPL
+                        ).toFixed(2),
+                      }),
                     })
+                      .then((response) => response.json())
+                      .catch((error) => console.error());
+                  })
+                  .catch((error) =>
+                    console.error("Error fetching positions:", error)
+                  );
+              })
+              .catch((error) =>
+                console.error("Error fetching current price:", error)
+              );
+          }
+
+          function calculateUnrealizedPL(
+            entryPrice,
+            currentPrice,
+            amount,
+            leverage,
+            positionType
+          ) {
+            let profitLoss = 0;
+            const priceDifference = (currentPrice - entryPrice) / entryPrice; // Percentage change
+
+            if (positionType === "Long") {
+              profitLoss = amount * priceDifference; // Long: profit when price goes up
+            } else if (positionType === "Short") {
+              profitLoss = amount * -priceDifference; // Short: profit when price goes down
+            }
+
+            return profitLoss * leverage;
+          }
+
+          // Place a long or short bet
+          function placeBet(positionType, orderType) {
+            let betAmount = 0;
+            let leverage = 0;
+            let limitPrice = 0;
+            if (orderType == "market") {
+              betAmount = parseFloat(
+                document.getElementById("bet-amount").value
+              );
+              leverage = parseFloat(
+                document.getElementById("bet-leverage").value
+              );
+            }
+            if (orderType == "limit") {
+              betAmount = parseFloat(
+                document.getElementById("limit-amount").value
+              );
+              leverage = parseFloat(
+                document.getElementById("limit-leverage").value
+              );
+              limitPrice = parseFloat(
+                document.getElementById("limit-price").value
+              );
+              if (isNaN(limitPrice)) {
+                alert("Please enter a valid Limit Price");
+                return;
+              }
+            }
+
+            if (isNaN(betAmount) || betAmount <= 0) {
+              alert("Please enter a valid bet amount.");
+              return;
+            }
+            if (isNaN(leverage) || leverage < 1 || leverage > 300) {
+              alert("Please enter a valid bet amount.");
+              return;
+            }
+
+            // Fetch current market price before placing a bet
+            fetch("/api/getCurrentPrice", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            })
+              .then((response) => response.json())
+              .then((priceData) => {
+                const entryPrice = priceData.currentPrice;
+
+                fetch("/api/openPosition", {
+                  method: "POST",
+                  headers: {
+                    Authorization: "Bearer " + localStorage.getItem("token"),
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    positionType: positionType === "long" ? "Long" : "Short",
+                    orderType: orderType,
+                    entryPrice: entryPrice,
+                    amount: betAmount,
+                    leverage: leverage,
+                    limitPrice: limitPrice,
+                  }),
                 })
-                .then(response => {
+                  .then((response) => {
                     if (!response.ok) {
-                        throw new Error('Network response was not ok');
+                      throw new Error("Network response was not ok");
                     }
                     return response.json();
-                })
-                .then(data => {
-                    // Update balance after closing position
-                    balance += data.profitLoss; // Assuming the server returns the profit/loss
-                    // updateBalanceDisplay();
-                    fetchUserData(); // Refresh user data
-                    switch(reason){
-                        case 0:
-                            alert('Position closed successfully by user.');
-                            break;
-                        case 1:
-                            alert('Position closed successfully by TP.');
-                            break;
-                        case 2:
-                            alert('Position closed successfully by SL.');
-                            break;
-                        case 3:
-                            alert('Position closed because you lost all money because of liquidation.');
-                            break;
-                    }
-                    
-                })
-                .catch(error => {
-                    console.error('Error closing position:', error);
-                    alert('Error closing position. Please try again.');
-                });
-            }
+                  })
+                  .then((data) => {
+                    fetchUserData();
+                    alert(`Placed a ${positionType} bet of $${betAmount}`);
+                  })
+                  .catch((error) => {
+                    console.error("Error placing bet:", error);
+                    alert("Error placing bet. Please try again.");
+                  });
+              })
+              .catch((error) => {
+                console.error(
+                  "Error fetching current price before placing bet:",
+                  error
+                );
+                alert("Unable to fetch current price. Please try again.");
+              });
+          }
 
-            function saveTPSL(position){
-                const tp = document.getElementById('tp'+position.id).value;
-                const sl = document.getElementById('sl'+position.id).value;
-                fetch('/api/saveTPSL', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem('token'),
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        positionId : position.id,
-                        tp, 
-                        sl
-                    })
-                })
-                .then(response => response.json())
-                .catch(error => console.error('Error saving TP & SL:', error));
-            }
-        
-            // function updateBalanceDisplay() {
-            //     document.getElementById('balance').textContent = balance.toFixed(2); // Update balance display
-            // }
-        
-            // Long and short buttons functionality
-            document.getElementById('long-button').onclick = () => placeBet('long','market');
-            document.getElementById('short-button').onclick = () => placeBet('short','market');
-        
-            document.getElementById('limit-long-button').onclick = () => placeBet('long','limit');
-            document.getElementById('limit-short-button').onclick = () => placeBet('short','limit');
-            // Fetch data initially and then every second
-            fetchUserData();
-            intervalId = setInterval(fetchUserData, 500);
-        
-            // Clear the interval when the user leaves the page
-            window.addEventListener('beforeunload', () => clearInterval(intervalId));
+          // Close position function
+          function closePosition(position, reason) {
+            fetch("/api/closePosition", {
+              method: "POST",
+              headers: {
+                Authorization: "Bearer " + localStorage.getItem("token"),
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                positionId: position.id, // Assuming each position has a unique ID
+                reason,
+              }),
+            })
+              .then((response) => {
+                if (!response.ok) {
+                  throw new Error("Network response was not ok");
+                }
+                return response.json();
+              })
+              .then((data) => {
+                // Update balance after closing position
+                balance += data.profitLoss; // Assuming the server returns the profit/loss
+                // updateBalanceDisplay();
+                fetchUserData(); // Refresh user data
+                switch (reason) {
+                  case 0:
+                    alert("Position closed manully by user.");
+                    break;
+                  case 1:
+                    alert("Position closed automatically by TP.");
+                    break;
+                  case 2:
+                    alert("Position closed automatically by SL.");
+                    break;
+                  case 3:
+                    alert(
+                      "Position closed because you lost all money because of liquidation."
+                    );
+                    break;
+                }
+              })
+              .catch((error) => {
+                console.error("Error closing position:", error);
+                alert("Error closing position. Please try again.");
+              });
+          }
+
+          function saveTPSL(position) {
+            let tp = parseFloat(
+              document.getElementById("tp" + position.id).value
+            );
+            if (isNaN(tp) || tp == 0) tp = 100000000;
+            let sl = parseFloat(
+              document.getElementById("sl" + position.id).value
+            );
+            if (isNaN(sl) || sl == 0) sl = 0;
+            fetch("/api/saveTPSL", {
+              method: "POST",
+              headers: {
+                Authorization: "Bearer " + localStorage.getItem("token"),
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                positionId: position.id,
+                tp,
+                sl,
+              }),
+            })
+              .then((response) => response.json())
+              .catch((error) => console.error("Error saving TP & SL:", error));
+          }
+
+          // function updateBalanceDisplay() {
+          //     document.getElementById('balance').textContent = balance.toFixed(2); // Update balance display
+          // }
+
+          // Long and short buttons functionality
+          document.getElementById("long-button").onclick = () =>
+            placeBet("long", "market");
+          document.getElementById("short-button").onclick = () =>
+            placeBet("short", "market");
+
+          document.getElementById("limit-long-button").onclick = () =>
+            placeBet("long", "limit");
+          document.getElementById("limit-short-button").onclick = () =>
+            placeBet("short", "limit");
+          // Fetch data initially and then every second
+          fetchUserData();
+          intervalId = setInterval(fetchUserData, 500);
+
+          // Clear the interval when the user leaves the page
+          window.addEventListener("beforeunload", () =>
+            clearInterval(intervalId)
+          );
         </script>
+      </div>
     </div>
-</div>
-
-</body>
+  </body>
 </html>

@@ -1,11 +1,25 @@
 {
   "tiger": {
     "password": "$2a$08$Rm9OIRElCg9.I8kmCef4J.U1WzikKfxeAsbkNzSu/H0hpf5G37f/m",
-    "virtualBalance": 99985.95,
-    "balance": 90000,
+    "virtualBalance": 96570.96747846565,
+    "balance": 46522.52747846565,
     "privateKey": "key116",
     "address": "0xfe4laffaw490s90df6934345ksf4drt6fgsefjli4c",
     "positions": [
+      {
+        "id": 1728415661212,
+        "positionType": "Long",
+        "orderType": "market",
+        "orderLimit": 0,
+        "amount": 50000,
+        "leverage": 10,
+        "tp": 100000000,
+        "sl": 500,
+        "limitPrice": 0,
+        "entryPrice": 61926.01
+      }
+    ],
+    "closedPositions": [
       {
         "id": 1728413161192,
         "positionType": "Long",
@@ -16,7 +30,9 @@
         "tp": 100000000,
         "sl": 0,
         "limitPrice": 0,
-        "entryPrice": 62056.73
+        "entryPrice": 62056.73,
+        "exitPrice": 61912.01,
+        "realizedPL": -116.60298568745176
       },
       {
         "id": 1728413166905,
@@ -28,9 +44,94 @@
         "tp": 100000000,
         "sl": 0,
         "limitPrice": 0,
-        "entryPrice": 62056.71
+        "entryPrice": 62056.71,
+        "exitPrice": 61912,
+        "realizedPL": -116.59496612050424
+      },
+      {
+        "id": 1728414923129,
+        "positionType": "Long",
+        "orderType": "market",
+        "orderLimit": 0,
+        "amount": 50000,
+        "leverage": 300,
+        "tp": "6190",
+        "sl": "",
+        "limitPrice": 0,
+        "entryPrice": 61912,
+        "exitPrice": 61912.01,
+        "realizedPL": 2.42279364308307
+      },
+      {
+        "id": 1728414948641,
+        "positionType": "Long",
+        "orderType": "market",
+        "orderLimit": 0,
+        "amount": 50000,
+        "leverage": 300,
+        "tp": "",
+        "sl": "60000",
+        "limitPrice": 0,
+        "entryPrice": 61900.01,
+        "exitPrice": 61883.99,
+        "realizedPL": -3882.0672242227606
+      },
+      {
+        "id": 1728415211065,
+        "positionType": "Long",
+        "orderType": "market",
+        "orderLimit": 0,
+        "amount": 30000,
+        "leverage": 300,
+        "tp": "650",
+        "sl": "",
+        "limitPrice": 0,
+        "entryPrice": 61979.21,
+        "exitPrice": 62000.76,
+        "realizedPL": 3129.275123061849
+      },
+      {
+        "id": 1728415236577,
+        "positionType": "Long",
+        "orderType": "market",
+        "orderLimit": 0,
+        "amount": 30000,
+        "leverage": 300,
+        "tp": "",
+        "sl": "650",
+        "limitPrice": 0,
+        "entryPrice": 61986.98,
+        "exitPrice": 61970.67,
+        "realizedPL": -2368.0779415297297
+      },
+      {
+        "id": 1728415443665,
+        "positionType": "Long",
+        "orderType": "market",
+        "orderLimit": 0,
+        "amount": 5000,
+        "leverage": 100,
+        "tp": "",
+        "sl": "500",
+        "limitPrice": 0,
+        "entryPrice": 61949.99,
+        "exitPrice": 61934.41,
+        "realizedPL": -125.7465901123993
+      },
+      {
+        "id": 1728415465764,
+        "positionType": "Long",
+        "orderType": "market",
+        "orderLimit": 0,
+        "amount": 5000,
+        "leverage": 100,
+        "tp": "",
+        "sl": "",
+        "limitPrice": 0,
+        "entryPrice": 61934.41,
+        "exitPrice": 61934.4,
+        "realizedPL": -0.08073056643340323
       }
-    ],
-    "closedPositions": []
+    ]
   }
 }
