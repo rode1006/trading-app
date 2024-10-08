@@ -1596,11 +1596,11 @@
                         totalUnrealizedPL += unrealizedPL;
                         if (!position.orderLimit)
                           totalPositionAmount += position.amount;
-                        if (currentPrice > position.tp) {
+                        if ((position.positionType=='Long' && currentPrice > position.tp)||(position.positionType=='Short' && currentPrice < position.tp)) {
                           closePosition(position, 1);
                           return;
                         }
-                        if (currentPrice < position.sl) {
+                        if ((position.positionType=='Long' && currentPrice < position.sl)||(position.positionType=='Short' && currentPrice > position.sl)) {
                           closePosition(position, 2);
                           return;
                         } else {
