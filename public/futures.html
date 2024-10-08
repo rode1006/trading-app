@@ -1900,11 +1900,23 @@
             let tp = parseFloat(
               document.getElementById("tp" + position.id).value
             );
-            if (isNaN(tp) || tp == 0) tp = 100000000;
+            if (isNaN(tp) || tp == 0){
+                if(position.positionType=='Long'){
+                    tp = 100000000;
+                }else{
+                    tp = 0;
+                }
+            } 
             let sl = parseFloat(
               document.getElementById("sl" + position.id).value
             );
-            if (isNaN(sl) || sl == 0) sl = 0;
+            if (isNaN(sl) || sl == 0){
+                if(position.positionType=='Long'){
+                    sl = 0;
+                }else{
+                    sl = 100000000;
+                }
+            } 
             fetch("/api/saveTPSL", {
               method: "POST",
               headers: {
