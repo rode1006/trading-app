@@ -34,9 +34,6 @@ body {
   background: #3a3a7a; /* Lighter shade on hover for visibility */
 }
 
-
-
-
 .container {
   display: flex;
   flex-direction: row;

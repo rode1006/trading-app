@@ -705,28 +705,39 @@
         
         <div class="open-position">
             
-            <div id="credit" class="credit">
-                <span id="balance" class="balance-value">0</span><br>Credit: 
-                <span id="credit-value">Loading...</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Current Price: 
-                <span id="current-price">Loading...</span>
+            <div id="credit" class="credit" style="color: rgba(165, 164, 164, 0.978);">
+                <span id="balance" style="color: aquamarine;">0</span><br>Credit: 
+                <span id="credit-value" style="color: hsl(236, 100%, 94%);">Loading...</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Current Price: 
+                <span id="current-price" style="color: chartreuse;">Loading...</span>
             </div>
-            <label>Bet Amount:</label>
-            <input type="number" id="bet-amount" min="1" max="100" style="width: 100px;font-size: 20px;">&nbsp;&nbsp;
-            <label>Leverage:</label>
-            <input type="number" id="bet-leverage" min="1" max="300" value="1" style="font-size: 20px;">&nbsp;&nbsp;
-            <label>TP:</label>
-            <input type="number" id="bet-tp" style="width: 100px;font-size: 20px;">&nbsp;&nbsp;
-            <label>SL:</label>
-            <input type="number" id="bet-sl" style="width: 100px;font-size: 20px;">&nbsp;&nbsp;
-            <button id="long-button" class="playbutttton" style="margin-top: 15px;">Long</button>&nbsp;&nbsp;
-            <button id="short-button" class="playbutttton" style="margin-top: 15px;">Short</button>&nbsp;&nbsp;
+            <div>
+                <label style="color: rgb(179, 57, 57);font-size: 24px;">Market Order: </label>&nbsp;&nbsp;
+                <label>Bet Amount:</label>
+                <input type="number" id="bet-amount" min="1" max="100" style="width: 80px;font-size: 20px;">&nbsp;&nbsp;
+                <label>Leverage:</label>
+                <input type="number" id="bet-leverage" min="1" max="300" value="1" style="width:50px;font-size: 20px;">&nbsp;&nbsp;
+                <button id="long-button" class="playbutttton" style="margin-top: 15px;">Long</button>&nbsp;&nbsp;
+                <button id="short-button" class="playbutttton" style="margin-top: 15px;">Short</button>&nbsp;&nbsp;
+            </div>
+            <div>
+                <label style="color: rgb(179, 57, 57);font-size: 24px;">Limit Order: </label>&nbsp;&nbsp;
+                <label>Bet Amount:</label>
+                <input type="number" id="limit-amount" min="1" max="100" style="width: 80px;font-size: 20px;">&nbsp;&nbsp;
+                <label>Leverage:</label>
+                <input type="number" id="limit-leverage" min="1" max="300" value="1" style="width:50px;font-size: 20px;">&nbsp;&nbsp;
+                <label>Limit Price:</label>
+                <input type="number" id="limit-price" style="width: 100px;font-size: 20px;">&nbsp;&nbsp;
+                <button id="limit-long-button" class="playbutttton" style="margin-top: 15px;">Long</button>&nbsp;&nbsp;
+                <button id="limit-short-button" class="playbutttton" style="margin-top: 15px;">Short</button>&nbsp;&nbsp;
+            </div>
+            <hr>
             <div id="positions"></div>
         </div>
-
         
         <script>
             let intervalId;
             let balance = 0; // Initialize balance
+            let positionsCount = 0;
         
             function fetchUserData() {
                 fetch('/api/getBalance', {
@@ -767,61 +778,123 @@
                     .then(response => response.json())
                     .then(data => {
                         const positionsDiv = document.getElementById('positions');
-                        positionsDiv.innerHTML = ''; // Clear previous positions
+                        // positionsDiv.innerHTML = ''; // Clear previous positions
+                        let count = data.positions.length + data.positions.filter(position => position.orderLimit == 1).length;
+                        if(count!==positionsCount)positionsDiv.innerHTML = ''; // Clear previous positions
 
                         let totalUnrealizedPL = 0;
                         let totalPositionAmount = 0;
         
                         data.positions.forEach(position => {
-                            const unrealizedPL = calculateUnrealizedPL(position.entryPrice, currentPrice, position.amount, position.leverage, position.positionType);
-                            const positionDiv = document.createElement('div');
+                            let unrealizedPL = calculateUnrealizedPL(position.entryPrice, currentPrice, position.amount, position.leverage, position.positionType);
+                            let positionDiv = document.createElement('div');
                             
+                            if(position.orderLimit==1){
+                                if(position.limitPrice==currentPrice){
+                                    fetch('/api/startTrade', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Authorization': 'Bearer ' + localStorage.getItem('token'),
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({
+                                            positionId : position.id,
+                                        })
+                                    })
+                                    .then(response => response.json())
+                                    .catch(error => console.error('Error starting Trade:', error));
+
+                                    position.orderLimit=0;
+                                }else{
+                                    unrealizedPL=0;
+                                }
+                            }
                             if(unrealizedPL<0 && Math.abs(unrealizedPL) > position.amount){
                                 totalUnrealizedPL -= position.amount
                                 totalPositionAmount += position.amount
                                 closePosition(position, 3);
                             }else{
                                 totalUnrealizedPL += unrealizedPL;
-                                totalPositionAmount += position.amount;
+                                if(!position.orderLimit)totalPositionAmount += position.amount;
                                 if(currentPrice > position.tp){
                                     closePosition(position, 1);
                                 }
                                 else if(currentPrice < position.sl){
                                     closePosition(position, 2);
                                 }
-                                else{
-                                    // Create close button
-                                    const closeButton = document.createElement('button');
-                                    closeButton.textContent = 'Close Position';
-                                    closeButton.onclick = () => closePosition(position, 0);
-                
-                                    // Display positionType, Amount, Entry, Market Price, and Unrealized P/L
-                                    positionDiv.textContent = `
-                                        ${position.positionType} - Amount: $${position.amount},
-                                        Leverage: ${position.leverage}X, 
-                                        TP: $${position.tp}, 
-                                        SL: $${position.sl}, 
-                                        Entry: $${position.entryPrice}, 
-                                        Market Price: $${currentPrice.toFixed(2)}, 
-                                        Unrealized P/L: $${unrealizedPL.toFixed(2)}
-                                    `;
-                                    positionDiv.appendChild(closeButton); // Add close button to position div
-                                    positionsDiv.appendChild(positionDiv);
-                                    // fetch("/api/updatebalance", {
-                                    //     method: "POST",
-                                    //     headers: {
-                                    //         'Authorization': 'Bearer ' + localStorage.getItem('token'),
-                                    //         'Content-Type': 'application/json'
-                                    //     },
-                                    //     body: JSON.stringify({unrealizepl: unrealizedPL.toFixed(2)})
-                                    // })
-                                    // .then(response => response.json())
-                                    // .catch(error => console.error());
+                                else{                
+                                    if(count!==positionsCount){
+                                        positionDiv.textContent = `
+                                            ${1 - position.orderLimit} - ${position.orderType} - ${position.positionType} - 
+                                            Amount: $${position.amount},
+                                            Leverage: ${position.leverage}X, 
+                                            Entry: $${position.entryPrice},
+                                        `;
+                                        if(position.orderType=='limit')positionDiv.textContent += ` Limit Price: $${position.limitPrice},`;
+
+                                        const unPLLabel = document.createElement('label');
+                                        unPLLabel.textContent = `Unrealized P/L: $${unrealizedPL.toFixed(2)},`;
+                                        unPLLabel.id = 'un' + position.id;
+                                        positionDiv.appendChild(unPLLabel);
+
+                                        const tpLabel = document.createElement('label');
+                                        tpLabel.textContent = 'TP: ';
+                                        positionDiv.appendChild(tpLabel);
+
+                                        const tpInput = document.createElement('input');
+                                        tpInput.type = 'number'
+                                        tpInput.id = 'tp' + position.id;
+                                        tpInput.style.width = "80px";
+                                        if(position.tp>0 && position.tp<10000000)tpInput.textContent = position.tp;
+                                        positionDiv.appendChild(tpInput);
+
+                                        const slLabel = document.createElement('label');
+                                        slLabel.textContent = 'SL: ';
+                                        positionDiv.appendChild(slLabel);
+
+                                        const slInput = document.createElement('input');
+                                        slInput.type = 'number'
+                                        slInput.id = 'sl' + position.id;
+                                        slInput.style.width = "80px";
+                                        if(position.sl>0 && position.sl<10000000)slInput.textContent = position.sl;
+                                        positionDiv.appendChild(slInput);
+
+                                        const saveButton = document.createElement('button');
+                                        saveButton.textContent = 'Save';
+                                        saveButton.onclick = () => saveTPSL(position);
+                                        positionDiv.appendChild(saveButton);
+                                        positionDiv.append(' ');
+
+                                        // Create close button
+                                        const closeButton = document.createElement('button');
+                                        closeButton.textContent = 'Close Position';
+                                        closeButton.onclick = () => closePosition(position, 0);
+                                        positionDiv.appendChild(closeButton); // Add close button to position div
+
+                                        if(position.orderType=='market'){
+                                            if(position.positionType=='Long')positionDiv.style.backgroundColor="#232323";
+                                            if(position.positionType=='Short')positionDiv.style.backgroundColor="#464646";
+                                        }
+                                        if(position.orderType=='limit'){
+                                            if(position.orderLimit==0){
+                                                if(position.positionType=='Long')positionDiv.style.backgroundColor="#853467";
+                                                if(position.positionType=='Short')positionDiv.style.backgroundColor="#925743";
+                                            }else{
+                                                if(position.positionType=='Long')positionDiv.style.backgroundColor="#295843";
+                                                if(position.positionType=='Short')positionDiv.style.backgroundColor="#694456";
+                                            }
+                                        }
+
+                                        positionsDiv.appendChild(positionDiv);
+                                    }else{
+                                        document.getElementById('un'+position.id).textContent = unrealizedPL.toFixed(2);
+                                    }
                                 }
                             }
 
                             
                         });
+                        positionsCount = count;
 
                         document.getElementById('balance').textContent = (balance + totalPositionAmount + totalUnrealizedPL).toFixed(2);
 
@@ -857,11 +930,23 @@
             }
         
             // Place a long or short bet
-            function placeBet(positionType) {
-                const betAmount = parseFloat(document.getElementById('bet-amount').value);
-                const leverage = parseFloat(document.getElementById('bet-leverage').value);
-                const tp = parseFloat(document.getElementById('bet-tp').value);
-                const sl = parseFloat(document.getElementById('bet-sl').value);
+            function placeBet(positionType, orderType) {
+                let betAmount = 0;
+                let leverage = 0;
+                let limitPrice = 0;
+                if(orderType=='market'){
+                    betAmount = parseFloat(document.getElementById('bet-amount').value);
+                    leverage = parseFloat(document.getElementById('bet-leverage').value);
+                }
+                if(orderType=='limit'){
+                    betAmount = parseFloat(document.getElementById('limit-amount').value);
+                    leverage = parseFloat(document.getElementById('limit-leverage').value);
+                    limitPrice = parseFloat(document.getElementById('limit-price').value);
+                    if(isNaN(limitPrice)){
+                        alert('Please enter a valid Limit Price');
+                        return;
+                    }
+                }
 
                 if (isNaN(betAmount) || betAmount <= 0) {
                     alert('Please enter a valid bet amount.');
@@ -871,8 +956,6 @@
                     alert('Please enter a valid bet amount.');
                     return;
                 }
-                if(isNaN(tp))tp=10000000000;
-                if(isNaN(sl))sl=0;
         
                 // Fetch current market price before placing a bet
                 fetch('/api/getCurrentPrice', {
@@ -893,11 +976,11 @@
                         },
                         body: JSON.stringify({
                             positionType: positionType === 'long' ? 'Long' : 'Short',
+                            orderType : orderType,
                             entryPrice: entryPrice,
                             amount: betAmount,
                             leverage : leverage,
-                            tp:tp,
-                            sl:sl,
+                            limitPrice : limitPrice
                         })
                     })
                     .then(response => {
@@ -965,15 +1048,36 @@
                     alert('Error closing position. Please try again.');
                 });
             }
+
+            function saveTPSL(position){
+                const tp = document.getElementById('tp'+position.id).value;
+                const sl = document.getElementById('sl'+position.id).value;
+                fetch('/api/saveTPSL', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token'),
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        positionId : position.id,
+                        tp, 
+                        sl
+                    })
+                })
+                .then(response => response.json())
+                .catch(error => console.error('Error saving TP & SL:', error));
+            }
         
             // function updateBalanceDisplay() {
             //     document.getElementById('balance').textContent = balance.toFixed(2); // Update balance display
             // }
         
             // Long and short buttons functionality
-            document.getElementById('long-button').onclick = () => placeBet('long');
-            document.getElementById('short-button').onclick = () => placeBet('short');
+            document.getElementById('long-button').onclick = () => placeBet('long','market');
+            document.getElementById('short-button').onclick = () => placeBet('short','market');
         
+            document.getElementById('limit-long-button').onclick = () => placeBet('long','limit');
+            document.getElementById('limit-short-button').onclick = () => placeBet('short','limit');
             // Fetch data initially and then every second
             fetchUserData();
             intervalId = setInterval(fetchUserData, 500);

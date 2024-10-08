@@ -135,13 +135,17 @@ async function fetchCurrentMarketPrice() {
 }
 
 app.post('/api/openPosition', authenticateToken, async (req, res) => {
-    const { positionType, amount, leverage, tp, sl } = req.body;
+    const { positionType, orderType, amount, leverage, limitPrice } = req.body;
     const username = req.user.username;
     const users = loadUsers();
     const user = users[username];
+    let orderLimit = 0;
 
-    if(user.positions){
-        if(user.positions.length == 5) return res.status(404).send('Orders limited to 5');
+    if(orderType=='limit'){
+        orderLimit=1;
+        if(user.positions.filter(position => position.orderLimit==1).length==5){
+            return res.status(404).send('Limit Orders limited to 5');
+        }
     }
 
     if (!user) return res.status(404).send('User not found');
@@ -156,16 +160,19 @@ app.post('/api/openPosition', authenticateToken, async (req, res) => {
         return res.status(500).send('Error fetching market price');
     }
 
-    user.balance -= amount; // Deduct the amount from user's balance
+    if(orderType=='market')user.balance -= amount; // Deduct the amount from user's balance
 
     const positionId = Date.now(); // Unique ID for the position (can be replaced with a more robust method)
     const position = {
         id: positionId,
         positionType,
+        orderType,
+        orderLimit,
         amount,
         leverage,
-        tp,
-        sl,
+        tp : 100000000,
+        sl : 0,
+        limitPrice,
         entryPrice: currentMarketPrice
     };
 
@@ -204,6 +211,42 @@ app.post('/api/getCurrentPrice', async (req, res) => {
     }
 });
 
+app.post('/api/saveTPSL', authenticateToken, async (req, res) => {
+    const { positionId, tp, sl } = req.body;
+    const username = req.user.username;
+    const users = loadUsers();
+    const user = users[username];
+
+    if (!user) return res.status(404).send('User not found');
+
+    // Find the position to close
+    const positionIndex = user.positions.findIndex(pos => pos.id === positionId);
+    if (positionIndex === -1) return res.status(404).send('Position not found');
+
+    user.positions[positionIndex].tp=tp;
+    user.positions[positionIndex].sl=sl;
+    saveUsers(users);
+    res.json({ positions: user.positions });
+});
+
+app.post('/api/startTrade', authenticateToken, async (req, res) => {
+    const { positionId } = req.body;
+    const username = req.user.username;
+    const users = loadUsers();
+    const user = users[username];
+
+    if (!user) return res.status(404).send('User not found');
+
+    // Find the position to close
+    const positionIndex = user.positions.findIndex(pos => pos.id === positionId);
+    if (positionIndex === -1) return res.status(404).send('Position not found');
+
+    user.positions[positionIndex].orderLimit=0;
+    user.balance -= user.positions[positionIndex].amount;
+    saveUsers(users);
+    res.json({ positions: user.positions });
+});
+
 app.post('/api/closePosition', authenticateToken, async (req, res) => {
     const { positionId } = req.body;
     const username = req.user.username;
@@ -229,7 +272,7 @@ app.post('/api/closePosition', authenticateToken, async (req, res) => {
     const profitLoss = closedPosition.amount * closedPosition.leverage * (priceDiff/closedPosition.entryPrice);
 
     // Update balance
-    user.balance += closedPosition.amount + profitLoss; // Add the amount and profit/loss
+    if(!closedPosition.orderLimit)user.balance += closedPosition.amount + profitLoss; // Add the amount and profit/loss
 
     // Log the closed position with realized P/L
     if (!user.closedPositions) {
