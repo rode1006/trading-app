@@ -248,7 +248,7 @@ app.post('/api/startTrade', authenticateToken, async (req, res) => {
 });
 
 app.post('/api/closePosition', authenticateToken, async (req, res) => {
-    const { positionId } = req.body;
+    const { positionId, reason } = req.body;
     const username = req.user.username;
     const users = loadUsers();
     const user = users[username];
@@ -272,6 +272,7 @@ app.post('/api/closePosition', authenticateToken, async (req, res) => {
     const profitLoss = closedPosition.amount * closedPosition.leverage * (priceDiff/closedPosition.entryPrice);
 
     // Update balance
+    if(reason==3)profitLoss = -closedPosition.amount; // liquidation
     if(!closedPosition.orderLimit)user.balance += closedPosition.amount + profitLoss; // Add the amount and profit/loss
 
     // Log the closed position with realized P/L

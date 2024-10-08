@@ -810,7 +810,7 @@
                                     unrealizedPL=0;
                                 }
                             }
-                            if(unrealizedPL<0 && Math.abs(unrealizedPL) > position.amount){
+                            if(unrealizedPL<0 && Math.abs(unrealizedPL) >= position.amount * 0.8){
                                 totalUnrealizedPL -= position.amount
                                 totalPositionAmount += position.amount
                                 closePosition(position, 3);
@@ -826,12 +826,18 @@
                                 else{                
                                     if(count!==positionsCount){
                                         positionDiv.textContent = `
-                                            ${1 - position.orderLimit} - ${position.orderType} - ${position.positionType} - 
+                                            ${1 - position.orderLimit}-${position.orderType}-${position.positionType}- 
                                             Amount: $${position.amount},
                                             Leverage: ${position.leverage}X, 
                                             Entry: $${position.entryPrice},
                                         `;
                                         if(position.orderType=='limit')positionDiv.textContent += ` Limit Price: $${position.limitPrice},`;
+
+                                        let liquidationPrice = 0;
+                                        if(position.positionType=='Short')liquidationPrice = position.entryPrice * (125+ position.leverage/100)/125;
+                                        if(position.positionType=='Long')liquidationPrice = position.entryPrice * (125-100/position.leverage)/125;
+
+                                        positionDiv.textContent += ` Liquidation: $${liquidationPrice.toFixed(2)},`;
 
                                         const unPLLabel = document.createElement('label');
                                         unPLLabel.textContent = `Unrealized P/L: $${unrealizedPL.toFixed(2)},`;
@@ -1014,7 +1020,8 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        positionId: position.id // Assuming each position has a unique ID
+                        positionId: position.id, // Assuming each position has a unique ID
+                        reason
                     })
                 })
                 .then(response => {
@@ -1039,7 +1046,7 @@
                             alert('Position closed successfully by SL.');
                             break;
                         case 3:
-                            alert('Position closed because you lost all money in the position.');
+                            alert('Position closed because you lost all money because of liquidation.');
                             break;
                     }
                     
