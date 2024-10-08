@@ -163,6 +163,16 @@ app.post('/api/openPosition', authenticateToken, async (req, res) => {
     if(orderType=='market')user.balance -= amount; // Deduct the amount from user's balance
 
     const positionId = Date.now(); // Unique ID for the position (can be replaced with a more robust method)
+    let tp=0;
+    let sl=0;
+    if(positionType=='Long'){
+        tp=100000000;
+        sl=0;
+    }
+    if(positionType=='Short'){
+        tp=0;
+        sl=100000000;
+    }
     const position = {
         id: positionId,
         positionType,
@@ -170,8 +180,8 @@ app.post('/api/openPosition', authenticateToken, async (req, res) => {
         orderLimit,
         amount,
         leverage,
-        tp : 100000000,
-        sl : 0,
+        tp,
+        sl,
         limitPrice,
         entryPrice: currentMarketPrice
     };
