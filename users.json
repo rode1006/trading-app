@@ -1,50 +1,26 @@
 {
   "tiger": {
     "password": "$2a$08$Rm9OIRElCg9.I8kmCef4J.U1WzikKfxeAsbkNzSu/H0hpf5G37f/m",
-    "virtualBalance": 199242.07791836318,
-    "balance": 194206.54791836318,
+    "virtualBalance": 499989.79575183336,
+    "balance": 499989.79575183336,
     "privateKey": "key116",
     "address": "0xfe4laffaw490s90df6934345ksf4drt6fgsefjli4c",
-    "positions": [
+    "positions": [],
+    "closedPositions": [
       {
-        "id": 1728479089313,
+        "id": 1728481976350,
         "positionType": "Long",
         "orderType": "limit",
-        "orderLimit": 1,
+        "orderLimit": 0,
         "amount": 50000,
-        "leverage": 10,
+        "leverage": 1,
         "tp": 100000000,
         "sl": 0,
         "limitPrice": 60000,
-        "entryPrice": 61998
-      },
-      {
-        "id": 1728479110042,
-        "positionType": "Short",
-        "orderType": "market",
-        "orderLimit": 0,
-        "amount": 5000,
-        "leverage": 20,
-        "tp": 0,
-        "sl": 100000000,
-        "limitPrice": 0,
-        "entryPrice": 61950.01
-      }
-    ],
-    "closedPositions": [
-      {
-        "id": 1728479080500,
-        "positionType": "Long",
-        "orderType": "market",
-        "orderLimit": 0,
-        "amount": 50000,
-        "leverage": 10,
-        "tp": 100000000,
-        "sl": 0,
-        "limitPrice": 0,
-        "entryPrice": 62026.43,
-        "exitPrice": 61928,
-        "realizedPL": -793.4520816368142
+        "entryPrice": 61885.99,
+        "exitPrice": 61873.36,
+        "realizedPL": -10.204248166666948,
+        "closedReason": 0
       }
     ]
   }

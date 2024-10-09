@@ -141,7 +141,7 @@ app.post('/api/openPosition', authenticateToken, async (req, res) => {
     const user = users[username];
     let orderLimit = 0;
 
-    if(orderType=='limit'){
+    if(orderType=='limit' && user.positions){
         orderLimit=1;
         if(user.positions.filter(position => position.orderLimit==1).length==5){
             return res.status(404).send('Limit Orders limited to 5');
