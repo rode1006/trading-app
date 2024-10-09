@@ -1,22 +1,34 @@
 {
   "tiger": {
     "password": "$2a$08$Rm9OIRElCg9.I8kmCef4J.U1WzikKfxeAsbkNzSu/H0hpf5G37f/m",
-    "virtualBalance": 236851.35763542482,
-    "balance": 189965.98763542483,
+    "virtualBalance": 186270.70452877897,
+    "balance": 70438.19452877896,
     "privateKey": "key116",
     "address": "0xfe4laffaw490s90df6934345ksf4drt6fgsefjli4c",
     "positions": [
       {
-        "id": 1728421072209,
+        "id": 1728474291181,
         "positionType": "Short",
         "orderType": "market",
         "orderLimit": 0,
         "amount": 50000,
         "leverage": 300,
-        "tp": 62300,
+        "tp": 0,
         "sl": 100000000,
         "limitPrice": 0,
-        "entryPrice": 62318.87
+        "entryPrice": 62168.77
+      },
+      {
+        "id": 1728477370323,
+        "positionType": "Long",
+        "orderType": "limit",
+        "orderLimit": 1,
+        "amount": 50000,
+        "leverage": 20,
+        "tp": 100000000,
+        "sl": 0,
+        "limitPrice": 62050,
+        "entryPrice": 62030.99
       }
     ],
     "closedPositions": [
@@ -117,6 +129,62 @@
         "entryPrice": 62329.99,
         "exitPrice": 62372.26,
         "realizedPL": -10172.47074803094
+      },
+      {
+        "id": 1728421072209,
+        "positionType": "Short",
+        "orderType": "market",
+        "orderLimit": 0,
+        "amount": 50000,
+        "leverage": 300,
+        "tp": 62300,
+        "sl": 100000000,
+        "limitPrice": 0,
+        "entryPrice": 62318.87,
+        "exitPrice": 62400,
+        "realizedPL": -19527.79310664588
+      },
+      {
+        "id": 1728477003046,
+        "positionType": "Long",
+        "orderType": "limit",
+        "orderLimit": 1,
+        "amount": 5000,
+        "leverage": 50,
+        "tp": 100000000,
+        "sl": 0,
+        "limitPrice": 62150,
+        "entryPrice": 62112,
+        "exitPrice": 62042,
+        "realizedPL": -281.7490984028851
+      },
+      {
+        "id": 1728474286314,
+        "positionType": "Long",
+        "orderType": "market",
+        "orderLimit": 0,
+        "amount": 50000,
+        "leverage": 300,
+        "tp": 100000000,
+        "sl": 0,
+        "limitPrice": 0,
+        "entryPrice": 62168.76,
+        "exitPrice": 61972.35,
+        "realizedPL": -50000
+      },
+      {
+        "id": 1728474294027,
+        "positionType": "Long",
+        "orderType": "market",
+        "orderLimit": 0,
+        "amount": 50000,
+        "leverage": 300,
+        "tp": 100000000,
+        "sl": 0,
+        "limitPrice": 0,
+        "entryPrice": 62168.76,
+        "exitPrice": 61972.34,
+        "realizedPL": -50000
       }
     ]
   }

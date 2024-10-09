@@ -205,7 +205,10 @@ app.post('/api/getPositions', authenticateToken, (req, res) => {
 
     if (!user) return res.status(404).send('User not found');
 
-    res.json({ positions: user.positions });
+    res.json({ 
+        positions: user.positions,
+        closedPositions: user.closedPositions 
+    });
 });
 
 app.post('/api/getCurrentPrice', async (req, res) => {
@@ -279,11 +282,13 @@ app.post('/api/closePosition', authenticateToken, async (req, res) => {
 
     // Calculate realized profit or loss
     const priceDiff = (currentMarketPrice - closedPosition.entryPrice) * (closedPosition.positionType === 'Long' ? 1 : -1);
-    const profitLoss = closedPosition.amount * closedPosition.leverage * (priceDiff/closedPosition.entryPrice);
+    let profitLoss = closedPosition.amount * closedPosition.leverage * (priceDiff/closedPosition.entryPrice);
+
+    if(closedPosition.orderLimit)profitLoss=0;
 
     // Update balance
     if(reason==3)profitLoss = -closedPosition.amount; // liquidation
-    if(!closedPosition.orderLimit)user.balance += closedPosition.amount + profitLoss; // Add the amount and profit/loss
+    user.balance += closedPosition.amount + profitLoss; // Add the amount and profit/loss
 
     // Log the closed position with realized P/L
     if (!user.closedPositions) {
