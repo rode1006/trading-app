@@ -288,7 +288,7 @@ app.post('/api/closePosition', authenticateToken, async (req, res) => {
 
     // Update balance
     if(reason==3)profitLoss = -closedPosition.amount; // liquidation
-    user.balance += closedPosition.amount + profitLoss; // Add the amount and profit/loss
+    if(!closedPosition.orderLimit)user.balance += closedPosition.amount + profitLoss; // Add the amount and profit/loss
 
     // Log the closed position with realized P/L
     if (!user.closedPositions) {
