@@ -1763,10 +1763,6 @@
                           2
                         )},`;
 
-                        positionDiv.textContent += ` realized P/L: $${position.realizedPL.toFixed(
-                          2
-                        )},`;
-
                         if(position.tp!=0 && position.tp!=100000000){
                           positionDiv.textContent += ` TP: $${position.tp.toFixed(
                             2
@@ -1778,6 +1774,28 @@
                             2
                           )},`;
                         }
+
+                        positionDiv.textContent += ` realized P/L: $${position.realizedPL.toFixed(
+                          2
+                        )},`;
+
+                        let closedReason = "";
+                        switch(position.closedReason){
+                          case 0:
+                            closedReason = "by User";
+                            break;
+                          case 1:
+                            closedReason = "by TP";
+                            break;
+                          case 2:
+                            closedReason = "by SL";
+                            break;
+                          case 3:
+                            closedReason = "by Liquidaion";
+                            break;
+                        }
+
+                        positionDiv.textContent += ` closed ${closedReason},`;
 
                         if (position.orderType == "market") {
                           if (position.positionType == "Long")

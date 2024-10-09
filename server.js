@@ -160,7 +160,8 @@ app.post('/api/openPosition', authenticateToken, async (req, res) => {
         return res.status(500).send('Error fetching market price');
     }
 
-    if(orderType=='market')user.balance -= amount; // Deduct the amount from user's balance
+    // if(orderType=='market')user.balance -= amount; // Deduct the amount from user's balance
+    user.balance -= amount; // Deduct the amount from user's balance
 
     const positionId = Date.now(); // Unique ID for the position (can be replaced with a more robust method)
     let tp=0;
@@ -255,7 +256,7 @@ app.post('/api/startTrade', authenticateToken, async (req, res) => {
     if (positionIndex === -1) return res.status(404).send('Position not found');
 
     user.positions[positionIndex].orderLimit=0;
-    user.balance -= user.positions[positionIndex].amount;
+    // user.balance -= user.positions[positionIndex].amount;
     saveUsers(users);
     res.json({ positions: user.positions });
 });
@@ -288,7 +289,8 @@ app.post('/api/closePosition', authenticateToken, async (req, res) => {
 
     // Update balance
     if(reason==3)profitLoss = -closedPosition.amount; // liquidation
-    if(!closedPosition.orderLimit)user.balance += closedPosition.amount + profitLoss; // Add the amount and profit/loss
+    // if(!closedPosition.orderLimit)user.balance += closedPosition.amount + profitLoss; // Add the amount and profit/loss
+    user.balance += closedPosition.amount + profitLoss; // Add the amount and profit/loss
 
     // Log the closed position with realized P/L
     if (!user.closedPositions) {
@@ -297,7 +299,8 @@ app.post('/api/closePosition', authenticateToken, async (req, res) => {
     user.closedPositions.push({
         ...closedPosition,
         exitPrice: currentMarketPrice,
-        realizedPL: profitLoss
+        realizedPL: profitLoss,
+        closedReason: reason
     });
 
     saveUsers(users);
