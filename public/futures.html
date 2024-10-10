@@ -1399,11 +1399,11 @@
           >
             <span id="balance" style="color: aquamarine">0</span><br />Credit:
             <span id="credit-value" style="color: hsl(236, 100%, 94%)"
-              >Loading...</span>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Futures Type:
+              >Loading...</span
+            >
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Futures Type:
             <select id="futures-type"></select>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Current
-            Price:
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Current Price:
             <span id="current-price" style="color: chartreuse">Loading...</span>
           </div>
           <div>
@@ -1485,11 +1485,11 @@
             >&nbsp;&nbsp;
           </div>
           <hr />
-          <h3 style="color: #ff8c00;">Opend Positions</h3>
+          <h3 style="color: #ff8c00">Opend Positions</h3>
           <div id="positions"></div>
-          <h3 style="color: #ff8c00;">Limit Orders</h3>
+          <h3 style="color: #ff8c00">Limit Orders</h3>
           <div id="limit-orders"></div>
-          <h3 style="color: #ff8c00;">Closed Positions</h3>
+          <h3 style="color: #ff8c00">Closed Positions</h3>
           <div id="closed-positions"></div>
         </div>
 
@@ -1538,7 +1538,10 @@
               .then((response) => response.json())
               .then((priceData) => {
                 const currentPrices = priceData.currentPrices;
-                document.getElementById("current-price").textContent = currentPrices.filter(item=>item['futuresType']==futuresType)[0].price;
+                document.getElementById("current-price").textContent =
+                  currentPrices.filter(
+                    (item) => item["futuresType"] == futuresType
+                  )[0].price;
 
                 fetch("/api/getPositions", {
                   method: "POST",
@@ -1550,290 +1553,312 @@
                   .then((response) => response.json())
                   .then((data) => {
                     const positionsDiv = document.getElementById("positions");
-                    const limitOrdersDiv = document.getElementById("limit-orders");
-                    const closedPositionsDiv = document.getElementById("closed-positions");
-                    // positionsDiv.innerHTML = ''; // Clear previous positions
-                    let count =
-                      data.positions.length +
-                      data.positions.filter(
-                        (position) => position.orderLimit == 1
-                      ).length;
-                    if (count !== positionsCount){
-                      positionsDiv.innerHTML = ""; // Clear previous positions
-                      limitOrdersDiv.innerHTML = ""; // Clear previous limit orders
-                    } 
+                    const limitOrdersDiv =
+                      document.getElementById("limit-orders");
+                    const closedPositionsDiv =
+                      document.getElementById("closed-positions");
 
+                    let count = 0;
                     let totalUnrealizedPL = 0;
                     let totalPositionAmount = 0;
 
-                    data.positions.forEach((position) => {
-                      currentPrice = currentPrices.filter(item=>item['futuresType']==position.futuresType)[0].price;
-                      let unrealizedPL = calculateUnrealizedPL(
-                        position.entryPrice,
-                        currentPrice,
-                        position.amount,
-                        position.leverage,
-                        position.positionType
-                      );
-                      let positionDiv = document.createElement("div");
-
-                      if (position.orderLimit == 1) {
-                        let startTrading = 0;
-                        if (
-                          (position.entryPrice < position.limitPrice &&
-                            position.limitPrice < currentPrice) ||
-                          (position.entryPrice > position.limitPrice &&
-                            position.limitPrice > currentPrice)
-                        ) {
-                          fetch("/api/startTrade", {
-                            method: "POST",
-                            headers: {
-                              Authorization:
-                                "Bearer " + localStorage.getItem("token"),
-                              "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify({
-                              positionId: position.id,
-                            }),
-                          })
-                            .then((response) => response.json())
-                            .catch((error) =>
-                              console.error("Error starting Trade:", error)
-                            );
-
-                          position.orderLimit = 0;
-                        } else {
-                          unrealizedPL = 0;
-                        }
+                    if (data.positions) {
+                      count =
+                        data.positions.length +
+                        data.positions.filter(
+                          (position) => position.orderLimit == 1
+                        ).length;
+                      if (count !== positionsCount) {
+                        positionsDiv.innerHTML = ""; // Clear previous positions
+                        limitOrdersDiv.innerHTML = ""; // Clear previous limit orders
                       }
-                      if (
-                        unrealizedPL < 0 &&
-                        Math.abs(unrealizedPL) >= position.amount * 0.8
-                      ) {
-                        totalUnrealizedPL -= position.amount;
-                        totalPositionAmount += position.amount;
-                        closePosition(position, 3);
-                        return;
-                      } else {
-                        totalUnrealizedPL += unrealizedPL;
-                        // if (!position.orderLimit)
-                        totalPositionAmount += position.amount;
-                        if ((position.positionType=='Long' && currentPrice > position.tp)||(position.positionType=='Short' && currentPrice < position.tp)) {
-                          closePosition(position, 1);
-                          return;
+
+                      data.positions.forEach((position) => {
+                        currentPrice = currentPrices.filter(
+                          (item) => item["futuresType"] == position.futuresType
+                        )[0].price;
+                        let unrealizedPL = calculateUnrealizedPL(
+                          position.entryPrice,
+                          currentPrice,
+                          position.amount,
+                          position.leverage,
+                          position.positionType
+                        );
+                        let positionDiv = document.createElement("div");
+
+                        if (position.orderLimit == 1) {
+                          let startTrading = 0;
+                          if (
+                            (position.entryPrice < position.limitPrice &&
+                              position.limitPrice < currentPrice) ||
+                            (position.entryPrice > position.limitPrice &&
+                              position.limitPrice > currentPrice)
+                          ) {
+                            fetch("/api/startTrade", {
+                              method: "POST",
+                              headers: {
+                                Authorization:
+                                  "Bearer " + localStorage.getItem("token"),
+                                "Content-Type": "application/json",
+                              },
+                              body: JSON.stringify({
+                                positionId: position.id,
+                              }),
+                            })
+                              .then((response) => response.json())
+                              .catch((error) =>
+                                console.error("Error starting Trade:", error)
+                              );
+
+                            position.orderLimit = 0;
+                          } else {
+                            unrealizedPL = 0;
+                          }
                         }
-                        if ((position.positionType=='Long' && currentPrice < position.sl)||(position.positionType=='Short' && currentPrice > position.sl)) {
-                          closePosition(position, 2);
+                        if (
+                          unrealizedPL < 0 &&
+                          Math.abs(unrealizedPL) >= position.amount * 0.8
+                        ) {
+                          totalUnrealizedPL -= position.amount;
+                          totalPositionAmount += position.amount;
+                          closePosition(position, 3);
                           return;
                         } else {
-                          if (count !== positionsCount) {
-                            positionDiv.textContent = `
+                          totalUnrealizedPL += unrealizedPL;
+                          // if (!position.orderLimit)
+                          totalPositionAmount += position.amount;
+                          if (
+                            (position.positionType == "Long" &&
+                              currentPrice > position.tp) ||
+                            (position.positionType == "Short" &&
+                              currentPrice < position.tp)
+                          ) {
+                            closePosition(position, 1);
+                            return;
+                          }
+                          if (
+                            (position.positionType == "Long" &&
+                              currentPrice < position.sl) ||
+                            (position.positionType == "Short" &&
+                              currentPrice > position.sl)
+                          ) {
+                            closePosition(position, 2);
+                            return;
+                          } else {
+                            if (count !== positionsCount) {
+                              positionDiv.textContent = `
                                             ${1 - position.orderLimit}-${
-                              position.orderType
-                            }-${position.positionType}- ${position.futuresType}- 
+                                position.orderType
+                              }-${position.positionType}- ${
+                                position.futuresType
+                              }- 
                                             Amount: $${position.amount},
                                             Leverage: ${position.leverage}X, 
                                             Entry: $${position.entryPrice},
                                         `;
-                            if (position.orderType == "limit")
-                              positionDiv.textContent += ` Limit Price: $${position.limitPrice},`;
+                              if (position.orderType == "limit")
+                                positionDiv.textContent += ` Limit Price: $${position.limitPrice},`;
 
-                            let liquidationPrice = 0;
-                            if (position.positionType == "Short")
-                              liquidationPrice =
-                                (position.entryPrice *
-                                  (125 + position.leverage / 100)) /
-                                125;
-                            if (position.positionType == "Long")
-                              liquidationPrice =
-                                (position.entryPrice *
-                                  (125 - 100 / position.leverage)) /
-                                125;
-
-                            positionDiv.textContent += ` Liquidation: $${liquidationPrice.toFixed(
-                              2
-                            )},`;
-
-                            const unPLLabel = document.createElement("label");
-                            unPLLabel.textContent = `Unrealized P/L: $${unrealizedPL.toFixed(
-                              2
-                            )},`;
-                            unPLLabel.id = "un" + position.id;
-                            positionDiv.appendChild(unPLLabel);
-
-                            const tpLabel = document.createElement("label");
-                            tpLabel.textContent = "TP: ";
-                            positionDiv.appendChild(tpLabel);
-
-                            const tpInput = document.createElement("input");
-                            tpInput.type = "number";
-                            tpInput.id = "tp" + position.id;
-                            tpInput.style.width = "80px";
-                            if (position.tp > 0 && position.tp < 10000000)
-                              tpInput.value = position.tp;
-                            positionDiv.appendChild(tpInput);
-
-                            const slLabel = document.createElement("label");
-                            slLabel.textContent = "SL: ";
-                            positionDiv.appendChild(slLabel);
-
-                            const slInput = document.createElement("input");
-                            slInput.type = "number";
-                            slInput.id = "sl" + position.id;
-                            slInput.style.width = "80px";
-                            if (position.sl > 0 && position.sl < 10000000)
-                              slInput.value = position.sl;
-                            positionDiv.appendChild(slInput);
-
-                            const saveButton = document.createElement("button");
-                            saveButton.textContent = "Save";
-                            saveButton.onclick = () => saveTPSL(position);
-                            positionDiv.appendChild(saveButton);
-                            positionDiv.append(" ");
-
-                            // Create close button
-                            const closeButton =
-                              document.createElement("button");
-                            closeButton.textContent = "Close";
-                            closeButton.onclick = () =>
-                              closePosition(position, 0);
-                            positionDiv.appendChild(closeButton); // Add close button to position div
-
-                            if (position.orderType == "market") {
-                              if (position.positionType == "Long")
-                                positionDiv.style.backgroundColor = "#232323";
+                              let liquidationPrice = 0;
                               if (position.positionType == "Short")
-                                positionDiv.style.backgroundColor = "#464646";
-                            }
-                            if (position.orderType == "limit") {
-                              if (position.orderLimit == 0) {
-                                if (position.positionType == "Long")
-                                  positionDiv.style.backgroundColor = "#853467";
-                                if (position.positionType == "Short")
-                                  positionDiv.style.backgroundColor = "#925743";
-                              } 
-                              else {
-                                if (position.positionType == "Long")
-                                  positionDiv.style.backgroundColor = "#295843";
-                                if (position.positionType == "Short")
-                                  positionDiv.style.backgroundColor = "#694456";
-                              }
-                            }
+                                liquidationPrice =
+                                  (position.entryPrice *
+                                    (125 + position.leverage / 100)) /
+                                  125;
+                              if (position.positionType == "Long")
+                                liquidationPrice =
+                                  (position.entryPrice *
+                                    (125 - 100 / position.leverage)) /
+                                  125;
 
-                            if(position.orderLimit){
-                              limitOrdersDiv.appendChild(positionDiv);
-                            }else{
-                              positionsDiv.appendChild(positionDiv);
+                              positionDiv.textContent += ` Liquidation: $${liquidationPrice.toFixed(
+                                2
+                              )},`;
+
+                              const unPLLabel = document.createElement("label");
+                              unPLLabel.textContent = `Unrealized P/L: $${unrealizedPL.toFixed(
+                                2
+                              )},`;
+                              unPLLabel.id = "un" + position.id;
+                              positionDiv.appendChild(unPLLabel);
+
+                              const tpLabel = document.createElement("label");
+                              tpLabel.textContent = "TP: ";
+                              positionDiv.appendChild(tpLabel);
+
+                              const tpInput = document.createElement("input");
+                              tpInput.type = "number";
+                              tpInput.id = "tp" + position.id;
+                              tpInput.style.width = "80px";
+                              if (position.tp > 0 && position.tp < 10000000)
+                                tpInput.value = position.tp;
+                              positionDiv.appendChild(tpInput);
+
+                              const slLabel = document.createElement("label");
+                              slLabel.textContent = "SL: ";
+                              positionDiv.appendChild(slLabel);
+
+                              const slInput = document.createElement("input");
+                              slInput.type = "number";
+                              slInput.id = "sl" + position.id;
+                              slInput.style.width = "80px";
+                              if (position.sl > 0 && position.sl < 10000000)
+                                slInput.value = position.sl;
+                              positionDiv.appendChild(slInput);
+
+                              const saveButton =
+                                document.createElement("button");
+                              saveButton.textContent = "Save";
+                              saveButton.onclick = () => saveTPSL(position);
+                              positionDiv.appendChild(saveButton);
+                              positionDiv.append(" ");
+
+                              // Create close button
+                              const closeButton =
+                                document.createElement("button");
+                              closeButton.textContent = "Close";
+                              closeButton.onclick = () =>
+                                closePosition(position, 0);
+                              positionDiv.appendChild(closeButton); // Add close button to position div
+
+                              if (position.orderType == "market") {
+                                if (position.positionType == "Long")
+                                  positionDiv.style.backgroundColor = "#232323";
+                                if (position.positionType == "Short")
+                                  positionDiv.style.backgroundColor = "#464646";
+                              }
+                              if (position.orderType == "limit") {
+                                if (position.orderLimit == 0) {
+                                  if (position.positionType == "Long")
+                                    positionDiv.style.backgroundColor =
+                                      "#853467";
+                                  if (position.positionType == "Short")
+                                    positionDiv.style.backgroundColor =
+                                      "#925743";
+                                } else {
+                                  if (position.positionType == "Long")
+                                    positionDiv.style.backgroundColor =
+                                      "#295843";
+                                  if (position.positionType == "Short")
+                                    positionDiv.style.backgroundColor =
+                                      "#694456";
+                                }
+                              }
+
+                              if (position.orderLimit) {
+                                limitOrdersDiv.appendChild(positionDiv);
+                              } else {
+                                positionsDiv.appendChild(positionDiv);
+                              }
+                            } else {
+                              document.getElementById(
+                                "un" + position.id
+                              ).textContent =
+                                "Unrealized P/L: " +
+                                unrealizedPL.toFixed(2) +
+                                ",";
                             }
-                            
-                          } else {
-                            document.getElementById(
-                              "un" + position.id
-                            ).textContent =
-                              "Unrealized P/L: " +
-                              unrealizedPL.toFixed(2) +
-                              ",";
                           }
                         }
-                      }
-                    });
-                    positionsCount = count;
+                      });
+                      positionsCount = count;
+                    }
+                    if (data.closedPositions) {
+                      count = data.closedPositions.length;
+                      if (count !== closedPositionsCount)
+                        closedPositionsDiv.innerHTML = ""; // Clear previous closed positions
 
-                    count = data.closedPositions.length;
-                    if (count !== closedPositionsCount) closedPositionsDiv.innerHTML = ""; // Clear previous closed positions
+                      data.closedPositions.forEach((position) => {
+                        let positionDiv = document.createElement("div");
 
-                    data.closedPositions.forEach((position) => {
-                      let positionDiv = document.createElement("div");
-
-                      if (count !== closedPositionsCount) {
-                        positionDiv.textContent = `
+                        if (count !== closedPositionsCount) {
+                          positionDiv.textContent = `
                                         ${1 - position.orderLimit}-${
-                          position.orderType
-                        }-${position.positionType}-${position.futuresType}- 
+                            position.orderType
+                          }-${position.positionType}-${position.futuresType}- 
                                         Amount: $${position.amount},
                                         Leverage: ${position.leverage}X, 
                                         Entry: $${position.entryPrice},
                                         Exit: $${position.exitPrice},
                                     `;
-                        if (position.orderType == "limit")
-                          positionDiv.textContent += ` Limit Price: $${position.limitPrice},`;
+                          if (position.orderType == "limit")
+                            positionDiv.textContent += ` Limit Price: $${position.limitPrice},`;
 
-                        let liquidationPrice = 0;
-                        if (position.positionType == "Short")
-                          liquidationPrice =
-                            (position.entryPrice *
-                              (125 + position.leverage / 100)) /
-                            125;
-                        if (position.positionType == "Long")
-                          liquidationPrice =
-                            (position.entryPrice *
-                              (125 - 100 / position.leverage)) /
-                            125;
-
-                        positionDiv.textContent += ` Liquidation: $${liquidationPrice.toFixed(
-                          2
-                        )},`;
-
-                        if(position.tp!=0 && position.tp!=100000000){
-                          positionDiv.textContent += ` TP: $${position.tp.toFixed(
-                            2
-                          )},`;
-                        }
-
-                        if(position.sl!=0 && position.sl!=100000000){
-                          positionDiv.textContent += ` SL: $${position.sl.toFixed(
-                            2
-                          )},`;
-                        }
-
-                        positionDiv.textContent += ` realized P/L: $${position.realizedPL.toFixed(
-                          2
-                        )},`;
-
-                        let closedReason = "";
-                        switch(position.closedReason){
-                          case 0:
-                            closedReason = "by User";
-                            break;
-                          case 1:
-                            closedReason = "by TP";
-                            break;
-                          case 2:
-                            closedReason = "by SL";
-                            break;
-                          case 3:
-                            closedReason = "by Liquidaion";
-                            break;
-                        }
-
-                        positionDiv.textContent += ` closed ${closedReason},`;
-
-                        if (position.orderType == "market") {
-                          if (position.positionType == "Long")
-                            positionDiv.style.backgroundColor = "#232323";
+                          let liquidationPrice = 0;
                           if (position.positionType == "Short")
-                            positionDiv.style.backgroundColor = "#464646";
-                        }
-                        if (position.orderType == "limit") {
-                          if (position.orderLimit == 0) {
-                            if (position.positionType == "Long")
-                              positionDiv.style.backgroundColor = "#853467";
-                            if (position.positionType == "Short")
-                              positionDiv.style.backgroundColor = "#925743";
-                          } 
-                          else {
-                            if (position.positionType == "Long")
-                              positionDiv.style.backgroundColor = "#295843";
-                            if (position.positionType == "Short")
-                              positionDiv.style.backgroundColor = "#694456";
-                          }
-                        }
+                            liquidationPrice =
+                              (position.entryPrice *
+                                (125 + position.leverage / 100)) /
+                              125;
+                          if (position.positionType == "Long")
+                            liquidationPrice =
+                              (position.entryPrice *
+                                (125 - 100 / position.leverage)) /
+                              125;
 
-                        closedPositionsDiv.appendChild(positionDiv);
-                        
-                      }
-                    });
-                    closedPositionsCount = count;
+                          positionDiv.textContent += ` Liquidation: $${liquidationPrice.toFixed(
+                            2
+                          )},`;
+
+                          if (position.tp != 0 && position.tp != 100000000) {
+                            positionDiv.textContent += ` TP: $${position.tp.toFixed(
+                              2
+                            )},`;
+                          }
+
+                          if (position.sl != 0 && position.sl != 100000000) {
+                            positionDiv.textContent += ` SL: $${position.sl.toFixed(
+                              2
+                            )},`;
+                          }
+
+                          positionDiv.textContent += ` realized P/L: $${position.realizedPL.toFixed(
+                            2
+                          )},`;
+
+                          let closedReason = "";
+                          switch (position.closedReason) {
+                            case 0:
+                              closedReason = "by User";
+                              break;
+                            case 1:
+                              closedReason = "by TP";
+                              break;
+                            case 2:
+                              closedReason = "by SL";
+                              break;
+                            case 3:
+                              closedReason = "by Liquidaion";
+                              break;
+                          }
+
+                          positionDiv.textContent += ` closed ${closedReason},`;
+
+                          if (position.orderType == "market") {
+                            if (position.positionType == "Long")
+                              positionDiv.style.backgroundColor = "#232323";
+                            if (position.positionType == "Short")
+                              positionDiv.style.backgroundColor = "#464646";
+                          }
+                          if (position.orderType == "limit") {
+                            if (position.orderLimit == 0) {
+                              if (position.positionType == "Long")
+                                positionDiv.style.backgroundColor = "#853467";
+                              if (position.positionType == "Short")
+                                positionDiv.style.backgroundColor = "#925743";
+                            } else {
+                              if (position.positionType == "Long")
+                                positionDiv.style.backgroundColor = "#295843";
+                              if (position.positionType == "Short")
+                                positionDiv.style.backgroundColor = "#694456";
+                            }
+                          }
+
+                          closedPositionsDiv.appendChild(positionDiv);
+                        }
+                      });
+                      closedPositionsCount = count;
+                    }
 
                     document.getElementById("balance").textContent = (
                       balance +
@@ -2005,23 +2030,23 @@
             let tp = parseFloat(
               document.getElementById("tp" + position.id).value
             );
-            if (isNaN(tp) || tp == 0){
-                if(position.positionType=='Long'){
-                    tp = 100000000;
-                }else{
-                    tp = 0;
-                }
-            } 
+            if (isNaN(tp) || tp == 0) {
+              if (position.positionType == "Long") {
+                tp = 100000000;
+              } else {
+                tp = 0;
+              }
+            }
             let sl = parseFloat(
               document.getElementById("sl" + position.id).value
             );
-            if (isNaN(sl) || sl == 0){
-                if(position.positionType=='Long'){
-                    sl = 0;
-                }else{
-                    sl = 100000000;
-                }
-            } 
+            if (isNaN(sl) || sl == 0) {
+              if (position.positionType == "Long") {
+                sl = 0;
+              } else {
+                sl = 100000000;
+              }
+            }
             fetch("/api/saveTPSL", {
               method: "POST",
               headers: {
