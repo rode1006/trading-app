@@ -318,6 +318,58 @@ app.post('/api/closePosition', authenticateToken, async (req, res) => {
     res.json({ positions: user.positions, newBalance: user.balance, profitLoss });
 });
 
+app.post('/api/partialClosePosition', authenticateToken, async (req, res) => {
+    const { positionId, percent } = req.body;
+    const username = req.user.username;
+    const users = loadUsers();
+    const user = users[username];
+    const reason = 4; // partial closing.
+
+    if (!user) return res.status(404).send('User not found');
+
+    // Find the position to close
+    const positionIndex = user.positions.findIndex(pos => pos.id === positionId);
+    if (positionIndex === -1) return res.status(404).send('Position not found');
+
+    // const closedPosition = user.positions.splice(positionIndex, 1)[0];
+    closedPosition = user.positions[positionIndex];
+
+    // Fetch the current market price
+    const currentMarketPrices = await fetchCurrentMarketPrices();
+    if (currentMarketPrices === null) {
+        return res.status(500).send('Error fetching market price');
+    }
+
+    const currentMarketPrice = currentMarketPrices.filter(item=>item.futuresType==closedPosition.futuresType)[0].price;
+
+    // Calculate realized profit or loss
+    const priceDiff = (currentMarketPrice - closedPosition.entryPrice) * (closedPosition.positionType === 'Long' ? 1 : -1);
+    let profitLoss = closedPosition.amount * percent / 100 *  closedPosition.leverage * (priceDiff/closedPosition.entryPrice);
+
+    if(closedPosition.orderLimit)profitLoss=0;
+
+    // Update balance
+    user.balance += closedPosition.amount * percent / 100 + profitLoss; // Add the amount and profit/loss
+    closedPosition.amount *= percent/100; 
+
+    // Log the closed position with realized P/L
+    if (!user.closedPositions) {
+        user.closedPositions = [];
+    }
+    user.closedPositions.push({
+        ...closedPosition,
+        exitPrice: currentMarketPrice,
+        realizedPL: profitLoss,
+        closedReason: reason
+    });
+
+    user.positions[positionIndex].amount *= 100 / percent;
+    user.positions[positionIndex].amount *= (1-percent/100);
+
+    saveUsers(users);
+    res.json({ positions: user.positions, newBalance: user.balance, profitLoss });
+});
+
 app.post('/api/getClosedPositions', authenticateToken, (req, res) => {
     const username = req.user.username;
     const users = loadUsers();

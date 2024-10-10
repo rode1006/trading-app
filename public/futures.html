@@ -1498,6 +1498,7 @@
           let balance = 0; // Initialize balance
           let positionsCount = 0;
           let closedPositionsCount = 0;
+          let closingPosition;
 
           const futuresTypes = ["BTC", "ETH", "BNB", "NEO", "LTC"];
           let futuresType = "BTC";
@@ -1717,8 +1718,11 @@
                               const closeButton =
                                 document.createElement("button");
                               closeButton.textContent = "Close";
-                              closeButton.onclick = () =>
-                                closePosition(position, 0);
+                              closeButton.onclick = (() => {
+                                closingPosition = position;
+                                partialClosingModal.style.display = "block";
+                              })
+                              // closeButton.onclick = () => closePosition(position, 0);
                               positionDiv.appendChild(closeButton); // Add close button to position div
 
                               if (position.orderType == "market") {
@@ -1829,6 +1833,9 @@
                               break;
                             case 3:
                               closedReason = "by Liquidaion";
+                              break;
+                            case 4:
+                              closedReason = "partially";
                               break;
                           }
 
@@ -2091,5 +2098,86 @@
         </script>
       </div>
     </div>
+    <div id="partialClosingModal" class="modal">
+      <!-- Modal content -->
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 style="color: #16171a">Partial Closing</h2>
+        <br />
+        <p style="color: #16171a; font-size: 20px">
+          <input
+            id="particalClosingPercent"
+            type="number"
+            min="1"
+            max="100"
+            value="100"
+          />%&nbsp;&nbsp;
+          <button onclick="partialClose()">Confirm</button>
+        </p>
+      </div>
+    </div>
+    <script>
+      // Get the <span> element that closes the modal
+      var span = document.getElementsByClassName("close")[0];
+      var partialClosingModal =
+          document.getElementById(
+            "partialClosingModal"
+          );
+      // When the user clicks on <span> (x), close the modal
+      span.onclick = function () {
+        partialClosingModal.style.display = "none";
+      };
+
+      // When the user clicks anywhere outside of the modal, close it
+      window.onclick = function (event) {
+        if (event.target == partialClosingModal) {
+          partialClosingModal.style.display = "none";
+        }
+      };
+
+      function partialClose() {
+        let percent = parseFloat(
+          document.getElementById("particalClosingPercent").value
+        );
+        if(percent==0){
+          alert("Please select a valid percent");
+        }
+        if (percent == 100) {
+          closePosition(closingPosition, 0);
+        } else {
+          fetch("/api/partialClosePosition", {
+              method: "POST",
+              headers: {
+                Authorization: "Bearer " + localStorage.getItem("token"),
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                positionId: closingPosition.id, // Assuming each position has a unique ID
+                percent,
+              }),
+            })
+              .then((response) => {
+                if (!response.ok) {
+                  throw new Error("Network response was not ok");
+                }
+                return response.json();
+              })
+              .then((data) => {
+                // Update balance after closing position
+                balance += data.profitLoss; // Assuming the server returns the profit/loss
+                // updateBalanceDisplay();
+                fetchUserData(); // Refresh user data
+                alert("Position partially closed by " + percent + "%.");
+                positionsCount = 0;
+                closedPositionsCount = 0;
+              })
+              .catch((error) => {
+                console.error("Error closing position:", error);
+                alert("Error closing position. Please try again.");
+              });
+        }
+        partialClosingModal.style.display = "none";
+      }
+    </script>
   </body>
 </html>
