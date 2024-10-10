@@ -5,6 +5,8 @@ const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const axios = require('axios');
 const app = express();
+const futuresTypes = ["BTC", "ETH", "BNB", "NEO", "LTC"];
+
 app.use(bodyParser.json());
 
 app.use(express.static('public'));
@@ -122,20 +124,25 @@ app.post('/api/getBalance', authenticateToken, (req, res) => {
 });
 
 
-async function fetchCurrentMarketPrice() {
+async function fetchCurrentMarketPrices() {
     try {
-        const response = await axios.get('https://api.binance.com/api/v3/ticker/price', {
-            params: { symbol: 'BTCUSDT' }
+        const promises = futuresTypes.map(async (futuresType) => {
+            const response = await axios.get('https://api.binance.com/api/v3/ticker/price', {
+                params: { symbol: futuresType + 'USDT' }
+            });
+            return { futuresType, price: parseFloat(response.data.price) };
         });
-        return parseFloat(response.data.price);
+        
+        const results = await Promise.all(promises);
+        return results;
     } catch (error) {
-        console.error('Error fetching price from Binance:', error);
+        console.error('Error fetching prices from Binance:', error);
         return null;
     }
 }
 
 app.post('/api/openPosition', authenticateToken, async (req, res) => {
-    const { positionType, orderType, amount, leverage, limitPrice } = req.body;
+    const { futuresType, positionType, orderType, amount, leverage, limitPrice } = req.body;
     const username = req.user.username;
     const users = loadUsers();
     const user = users[username];
@@ -154,12 +161,13 @@ app.post('/api/openPosition', authenticateToken, async (req, res) => {
         return res.status(400).send('Insufficient balance');
     }
 
-    const currentMarketPrice = await fetchCurrentMarketPrice();
+    const currentMarketPrices = await fetchCurrentMarketPrices();
 
-    if (currentMarketPrice === null) {
+    if (currentMarketPrices === null) {
         return res.status(500).send('Error fetching market price');
     }
 
+    const currentMarketPrice = currentMarketPrices.filter(item=>item.futuresType==futuresType)[0].price;
     // if(orderType=='market')user.balance -= amount; // Deduct the amount from user's balance
     user.balance -= amount; // Deduct the amount from user's balance
 
@@ -176,6 +184,7 @@ app.post('/api/openPosition', authenticateToken, async (req, res) => {
     }
     const position = {
         id: positionId,
+        futuresType,
         positionType,
         orderType,
         orderLimit,
@@ -214,9 +223,9 @@ app.post('/api/getPositions', authenticateToken, (req, res) => {
 
 app.post('/api/getCurrentPrice', async (req, res) => {
     try {
-        const price = await fetchCurrentMarketPrice();
+        const price = await fetchCurrentMarketPrices();
         if (price !== null) {
-            res.json({ currentPrice: price });
+            res.json({ currentPrices: price });
         } else {
             res.status(500).json({ error: 'Failed to fetch price. Please try again later.' });
         }
@@ -276,10 +285,12 @@ app.post('/api/closePosition', authenticateToken, async (req, res) => {
     const closedPosition = user.positions.splice(positionIndex, 1)[0];
 
     // Fetch the current market price
-    const currentMarketPrice = await fetchCurrentMarketPrice();
-    if (currentMarketPrice === null) {
+    const currentMarketPrices = await fetchCurrentMarketPrices();
+    if (currentMarketPrices === null) {
         return res.status(500).send('Error fetching market price');
     }
+
+    const currentMarketPrice = currentMarketPrices.filter(item=>item.futuresType==closedPosition.futuresType)[0].price;
 
     // Calculate realized profit or loss
     const priceDiff = (currentMarketPrice - closedPosition.entryPrice) * (closedPosition.positionType === 'Long' ? 1 : -1);
