@@ -374,10 +374,10 @@ app.post("/api/saveTPSL", authenticateToken, async (req, res) => {
   );
   if (positionIndex === -1) return res.status(404).send("Position not found");
 
+  if(user.positions[positionIndex].tp != tp)sendPositionTPEmail(username, user.positions[positionIndex]);
   user.positions[positionIndex].tp = tp;
-  if(tp!=0 && tp!=100000000)sendPositionTPEmail(username, position);
+  if(user.positions[positionIndex].sl != sl)sendPositionTPEmail(username, user.positions[positionIndex]);
   user.positions[positionIndex].sl = sl;
-  if(sl!=0 && sl!=100000000)sendPositionSLEmail(username, position);
   saveUsers(users);
   res.json({ positions: user.positions });
 });
