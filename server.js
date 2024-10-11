@@ -3,9 +3,10 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
+const nodemailer = require('nodemailer');
 const axios = require('axios');
 const app = express();
-const futuresTypes = ["BTC", "ETH", "BNB", "NEO", "LTC"];
+const futuresTypes = ["BTC", "ETH", "BNB", "NEO", "LTC", "SOL", "XRP"];
 
 app.use(bodyParser.json());
 
@@ -38,6 +39,59 @@ function loadKeys() {
 function saveKeys(keys) {
     fs.writeFileSync(keysFilePath, JSON.stringify(keys, null, 2));
 }
+
+// Load withdrawal requests from file
+function loadWithdrawalRequests() {
+    if (fs.existsSync(withdrawalRequestsFilePath)) {
+        return JSON.parse(fs.readFileSync(withdrawalRequestsFilePath, 'utf8'));
+    } else {
+        return []; // Return empty array if no data file exists
+    }
+}
+// Save withdrawal requests to file
+function saveWithdrawalRequests(requests) {
+    fs.writeFileSync(withdrawalRequestsFilePath, JSON.stringify(requests, null, 2));
+}
+// Nodemailer transporter configuration
+const transporter = nodemailer.createTransport({
+    service: 'gmail', // Use the email provider of your choice
+    auth: {
+        user: 'gagenikolov50@gmail.com', // Replace with your admin email
+        pass: 'ijif cbht ohua xzh' // Replace with your email password (use environment variables in production)
+    }
+});
+// Send email with withdrawal request
+function sendWithdrawalEmail(username, address, amount) {
+    const mailOptions = {
+        from: 'gagenikolov50@gmail.com', // Replace with your admin email
+        to: 'gagenikolov.z@gmail.com',   // Replace with the recipient (admin) email
+        subject: 'New Withdrawal Request',
+        text: `User ${username} has requested a withdrawal on the exchange. Amount: ${amount} Address: ${address}`
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.log('Error sending email:', error);
+        } else {
+            console.log('Email sent:', info.response);
+        }
+    });
+}
+// Withdrawal Request API
+app.post('/api/withdrawRequest', authenticateToken, (req, res) => {
+    const { address, amount } = req.body;
+    const username = req.user.username; // Use the authenticated username
+
+    // Log the withdrawal request
+    let withdrawalRequests = loadWithdrawalRequests();
+    withdrawalRequests.push({ username, address, amount, date: new Date().toISOString() });
+    saveWithdrawalRequests(withdrawalRequests);
+
+    // Send email to admin
+    sendWithdrawalEmail(username, address, amount);
+
+    res.sendStatus(200); // Respond with success
+});
 
 // User Registration
 app.post('/register', (req, res) => {
