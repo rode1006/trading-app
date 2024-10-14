@@ -6,12 +6,11 @@
     <link rel="stylesheet" href="futures.css" />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-    />
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <script>
-      const currencyFormatter = new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: 'USD'
+      const currencyFormatter = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
       });
 
       function checkToken() {
@@ -34,7 +33,7 @@
           document.getElementById(
             "welcome-message"
           ).textContent = `${data.username}`;
-          document.getElementById("balance").textContent = `${data.balance}`;
+          // document.getElementById("balance").textContent = `${data.balance}`;
           document.getElementById("address").textContent = `${data.address}`;
         } catch (error) {
           console.error("Error fetching user data:", error);
@@ -82,16 +81,11 @@
             z-index: 100;
             align-self: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-          "
-        >
+          ">
           <!--left-->
-          <div
-            class="nav-left"
-            style="flex-direction: row; display: flex"
-          >
-          <div id="now-price" style="margin: 10px;">
+          <div class="nav-left" style="flex-direction: row; display: flex">
+            <div id="now-price" style="margin: 10px"></div>
           </div>
-        </div>
 
           <!--right-->
           <div class="nav-right" style="flex-direction: row; display: flex">
@@ -107,8 +101,7 @@
                     <img
                       src="img/close.png"
                       id="popup-close-btn"
-                      class="closee"
-                    />
+                      class="closee" />
                     <h2 style="font-size: 20px">Transfer Crypto</h2>
                   </div>
                   <div class="deposit-header"></div>
@@ -120,8 +113,7 @@
                         border-radius: 10px;
                         padding-top: 11px;
                       "
-                      class="toggle-button-custom active"
-                    >
+                      class="toggle-button-custom active">
                       Deposit
                     </button>
                     <button
@@ -131,22 +123,19 @@
                         border-radius: 10px;
                         padding-top: 11px;
                       "
-                      class="toggle-button-custom"
-                    >
+                      class="toggle-button-custom">
                       Withdraw
                     </button>
                   </div>
                   <!-- DEPOSIT -->
                   <div
                     id="deposit-content-custom"
-                    class="content-section-custom active"
-                  >
+                    class="content-section-custom active">
                     <div id="network-selectors">
                       <!--Asset Dropdown-->
                       <div
                         class="custom-dropdown"
-                        style="flex: 1; font-weight: 550; font-size: 15px"
-                      >
+                        style="flex: 1; font-weight: 550; font-size: 15px">
                         <label class="choose">Choose Asset</label>
                         <div
                           class="custom-dropdown-selected"
@@ -161,22 +150,18 @@
                             padding: 10px;
                             border-radius: 8px;
                           "
-                          id="network-selector2"
-                        >
-                          <span class="custom-dropdown-selected-text"
-                            >USDT</span
-                          >
-                          <span class="custom-dropdown-arrow"
-                            ><img width="14px" src="img/arrow-right.png"
-                          /></span>
+                          id="network-selector2">
+                          <span
+                            class="custom-dropdown-selected-text">USDT</span>
+                          <span class="custom-dropdown-arrow"><img width="14px"
+                              src="img/arrow-right.png" /></span>
                         </div>
                         <div class="custom-dropdown-options">
                           <hr class="separator2" />
                           <div class="custom-dropdown-option">
                             <img
                               src="img/ETH.png"
-                              style="width: 24px; margin-left: 10px"
-                            />
+                              style="width: 24px; margin-left: 10px" />
                             <span style="margin-left: 10px">ETH</span>
                           </div>
                           <div class="custom-dropdown-option">
@@ -186,36 +171,31 @@
                                 width: 25px;
                                 height: 25px;
                                 margin-left: 10px;
-                              "
-                            />
+                              " />
                             <span style="margin-left: 10px">BRETT</span>
                           </div>
                           <div class="custom-dropdown-option">
                             <img
                               src="img/people.png"
-                              style="width: 22px; margin-left: 10px"
-                            />
+                              style="width: 22px; margin-left: 10px" />
                             <span style="margin-left: 10px">PEOPLE</span>
                           </div>
                           <div class="custom-dropdown-option">
                             <img
                               src="img/USDT.png"
-                              style="width: 22px; margin-left: 10px"
-                            />
+                              style="width: 22px; margin-left: 10px" />
                             <span style="margin-left: 10px">USDT</span>
                           </div>
                           <div class="custom-dropdown-option">
                             <img
                               src="img/USDC.png"
-                              style="width: 22px; margin-left: 10px"
-                            />
+                              style="width: 22px; margin-left: 10px" />
                             <span style="margin-left: 10px">USDC</span>
                           </div>
                           <div class="custom-dropdown-option">
                             <img
                               src="img/BNB.png"
-                              style="width: 22px; margin-left: 10px"
-                            />
+                              style="width: 22px; margin-left: 10px" />
                             <span style="margin-left: 10px">BNB</span>
                           </div>
                         </div>
@@ -223,8 +203,7 @@
                       <!--Network Dropdown-->
                       <div
                         class="custom-dropdown"
-                        style="flex: 1; font-weight: 550; font-size: 15px"
-                      >
+                        style="flex: 1; font-weight: 550; font-size: 15px">
                         <label class="choose">Choose Network</label>
                         <div
                           class="custom-dropdown-selected"
@@ -239,14 +218,11 @@
                             padding: 10px;
                             border-radius: 8px;
                           "
-                          id="network-selector2"
-                        >
-                          <span class="custom-dropdown-selected-text"
-                            >ERC-20</span
-                          >
-                          <span class="custom-dropdown-arrow"
-                            ><img width="14px" src="img/arrow-right.png"
-                          /></span>
+                          id="network-selector2">
+                          <span
+                            class="custom-dropdown-selected-text">ERC-20</span>
+                          <span class="custom-dropdown-arrow"><img width="14px"
+                              src="img/arrow-right.png" /></span>
                         </div>
                         <div class="custom-dropdown-options">
                           <hr class="separator2" />
@@ -258,8 +234,7 @@
                                 height: 24px;
                                 width: 15px;
                                 margin-left: 15px;
-                              "
-                            />
+                              " />
                             <span style="margin-left: 10px">ERC-20</span>
                           </div>
                           <div class="custom-dropdown-option">
@@ -269,22 +244,19 @@
                                 width: 25px;
                                 height: 25px;
                                 margin-left: 10px;
-                              "
-                            />
+                              " />
                             <span style="margin-left: 10px">BSC</span>
                           </div>
                           <div class="custom-dropdown-option">
                             <img
                               src="img/base.png"
-                              style="width: 22px; margin-left: 10px"
-                            />
+                              style="width: 22px; margin-left: 10px" />
                             <span style="margin-left: 10px">Base</span>
                           </div>
                           <div class="custom-dropdown-option">
                             <img
                               src="img/arb.png"
-                              style="width: 22px; margin-left: 10px"
-                            />
+                              style="width: 22px; margin-left: 10px" />
                             <span style="margin-left: 10px">Arbitrum One</span>
                           </div>
                         </div>
@@ -304,14 +276,12 @@
                           src="img/copy.png"
                           style="width: 21px; margin-top: 15px"
                           id="copy-icon"
-                          onclick="copyAddress()"
-                        />
+                          onclick="copyAddress()" />
                       </div>
                     </div>
                     <div
                       id="warningContainer"
-                      class="warning-container-darkblue"
-                    >
+                      class="warning-container-darkblue">
                       <p class="warning-text">
                         <img src="img/warning2.png" class="warning-icon" />
                         Minimum Deposit: $1.5 ∼ 1.5 USDT
@@ -323,8 +293,7 @@
                   <div
                     id="withdraw-content-custom"
                     class="content-section-custom"
-                    style="font-weight: bold"
-                  >
+                    style="font-weight: bold">
                     <div id="network-selectors">
                       <!--Asset Dropdown-->
                       <div class="custom-dropdown" style="flex: 1">
@@ -341,16 +310,12 @@
                             padding: 10px;
                             border-radius: 8px;
                           "
-                          id="network-selector1"
-                        >
+                          id="network-selector1">
                           <span
                             class="custom-dropdown-selected-text"
-                            style="font-size: 15px"
-                            >USDT</span
-                          >
-                          <span class="custom-dropdown-arrow"
-                            ><img width="14px" src="img/arrow-right.png"
-                          /></span>
+                            style="font-size: 15px">USDT</span>
+                          <span class="custom-dropdown-arrow"><img width="14px"
+                              src="img/arrow-right.png" /></span>
                         </div>
                         <div class="custom-dropdown-options">
                           <hr class="separator2" />
@@ -362,13 +327,11 @@
                               align-items: center;
                               justify-content: space-between;
                               padding: 10px;
-                            "
-                          >
+                            ">
                             <div style="display: flex; align-items: center">
                               <img
                                 src="img/ETH.png"
-                                style="width: 24px; height: 24px"
-                              />
+                                style="width: 24px; height: 24px" />
                               <span style="margin-left: 10px">ETH</span>
                             </div>
                             <span
@@ -376,9 +339,7 @@
                                 font-size: 14px;
                                 font-weight: bold;
                                 color: #929292;
-                              "
-                              >0.00</span
-                            >
+                              ">0.00</span>
                           </div>
                           <div
                             class="custom-dropdown-option"
@@ -388,13 +349,11 @@
                               align-items: center;
                               justify-content: space-between;
                               padding: 10px;
-                            "
-                          >
+                            ">
                             <div style="display: flex; align-items: center">
                               <img
                                 src="img/brett.png"
-                                style="width: 24px; height: 24px"
-                              />
+                                style="width: 24px; height: 24px" />
                               <span style="margin-left: 10px">BRETT</span>
                             </div>
                             <span
@@ -403,9 +362,7 @@
                                 font-weight: bold;
                                 display: flex;
                                 color: #afafaf;
-                              "
-                              >0.00</span
-                            >
+                              ">0.00</span>
                           </div>
                           <div
                             class="custom-dropdown-option"
@@ -415,13 +372,11 @@
                               align-items: center;
                               justify-content: space-between;
                               padding: 10px;
-                            "
-                          >
+                            ">
                             <div style="display: flex; align-items: center">
                               <img
                                 src="img/people.png"
-                                style="width: 24px; height: 24px"
-                              />
+                                style="width: 24px; height: 24px" />
                               <span style="margin-left: 10px">PEOPLE</span>
                             </div>
                             <span
@@ -430,9 +385,7 @@
                                 font-weight: bold;
                                 display: flex;
                                 color: #afafaf;
-                              "
-                              >0.00</span
-                            >
+                              ">0.00</span>
                           </div>
 
                           <div
@@ -442,13 +395,11 @@
                               display: flex;
                               justify-content: space-between;
                               padding: 10px;
-                            "
-                          >
+                            ">
                             <div style="display: flex; align-items: center">
                               <img
                                 src="img/USDT.png"
-                                style="width: 24px; height: 24px"
-                              />
+                                style="width: 24px; height: 24px" />
                               <span style="margin-left: 10px">USDT</span>
                             </div>
                             <span
@@ -458,9 +409,7 @@
                                 font-weight: bold;
                                 display: flex;
                                 color: #afafaf;
-                              "
-                              >0.00</span
-                            >
+                              ">0.00</span>
                           </div>
                           <div
                             class="custom-dropdown-option"
@@ -469,13 +418,11 @@
                               display: flex;
                               justify-content: space-between;
                               padding: 10px;
-                            "
-                          >
+                            ">
                             <div style="display: flex; align-items: center">
                               <img
                                 src="img/USDC.png"
-                                style="width: 24px; height: 24px"
-                              />
+                                style="width: 24px; height: 24px" />
                               <span style="margin-left: 10px">USDC</span>
                             </div>
                             <span
@@ -485,9 +432,7 @@
                                 display: flex;
                                 align-items: center;
                                 color: #afafaf;
-                              "
-                              >0.00</span
-                            >
+                              ">0.00</span>
                           </div>
                           <script>
                             async function loadUserData() {
@@ -505,9 +450,8 @@
                                   }
                                 );
                                 const data = await response.json();
-                                const balanceText = `${data.balance}`;
-                                document.getElementById("balance").textContent =
-                                  balanceText;
+                                // const balanceText = `${data.balance}`;
+                                // document.getElementById("balance").textContent = balanceText;
                                 document.getElementById(
                                   "dropdown-balance"
                                 ).textContent = balanceText; // Ensure this line is executed
@@ -531,13 +475,11 @@
                               align-items: center;
                               justify-content: space-between;
                               padding: 10px;
-                            "
-                          >
+                            ">
                             <div style="display: flex; align-items: center">
                               <img
                                 src="img/BNB.png"
-                                style="width: 24px; height: 24px"
-                              />
+                                style="width: 24px; height: 24px" />
                               <span style="margin-left: 10px">BNB</span>
                             </div>
                             <span
@@ -547,17 +489,14 @@
                                 display: flex;
                                 align-items: center;
                                 color: #afafaf;
-                              "
-                              >0.00</span
-                            >
+                              ">0.00</span>
                           </div>
                         </div>
                       </div>
                       <!--Network Dropdown-->
                       <div
                         class="custom-dropdown"
-                        style="flex: 1; font-size: 15px"
-                      >
+                        style="flex: 1; font-size: 15px">
                         <label class="choose">Choose Network</label>
                         <div
                           class="custom-dropdown-selected"
@@ -571,14 +510,11 @@
                             padding: 10px;
                             border-radius: 8px;
                           "
-                          id="network-selector2"
-                        >
-                          <span class="custom-dropdown-selected-text"
-                            >ERC-20</span
-                          >
-                          <span class="custom-dropdown-arrow"
-                            ><img width="14px" src="img/arrow-right.png"
-                          /></span>
+                          id="network-selector2">
+                          <span
+                            class="custom-dropdown-selected-text">ERC-20</span>
+                          <span class="custom-dropdown-arrow"><img width="14px"
+                              src="img/arrow-right.png" /></span>
                         </div>
                         <div class="custom-dropdown-options">
                           <hr class="separator2" />
@@ -590,8 +526,7 @@
                                 height: 24px;
                                 width: 15px;
                                 margin-left: 15px;
-                              "
-                            />
+                              " />
                             <span style="margin-left: 10px">ERC-20</span>
                           </div>
                           <div class="custom-dropdown-option">
@@ -601,22 +536,19 @@
                                 width: 25px;
                                 height: 25px;
                                 margin-left: 10px;
-                              "
-                            />
+                              " />
                             <span style="margin-left: 10px">BSC</span>
                           </div>
                           <div class="custom-dropdown-option">
                             <img
                               src="img/base.png"
-                              style="width: 22px; margin-left: 10px"
-                            />
+                              style="width: 22px; margin-left: 10px" />
                             <span style="margin-left: 10px">Base</span>
                           </div>
                           <div class="custom-dropdown-option">
                             <img
                               src="img/arb.png"
-                              style="width: 22px; margin-left: 10px"
-                            />
+                              style="width: 22px; margin-left: 10px" />
                             <span style="margin-left: 10px">Arbitrum One</span>
                           </div>
                         </div>
@@ -625,14 +557,11 @@
 
                     <span
                       id="welcome-message"
-                      style="pointer-events: none; color: transparent"
-                      >Login</span
-                    >
+                      style="pointer-events: none; color: transparent">Login</span>
                     <div class="amount-sectionz">
                       <div class="razss">
-                        <label style="margin: 0" class="choose"
-                          >Withdraw Address</label
-                        >
+                        <label style="margin: 0" class="choose">Withdraw
+                          Address</label>
                         <div id="error-message2" class="error-message2"></div>
                       </div>
                       <div class="input-wrapperz">
@@ -645,8 +574,7 @@
                           "
                           placeholder="0xc4.."
                           class="inputz"
-                          id="addressInput"
-                        />
+                          id="addressInput" />
                       </div>
                     </div>
                     <div class="amount-sectionz">
@@ -665,8 +593,7 @@
                           "
                           placeholder="10"
                           class="inputz"
-                          type="number"
-                        />
+                          type="number" />
                       </div>
                     </div>
 
@@ -675,9 +602,7 @@
                       <span
                         style="font-weight: bold"
                         id="availableAmount"
-                        class="available-valuez"
-                        >0.000</span
-                      >
+                        class="available-valuez">0.000</span>
                     </div>
                     <div class="memo-sectionz">
                       <label class="choose">MEMO (Optional)</label>
@@ -685,16 +610,13 @@
                         type="text"
                         style="font-size: 12px; color: #dcd9ff"
                         class="inputz"
-                        placeholder=""
-                      />
+                        placeholder />
                     </div>
                     <div class="network-feez">
-                      <span style="color: #dcd9ff; font-size: 14px"
-                        >Network Fee</span
-                      >
-                      <span style="font-size: 14px" class="fee-valuez"
-                        >&lt; 0.01 USDT</span
-                      >
+                      <span style="color: #dcd9ff; font-size: 14px">Network
+                        Fee</span>
+                      <span style="font-size: 14px" class="fee-valuez">&lt; 0.01
+                        USDT</span>
                     </div>
                     <button class="withdraw-button33" id="withdrawButton">
                       Withdraw
@@ -711,7 +633,7 @@
                           document.getElementById("error-message2");
                         const errorMessage =
                           document.getElementById("error-message");
-                        let availableAmount = 0; // Variable to store available balance from backend
+                        let availableAmount = 0; // Variable to store available futuresUSDTBalance from backend
 
                         // Initially disable the withdraw button
                         withdrawButton.disabled = true;
@@ -781,12 +703,12 @@
                             });
                             const data = await response.json();
 
-                            availableAmount = parseFloat(data.balance); // Set available balance to variable
+                            availableAmount = parseFloat(data.balance); // Set available futuresUSDTBalance to variable
                             document.getElementById(
                               "availableAmount"
                             ).textContent = availableAmount.toFixed(3); // Display formatted balance
 
-                            // Now that the balance is set, add the validation listener
+                            // Now that the futuresUSDTBalance is set, add the validation listener
                             addValidationEventListener();
                           } catch (error) {
                             console.error("Error fetching user data:", error);
@@ -1010,8 +932,7 @@
                 height: 45px;
                 display: flex;
                 align-items: center;
-              "
-            >
+              ">
               <span>Wallets</span>
             </a>
 
@@ -1027,13 +948,11 @@
                   border-radius: 10px;
                   z-index: 10;
                   box-shadow: 0 4px 8px rgba(0.3, 0.3, 0.3, 0.3);
-                "
-              >
+                ">
                 <!-- Center the profile picture and welcome message -->
                 <div class="balance-info">
-                  <span class="balance-text"
-                    ><img style="width: 20px" src="img/USDT.png"
-                  /></span>
+                  <span class="balance-text"><img style="width: 20px"
+                      src="img/USDT.png" /></span>
                 </div>
                 <hr
                   class="separator3"
@@ -1044,20 +963,18 @@
                     height: 1.8px;
                     background: linear-gradient(to right, #ff8c00, #ff0080);
                     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-                  "
-                />
+                  " />
 
                 <!-- Main menu items -->
                 <a
-                  href=""
+                  href
                   id="activity-link"
                   style="
                     display: flex;
                     align-items: center;
                     text-decoration: none;
                     margin-bottom: 8px;
-                  "
-                >
+                  ">
                   <img
                     src="img/activity.png"
                     style="
@@ -1065,21 +982,19 @@
                       height: 22px;
                       margin-right: 20px;
                       margin-left: 5px;
-                    "
-                  />
+                    " />
                   <p style="margin: 0; font-size: 16px">Spot</p>
                 </a>
 
                 <a
-                  href=""
+                  href
                   id="privacy-security-link"
                   style="
                     display: flex;
                     align-items: center;
                     text-decoration: none;
                     margin-bottom: 8px;
-                  "
-                >
+                  ">
                   <img
                     src="img/lock.png"
                     style="
@@ -1087,21 +1002,19 @@
                       height: 20px;
                       margin-right: 20px;
                       margin-left: 4px;
-                    "
-                  />
+                    " />
                   <p style="margin: 0; font-size: 16px">Futures</p>
                 </a>
 
                 <a
-                  href=""
+                  href
                   id="support-link"
                   style="
                     display: flex;
                     align-items: center;
                     text-decoration: none;
                     margin-bottom: 8px;
-                  "
-                >
+                  ">
                   <img
                     src="img/contact.png"
                     style="
@@ -1109,8 +1022,7 @@
                       height: 20px;
                       margin-right: 20px;
                       margin-left: 4px;
-                    "
-                  />
+                    " />
                   <p style="margin: 0; font-size: 16px">Copy Trade</p>
                 </a>
               </div>
@@ -1129,8 +1041,7 @@
                 );
                 display: flex;
                 align-items: center;
-              "
-            >
+              ">
               <img class="pfp" src="img/pfp.png" style="pointer-events: none" />
               <div
                 class="icon"
@@ -1139,13 +1050,10 @@
                   height: 20px;
                   margin: 4px 20px 0 10px;
                   pointer-events: none;
-                "
-              >
+                ">
                 <span
                   id="welcome-message-duplicate"
-                  style="pointer-events: none; color: #dcdcdc"
-                  >Login</span
-                >
+                  style="pointer-events: none; color: #dcdcdc">Login</span>
               </div>
               <img
                 src="img/arrow-down.png"
@@ -1154,8 +1062,7 @@
                   height: 16px;
                   margin-left: 10px;
                   pointer-events: none;
-                "
-              />
+                " />
             </a>
             <div id="icon3">
               <!-- Main dropdown content -->
@@ -1169,8 +1076,7 @@
                   border-radius: 10px;
                   z-index: 10;
                   box-shadow: 0 4px 8px rgba(0.3, 0.3, 0.3, 0.3);
-                "
-              >
+                ">
                 <!-- Center the profile picture and welcome message -->
                 <div
                   style="
@@ -1178,13 +1084,11 @@
                     flex-direction: column;
                     align-items: center;
                     margin-bottom: 5px;
-                  "
-                >
+                  ">
                   <img
                     src="img/pfp.png"
                     class="pfp-large"
-                    style="width: 100px; height: 100px; border-radius: 50%"
-                  />
+                    style="width: 100px; height: 100px; border-radius: 50%" />
                 </div>
                 <hr
                   class="separator3"
@@ -1195,20 +1099,18 @@
                     height: 1.8px;
                     background: linear-gradient(to right, #ff8c00, #ff0080);
                     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-                  "
-                />
+                  " />
 
                 <!-- Main menu items -->
                 <a
-                  href=""
+                  href
                   id="activity-link"
                   style="
                     display: flex;
                     align-items: center;
                     text-decoration: none;
                     margin-bottom: 8px;
-                  "
-                >
+                  ">
                   <img
                     src="img/activity.png"
                     style="
@@ -1216,21 +1118,19 @@
                       height: 22px;
                       margin-right: 20px;
                       margin-left: 5px;
-                    "
-                  />
+                    " />
                   <p style="margin: 0; font-size: 16px">Activity</p>
                 </a>
 
                 <a
-                  href=""
+                  href
                   id="privacy-security-link"
                   style="
                     display: flex;
                     align-items: center;
                     text-decoration: none;
                     margin-bottom: 8px;
-                  "
-                >
+                  ">
                   <img
                     src="img/lock.png"
                     style="
@@ -1238,21 +1138,19 @@
                       height: 20px;
                       margin-right: 20px;
                       margin-left: 4px;
-                    "
-                  />
+                    " />
                   <p style="margin: 0; font-size: 16px">Privacy & security</p>
                 </a>
 
                 <a
-                  href=""
+                  href
                   id="support-link"
                   style="
                     display: flex;
                     align-items: center;
                     text-decoration: none;
                     margin-bottom: 8px;
-                  "
-                >
+                  ">
                   <img
                     src="img/contact.png"
                     style="
@@ -1260,8 +1158,7 @@
                       height: 20px;
                       margin-right: 20px;
                       margin-left: 4px;
-                    "
-                  />
+                    " />
                   <p style="margin: 0; font-size: 16px">Contact</p>
                 </a>
 
@@ -1272,12 +1169,10 @@
                     display: flex;
                     align-items: center;
                     text-decoration: none;
-                  "
-                >
+                  ">
                   <img
                     src="img/logout.png"
-                    style="width: 25px; height: 25px; margin-right: 20px"
-                  />
+                    style="width: 25px; height: 25px; margin-right: 20px" />
                   <p style="margin: 0; font-size: 16px">Login / Logout</p>
                 </a>
               </div>
@@ -1400,38 +1295,36 @@
         </div>
 
         <div class="tab">
-          <button class="tablinks" onclick="openTrading(event, 'futures')" id="defaultOpen">Futures Trading</button>
-          <button class="tablinks" onclick="openTrading(event, 'spot')">Spot Trading</button>
+          <button
+            class="tablinks"
+            onclick="openTrading(event, 'futures')"
+            id="defaultOpen">
+            Futures Trading
+          </button>
+          <button class="tablinks" onclick="openTrading(event, 'spot')">
+            Spot Trading
+          </button>
         </div>
 
-        <div id="futures" class="tabcontent">
-          <div class="open-position">
-            <div
-              id="credit"
-              class="credit"
-              style="color: rgba(165, 164, 164, 0.978)"
-            >
-              <span id="balance" style="color: aquamarine">0</span><br />Credit:
-              <span id="credit-value" style="color: hsl(236, 100%, 94%)"
-                >Loading...</span
-              >
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Futures Type:
-              <select id="futures-type"></select>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Current Price:
-              <span id="current-price" style="color: chartreuse">Loading...</span>
+        <div id="futures" class="tabcontent trading-panel">
+          <div id="futures-statistics"></div><br>
+          <div id="assets-statistics"></div>
+          <div class="order-panel">
+            <div>
+              Asset Type:<select id="asset-type" style="width: 80px"></select>&nbsp;&nbsp;&nbsp;
+              <span class="money-type">Current Price:</span>
+              <span id="current-price" class="money-value">Loading...</span>
             </div>
             <div>
-              <label style="color: rgb(179, 57, 57); font-size: 24px"
-                >Market Order: </label
-              >&nbsp;&nbsp;
+              <label style="color: rgb(255, 0, 0); font-size: 24px">Market
+                Order: </label>&nbsp;&nbsp;
               <label>Bet Amount:</label>
               <input
                 type="number"
                 id="bet-amount"
                 min="1"
                 max="100"
-                style="width: 80px; font-size: 20px"
-              />&nbsp;&nbsp;
+                style="width: 80px; font-size: 20px" />&nbsp;&nbsp;
               <label>Leverage:</label>
               <input
                 type="number"
@@ -1439,35 +1332,28 @@
                 min="1"
                 max="300"
                 value="1"
-                style="width: 50px; font-size: 20px"
-              />&nbsp;&nbsp;
+                style="width: 50px; font-size: 20px" />&nbsp;&nbsp;
               <button
                 id="long-button"
                 class="playbutttton"
-                style="margin-top: 15px"
-              >
-                Long</button
-              >&nbsp;&nbsp;
+                style="margin-top: 15px">
+                Long</button>&nbsp;&nbsp;
               <button
                 id="short-button"
                 class="playbutttton"
-                style="margin-top: 15px"
-              >
-                Short</button
-              >&nbsp;&nbsp;
+                style="margin-top: 15px">
+                Short</button>&nbsp;&nbsp;
             </div>
             <div>
-              <label style="color: rgb(179, 57, 57); font-size: 24px"
-                >Limit Order: </label
-              >&nbsp;&nbsp;
+              <label style="color: rgb(255, 0, 0); font-size: 24px">Limit Order:
+              </label>&nbsp;&nbsp;
               <label>Bet Amount:</label>
               <input
                 type="number"
                 id="limit-amount"
                 min="1"
                 max="100"
-                style="width: 80px; font-size: 20px"
-              />&nbsp;&nbsp;
+                style="width: 80px; font-size: 20px" />&nbsp;&nbsp;
               <label>Leverage:</label>
               <input
                 type="number"
@@ -1475,43 +1361,35 @@
                 min="1"
                 max="300"
                 value="1"
-                style="width: 50px; font-size: 20px"
-              />&nbsp;&nbsp;
+                style="width: 50px; font-size: 20px" />&nbsp;&nbsp;
               <label>Limit Price:</label>
               <input
                 type="number"
                 id="limit-price"
-                style="width: 100px; font-size: 20px"
-              />&nbsp;&nbsp;
+                style="width: 100px; font-size: 20px" />&nbsp;&nbsp;
               <button
                 id="limit-long-button"
                 class="playbutttton"
-                style="margin-top: 15px"
-              >
-                Long</button
-              >&nbsp;&nbsp;
+                style="margin-top: 15px">
+                Long</button>&nbsp;&nbsp;
               <button
                 id="limit-short-button"
                 class="playbutttton"
-                style="margin-top: 15px"
-              >
-                Short</button
-              >&nbsp;&nbsp;
+                style="margin-top: 15px">
+                Short</button>&nbsp;&nbsp;
             </div>
-            <hr />
-            <h3 style="color: #ff8c00">Opend Positions</h3>
-            <div id="positions"></div>
-            <h3 style="color: #ff8c00">Limit Orders</h3>
-            <div id="limit-orders"></div>
-            <h3 style="color: #ff8c00">Closed Positions</h3>
-            <div id="closed-positions"></div>
           </div>
-        </div>
-        
-        <div id="spot" class="tabcontent">
-          <h3>There is nothing here yet.</h3>
+          <h3 style="color: #ff8c00">Open Positions</h3>
+          <div id="positions"></div>
+          <h3 style="color: #ff8c00">Open Orders</h3>
+          <div id="limit-orders"></div>
+          <h3 style="color: #ff8c00">Closed Positions</h3>
+          <div id="closed-positions"></div>
         </div>
 
+        <div id="spot" class="tabcontent trading-panel">
+          <h3>There is nothing here yet.</h3>
+        </div>
       </div>
     </div>
     <div id="partialClosingModal" class="modal">
@@ -1526,15 +1404,14 @@
             type="number"
             min="1"
             max="100"
-            value="100"
-          />%&nbsp;&nbsp;
+            value="100" />%&nbsp;&nbsp;
           <button onclick="partialClose()">Confirm</button>
         </p>
       </div>
     </div>
     <script>
       let intervalId;
-      let balance = 0; // Initialize balance
+      let futuresUSDTBalance = 0; // Initialize balance
       let positionsCount = 0;
       let closedPositionsCount = 0;
       let closingPosition;
@@ -1547,7 +1424,7 @@
         tmp += "<option>" + futures + "</option>";
       });
 
-      document.getElementById("futures-type").innerHTML = tmp;
+      document.getElementById("asset-type").innerHTML = tmp;
 
       function fetchUserData() {
         fetch("/api/getBalance", {
@@ -1559,15 +1436,15 @@
         })
           .then((response) => response.json())
           .then((data) => {
-            balance = data.balance; // Update balance from the server
-            document.getElementById("credit-value").textContent =
-              balance.toFixed(2);
+            futuresUSDTBalance = data.futuresUSDTBalance; // Update futuresUSDTBalance from the server
+            // document.getElementById("credit-value").textContent = balance.toFixed(2);
             // updateBalanceDisplay();
           })
-          .catch((error) =>
-            console.error("Error fetching balance:", error)
-          );
+          .catch((error) => console.error("Error fetching balance:", error));
 
+          
+        let futuresBalances = [];
+        futuresBalances.push(futuresUSDTBalance);
         // Fetch current market price
         fetch("/api/getCurrentPrice", {
           method: "POST",
@@ -1578,21 +1455,26 @@
           .then((response) => response.json())
           .then((priceData) => {
             const currentPrices = priceData.currentPrices;
-            
+
             let priceText = "";
             priceData.currentPrices.forEach((price, index) => {
-              priceText += "<span class='asset-name'>" + price["assetType"] + ":</span>";
-              priceText += "<span class='asset-price'>" + currencyFormatter.format(price["price"]) + "</span>";
+              futuresBalances.push(0);
+              priceText +=
+                "<span class='money-type'>" + price["assetType"] + ":</span>";
+              priceText +=
+                "<span class='money-value'>" +
+                  new Intl.NumberFormat('en-US').format(price["price"]) +
+                "</span>";
               priceText += "&nbsp;&nbsp;&nbsp;&nbsp;";
-              if(index%5==4)priceText += "<br>";
+              if (index % 5 == 4) priceText += "<br>";
             });
 
             document.getElementById("now-price").innerHTML = priceText;
 
-            // document.getElementById("current-price").textContent =
-            //   currentPrices.filter(
-            //     (item) => item["assetType"] == assetType
-            //   )[0].price;
+            document.getElementById("current-price").textContent = Intl.NumberFormat('en-US').format(
+              currentPrices.filter(
+                (item) => item["assetType"] == assetType
+              )[0].price);
 
             fetch("/api/getPositions", {
               method: "POST",
@@ -1604,8 +1486,7 @@
               .then((response) => response.json())
               .then((data) => {
                 const positionsDiv = document.getElementById("positions");
-                const limitOrdersDiv =
-                  document.getElementById("limit-orders");
+                const limitOrdersDiv = document.getElementById("limit-orders");
                 const closedPositionsDiv =
                   document.getElementById("closed-positions");
 
@@ -1625,6 +1506,7 @@
                   }
 
                   data.positions.forEach((position) => {
+                    futuresBalances[assetTypes.indexOf(position.assetType) + 1] += position.amount;
                     currentPrice = currentPrices.filter(
                       (item) => item["assetType"] == position.assetType
                     )[0].price;
@@ -1700,9 +1582,7 @@
                           positionDiv.textContent = `
                                         ${1 - position.orderLimit}-${
                             position.orderType
-                          }-${position.positionType}- ${
-                            position.assetType
-                          }- 
+                          }-${position.positionType}- ${position.assetType}- 
                                         Amount: $${position.amount},
                                         Leverage: ${position.leverage}X, 
                                         Entry: $${position.entryPrice},
@@ -1757,21 +1637,19 @@
                             slInput.value = position.sl;
                           positionDiv.appendChild(slInput);
 
-                          const saveButton =
-                            document.createElement("button");
+                          const saveButton = document.createElement("button");
                           saveButton.textContent = "Save";
                           saveButton.onclick = () => saveTPSL(position);
                           positionDiv.appendChild(saveButton);
                           positionDiv.append(" ");
 
                           // Create close button
-                          const closeButton =
-                            document.createElement("button");
+                          const closeButton = document.createElement("button");
                           closeButton.textContent = "Close";
-                          closeButton.onclick = (() => {
+                          closeButton.onclick = () => {
                             closingPosition = position;
                             partialClosingModal.style.display = "block";
-                          })
+                          };
                           // closeButton.onclick = () => closePosition(position, 0);
                           positionDiv.appendChild(closeButton); // Add close button to position div
 
@@ -1784,18 +1662,14 @@
                           if (position.orderType == "limit") {
                             if (position.orderLimit == 0) {
                               if (position.positionType == "Long")
-                                positionDiv.style.backgroundColor =
-                                  "#853467";
+                                positionDiv.style.backgroundColor = "#853467";
                               if (position.positionType == "Short")
-                                positionDiv.style.backgroundColor =
-                                  "#925743";
+                                positionDiv.style.backgroundColor = "#925743";
                             } else {
                               if (position.positionType == "Long")
-                                positionDiv.style.backgroundColor =
-                                  "#295843";
+                                positionDiv.style.backgroundColor = "#295843";
                               if (position.positionType == "Short")
-                                positionDiv.style.backgroundColor =
-                                  "#694456";
+                                positionDiv.style.backgroundColor = "#694456";
                             }
                           }
 
@@ -1808,9 +1682,7 @@
                           document.getElementById(
                             "un" + position.id
                           ).textContent =
-                            "Unrealized P/L: " +
-                            unrealizedPL.toFixed(2) +
-                            ",";
+                            "Unrealized P/L: " + unrealizedPL.toFixed(2) + ",";
                         }
                       }
                     }
@@ -1917,17 +1789,61 @@
                   closedPositionsCount = count;
                 }
 
-                document.getElementById("balance").textContent = (
-                  balance +
-                  totalPositionAmount +
-                  totalUnrealizedPL
-                ).toFixed(2);
+                let statisticsBar = "";
+                statisticsBar +=
+                  "<span class='money-type'>Est. Total Value (USDT):</span>";
+                statisticsBar +=
+                  "<span class='money-value'>" +
+                    new Intl.NumberFormat('en-US').format(
+                    (futuresUSDTBalance + totalPositionAmount + totalUnrealizedPL).toFixed(2)
+                  ) +
+                  "</span>";
+                statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+                statisticsBar +=
+                  "<span class='money-type'>Est. Total Cost (USDT):</span>";
+                statisticsBar +=
+                  "<span class='money-value'>" +
+                    Intl.NumberFormat('en-US').format(totalPositionAmount) +
+                  "</span>";
+                statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+                statisticsBar +=
+                  "<span class='money-type'>Est. Total Unrealized PNL (USDT):</span>";
+                statisticsBar +=
+                  "<span class='money-value'>" +
+                    Intl.NumberFormat('en-US').format(totalUnrealizedPL.toFixed(2)) +
+                  "</span>";
+
+                document.getElementById("futures-statistics").innerHTML =
+                  statisticsBar;
+
+                statisticsBar = "";
+                futuresBalances.forEach((balance, index) => {
+                  if(!index){
+                    statisticsBar +=
+                    "<span class='money-value'>" +
+                    new Intl.NumberFormat('en-US').format(balance.toFixed(2)) +
+                    "</span>";
+                    statisticsBar +=
+                    "<span class='money-type'> USDT</span>";
+                  }else{
+                    statisticsBar +=
+                    "<span class='money-value'>" +
+                      new Intl.NumberFormat('en-US').format(balance.toFixed(2)) +
+                    "</span>";
+                    statisticsBar +=
+                    "<span class='money-type'> " + assetTypes[index-1] + "</span>";
+                  }
+                  statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;";
+                  if (index % 8 == 7) statisticsBar += "<br>";
+                });
+
+                document.getElementById("assets-statistics").innerHTML =
+                  statisticsBar;
 
                 fetch("/api/updatebalance", {
                   method: "POST",
                   headers: {
-                    Authorization:
-                      "Bearer " + localStorage.getItem("token"),
+                    Authorization: "Bearer " + localStorage.getItem("token"),
                     "Content-Type": "application/json",
                   },
                   body: JSON.stringify({
@@ -1973,23 +1889,15 @@
         let leverage = 0;
         let limitPrice = 0;
         if (orderType == "market") {
-          betAmount = parseFloat(
-            document.getElementById("bet-amount").value
-          );
-          leverage = parseFloat(
-            document.getElementById("bet-leverage").value
-          );
+          betAmount = parseFloat(document.getElementById("bet-amount").value);
+          leverage = parseFloat(document.getElementById("bet-leverage").value);
         }
         if (orderType == "limit") {
-          betAmount = parseFloat(
-            document.getElementById("limit-amount").value
-          );
+          betAmount = parseFloat(document.getElementById("limit-amount").value);
           leverage = parseFloat(
             document.getElementById("limit-leverage").value
           );
-          limitPrice = parseFloat(
-            document.getElementById("limit-price").value
-          );
+          limitPrice = parseFloat(document.getElementById("limit-price").value);
           if (isNaN(limitPrice)) {
             alert("Please enter a valid Limit Price");
             return;
@@ -2056,8 +1964,8 @@
             return response.json();
           })
           .then((data) => {
-            // Update balance after closing position
-            balance += data.profitLoss; // Assuming the server returns the profit/loss
+            // Update futuresUSDTBalance after closing position
+            futuresUSDTBalance += data.profitLoss; // Assuming the server returns the profit/loss
             // updateBalanceDisplay();
             fetchUserData(); // Refresh user data
             switch (reason) {
@@ -2084,9 +1992,7 @@
       }
 
       function saveTPSL(position) {
-        let tp = parseFloat(
-          document.getElementById("tp" + position.id).value
-        );
+        let tp = parseFloat(document.getElementById("tp" + position.id).value);
         if (isNaN(tp) || tp == 0) {
           if (position.positionType == "Long") {
             tp = 100000000;
@@ -2094,9 +2000,7 @@
             tp = 0;
           }
         }
-        let sl = parseFloat(
-          document.getElementById("sl" + position.id).value
-        );
+        let sl = parseFloat(document.getElementById("sl" + position.id).value);
         if (isNaN(sl) || sl == 0) {
           if (position.positionType == "Long") {
             sl = 0;
@@ -2121,15 +2025,12 @@
       }
 
       // function updateBalanceDisplay() {
-      //     document.getElementById('balance').textContent = balance.toFixed(2); // Update balance display
+      //     document.getElementById('balance').textContent = balance.toFixed(2); // Update futuresUSDTBalance display
       // }
 
       // Get the <span> element that closes the modal
-        var span = document.getElementsByClassName("close")[0];
-      var partialClosingModal =
-          document.getElementById(
-            "partialClosingModal"
-          );
+      var span = document.getElementsByClassName("close")[0];
+      var partialClosingModal = document.getElementById("partialClosingModal");
       // When the user clicks on <span> (x), close the modal
       span.onclick = function () {
         partialClosingModal.style.display = "none";
@@ -2146,42 +2047,42 @@
         let percent = parseFloat(
           document.getElementById("particalClosingPercent").value
         );
-        if(percent==0){
+        if (percent == 0) {
           alert("Please select a valid percent");
         }
         if (percent == 100) {
           closePosition(closingPosition, 0);
         } else {
           fetch("/api/partialClosePosition", {
-              method: "POST",
-              headers: {
-                Authorization: "Bearer " + localStorage.getItem("token"),
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                positionId: closingPosition.id, // Assuming each position has a unique ID
-                percent,
-              }),
+            method: "POST",
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token"),
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              positionId: closingPosition.id, // Assuming each position has a unique ID
+              percent,
+            }),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("Network response was not ok");
+              }
+              return response.json();
             })
-              .then((response) => {
-                if (!response.ok) {
-                  throw new Error("Network response was not ok");
-                }
-                return response.json();
-              })
-              .then((data) => {
-                // Update balance after closing position
-                balance += data.profitLoss; // Assuming the server returns the profit/loss
-                // updateBalanceDisplay();
-                fetchUserData(); // Refresh user data
-                alert("Position partially closed by " + percent + "%.");
-                positionsCount = 0;
-                closedPositionsCount = 0;
-              })
-              .catch((error) => {
-                console.error("Error closing position:", error);
-                alert("Error closing position. Please try again.");
-              });
+            .then((data) => {
+              // Update futuresUSDTBalance after closing position
+              futuresUSDTBalance += data.profitLoss; // Assuming the server returns the profit/loss
+              // updateBalanceDisplay();
+              fetchUserData(); // Refresh user data
+              alert("Position partially closed by " + percent + "%.");
+              positionsCount = 0;
+              closedPositionsCount = 0;
+            })
+            .catch((error) => {
+              console.error("Error closing position:", error);
+              alert("Error closing position. Please try again.");
+            });
         }
         partialClosingModal.style.display = "none";
       }
@@ -2213,17 +2114,15 @@
         placeBet("long", "limit");
       document.getElementById("limit-short-button").onclick = () =>
         placeBet("short", "limit");
-      document.getElementById("futures-type").onchange = () => {
-        assetType = document.getElementById("futures-type").value;
+      document.getElementById("asset-type").onchange = () => {
+        assetType = document.getElementById("asset-type").value;
       };
       // Fetch data initially and then every second
       fetchUserData();
       intervalId = setInterval(fetchUserData, 500);
 
       // Clear the interval when the user leaves the page
-      window.addEventListener("beforeunload", () =>
-        clearInterval(intervalId)
-      );
+      window.addEventListener("beforeunload", () => clearInterval(intervalId));
     </script>
   </body>
 </html>

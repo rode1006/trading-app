@@ -1,8 +1,8 @@
 {
   "s": {
     "password": "$2a$08$i.AMZFb3y.bXLS5pqCnHi.xHeX0vkBrel3qrR1SUxxX4wByVkmHWG",
-    "virtualBalance": 252180.1516137703,
-    "balance": 117342.0316137703,
+    "totalValue": 252180.1516137703,
+    "futuresUSDTBalance": 117342.0316137703,
     "privateKey": "key24",
     "address": "0xad63da502b21bbec1d0c546509b24f1275ea873a",
     "positions": [
@@ -166,11 +166,38 @@
   },
   "tiger": {
     "password": "$2a$08$V6dQqUGfz7GR8jZ/ZacUfO.b.jS0a6Cnss7WcBrwQLTE.93SVC.cS",
-    "virtualBalance": 104963.75732129122,
-    "balance": 104963.75732129122,
+    "totalValue": 101889.68732129122,
+    "futuresUSDTBalance": 91963.75732129122,
     "privateKey": "key11",
     "address": "0xb3ad63d24fa85ea509c121d7a502b6127bbe0c54",
-    "positions": [],
+    "positions": [
+      {
+        "id": 1728896590691,
+        "assetType": "BTC",
+        "positionType": "Long",
+        "orderType": "market",
+        "orderLimit": 0,
+        "amount": 5000,
+        "leverage": 10,
+        "tp": 100000000,
+        "sl": 0,
+        "limitPrice": 0,
+        "entryPrice": 64465.91
+      },
+      {
+        "id": 1728897150962,
+        "assetType": "BTC",
+        "positionType": "Long",
+        "orderType": "limit",
+        "orderLimit": 0,
+        "amount": 3000,
+        "leverage": 100,
+        "tp": 100000000,
+        "sl": 0,
+        "limitPrice": 64500,
+        "entryPrice": 64368
+      }
+    ],
     "closedPositions": [
       {
         "id": 1728686271893,
@@ -219,6 +246,22 @@
         "exitPrice": 63097.81,
         "realizedPL": 5888.824083301821,
         "closedReason": 0
+      },
+      {
+        "id": 1728897192202,
+        "assetType": "SOL",
+        "positionType": "Short",
+        "orderType": "market",
+        "orderLimit": 0,
+        "amount": 5000,
+        "leverage": 100,
+        "tp": 0,
+        "sl": 100000000,
+        "limitPrice": 0,
+        "entryPrice": 152.14,
+        "exitPrice": 153.36,
+        "realizedPL": -5000,
+        "closedReason": 3
       }
     ]
   }

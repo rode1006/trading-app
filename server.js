@@ -176,8 +176,8 @@ app.post("/register", (req, res) => {
 
   users[username] = {
     password: hashedPassword,
-    virtualBalance: 0,
-    balance: 0, // Initial balance (change if needed)
+    totalValue: 0,
+    futuresUSDTBalance: 0, // Initial balance (change if needed)
     privateKey: selectedKey.privateKey,
     address: selectedKey.address,
   }; // Save user with initial balance
@@ -232,7 +232,7 @@ app.post("/api/getBalance", authenticateToken, (req, res) => {
 
   res.json({
     username,
-    balance: user.balance,
+    futuresUSDTBalance: user.futuresUSDTBalance,
     address: user.address,
     // privateKey: user.privateKey
   });
@@ -277,7 +277,7 @@ app.post("/api/openPosition", authenticateToken, async (req, res) => {
 
   if (!user) return res.status(404).send("User not found");
 
-  if (user.balance < amount) {
+  if (user.futuresUSDTBalance < amount) {
     return res.status(400).send("Insufficient balance");
   }
 
@@ -290,8 +290,8 @@ app.post("/api/openPosition", authenticateToken, async (req, res) => {
   const currentMarketPrice = currentMarketPrices.filter(
     (item) => item.assetType == assetType
   )[0].price;
-  // if(orderType=='market')user.balance -= amount; // Deduct the amount from user's balance
-  user.balance -= amount; // Deduct the amount from user's balance
+  // if(orderType=='market')user.futuresUSDTBalance -= amount; // Deduct the amount from user's balance
+  user.futuresUSDTBalance -= amount; // Deduct the amount from user's balance
 
   const positionId = Date.now(); // Unique ID for the position (can be replaced with a more robust method)
   let tp = 0;
@@ -327,7 +327,7 @@ app.post("/api/openPosition", authenticateToken, async (req, res) => {
   saveUsers(users);
   sendPositionOpenEmail(username, position);
 
-  res.json({ positions: user.positions, newBalance: user.balance });
+  res.json({ positions: user.positions, newfuturesUSDTBalance: user.futuresUSDTBalance });
 });
 
 app.post("/api/getPositions", authenticateToken, (req, res) => {
@@ -401,7 +401,7 @@ app.post("/api/startTrade", authenticateToken, async (req, res) => {
   if (positionIndex === -1) return res.status(404).send("Position not found");
 
   user.positions[positionIndex].orderLimit = 0;
-  // user.balance -= user.positions[positionIndex].amount;
+  // user.futuresUSDTBalance -= user.positions[positionIndex].amount;
   saveUsers(users);
   res.json({ positions: user.positions });
 });
@@ -445,8 +445,8 @@ app.post("/api/closePosition", authenticateToken, async (req, res) => {
 
   // Update balance
   if (reason == 3) profitLoss = -closedPosition.amount; // liquidation
-  // if(!closedPosition.orderLimit)user.balance += closedPosition.amount + profitLoss; // Add the amount and profit/loss
-  user.balance += closedPosition.amount + profitLoss; // Add the amount and profit/loss
+  // if(!closedPosition.orderLimit)user.futuresUSDTBalance += closedPosition.amount + profitLoss; // Add the amount and profit/loss
+  user.futuresUSDTBalance += closedPosition.amount + profitLoss; // Add the amount and profit/loss
 
   // Log the closed position with realized P/L
   if (!user.closedPositions) {
@@ -462,7 +462,7 @@ app.post("/api/closePosition", authenticateToken, async (req, res) => {
   sendPositionClosedEmail(username, closedPosition, currentMarketPrice);
 
   saveUsers(users);
-  res.json({ positions: user.positions, newBalance: user.balance, profitLoss });
+  res.json({ positions: user.positions, newfuturesUSDTBalance: user.futuresUSDTBalance, profitLoss });
 });
 
 app.post("/api/partialClosePosition", authenticateToken, async (req, res) => {
@@ -505,7 +505,7 @@ app.post("/api/partialClosePosition", authenticateToken, async (req, res) => {
   if (closedPosition.orderLimit) profitLoss = 0;
 
   // Update balance
-  user.balance += (closedPosition.amount * percent) / 100 + profitLoss; // Add the amount and profit/loss
+  user.futuresUSDTBalance += (closedPosition.amount * percent) / 100 + profitLoss; // Add the amount and profit/loss
   closedPosition.amount *= percent / 100;
 
   // Log the closed position with realized P/L
@@ -523,7 +523,7 @@ app.post("/api/partialClosePosition", authenticateToken, async (req, res) => {
   user.positions[positionIndex].amount *= 1 - percent / 100;
 
   saveUsers(users);
-  res.json({ positions: user.positions, newBalance: user.balance, profitLoss });
+  res.json({ positions: user.positions, newfuturesUSDTBalance: user.futuresUSDTBalance, profitLoss });
 });
 
 app.post("/api/getClosedPositions", authenticateToken, (req, res) => {
@@ -543,10 +543,10 @@ app.post("/api/updatebalance", authenticateToken, (req, res) => {
 
   if (!user) return res.status(404).send("User not found");
 
-  user.virtualBalance = user.balance + parseFloat(req.body.unrealizepl); // Using user.balance directly
+  user.totalValue = user.futuresUSDTBalance + parseFloat(req.body.unrealizepl); // Using user.futuresUSDTBalance directly
   saveUsers(users);
   res.json({
-    balance: user.balance,
-    virtualBalance: user.virtualBalance,
+    futuresUSDTBalance: user.futuresUSDTBalance,
+    totalValue: user.totalValue,
   });
 });

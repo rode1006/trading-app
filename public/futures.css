@@ -15,7 +15,7 @@ body {
 
 /* Style the tab */
 .tab {
-  overflow: hidden;
+  /* overflow: hidden; */
   border: 1px solid #ccc;
   background-color: #222222;
   margin-top: 80px;
@@ -197,16 +197,23 @@ body {
 
 
 
-.asset-name{
+.money-type{
   color: #f4a070;
 }
 
-.asset-price{
+.money-value{
   color: #2fda65;
 }
 
+.order-panel{
+  background-color: #333333;
+  font-size: 20px;
+  border: white solid 1px;
+  margin: 10px;
+  padding: 10px;
+}
 
-.open-position{
+.trading-panel{
   background-color: #16171a;
   padding: 20px;
   border-radius: 3px;
