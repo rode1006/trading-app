@@ -6,7 +6,7 @@ const fs = require("fs");
 const nodemailer = require("nodemailer");
 const axios = require("axios");
 const app = express();
-const futuresTypes = ["BTC", "ETH", "BNB", "NEO", "LTC", "SOL", "XRP"];
+const assetTypes = ["BTC", "ETH", "BNB", "NEO", "LTC", "SOL", "XRP"];
 
 app.use(bodyParser.json());
 
@@ -97,7 +97,7 @@ function sendPositionOpenEmail(username, position) {
     from: "gagenikolov50@gmail.com", // Replace with your admin email
     to: "gagenikolov.z@gmail.com", // Replace with the recipient (admin) email
     subject: "New Position Opened",
-    text: `${position.id} user ${username} opened ${position.positionType} ${position.orderType} ${position.futuresType} Amount: ${position.amount} Leverage: ${position.leverage} Entry: ${position.entryPrice} Liquidation: ${liquidationPrice}`,
+    text: `${position.id} user ${username} opened ${position.positionType} ${position.orderType} ${position.assetType} Amount: ${position.amount} Leverage: ${position.leverage} Entry: ${position.entryPrice} Liquidation: ${liquidationPrice}`,
   };
   transporterSendMail(mailOptions);
 }
@@ -240,14 +240,14 @@ app.post("/api/getBalance", authenticateToken, (req, res) => {
 
 async function fetchCurrentMarketPrices() {
   try {
-    const promises = futuresTypes.map(async (futuresType) => {
+    const promises = assetTypes.map(async (assetType) => {
       const response = await axios.get(
         "https://api.binance.com/api/v3/ticker/price",
         {
-          params: { symbol: futuresType + "USDT" },
+          params: { symbol: assetType + "USDT" },
         }
       );
-      return { futuresType, price: parseFloat(response.data.price) };
+      return { assetType, price: parseFloat(response.data.price) };
     });
 
     const results = await Promise.all(promises);
@@ -259,7 +259,7 @@ async function fetchCurrentMarketPrices() {
 }
 
 app.post("/api/openPosition", authenticateToken, async (req, res) => {
-  const { futuresType, positionType, orderType, amount, leverage, limitPrice } =
+  const { assetType, positionType, orderType, amount, leverage, limitPrice } =
     req.body;
   const username = req.user.username;
   const users = loadUsers();
@@ -288,7 +288,7 @@ app.post("/api/openPosition", authenticateToken, async (req, res) => {
   }
 
   const currentMarketPrice = currentMarketPrices.filter(
-    (item) => item.futuresType == futuresType
+    (item) => item.assetType == assetType
   )[0].price;
   // if(orderType=='market')user.balance -= amount; // Deduct the amount from user's balance
   user.balance -= amount; // Deduct the amount from user's balance
@@ -306,7 +306,7 @@ app.post("/api/openPosition", authenticateToken, async (req, res) => {
   }
   const position = {
     id: positionId,
-    futuresType,
+    assetType,
     positionType,
     orderType,
     orderLimit,
@@ -429,7 +429,7 @@ app.post("/api/closePosition", authenticateToken, async (req, res) => {
   }
 
   const currentMarketPrice = currentMarketPrices.filter(
-    (item) => item.futuresType == closedPosition.futuresType
+    (item) => item.assetType == closedPosition.assetType
   )[0].price;
 
   // Calculate realized profit or loss
@@ -490,7 +490,7 @@ app.post("/api/partialClosePosition", authenticateToken, async (req, res) => {
   }
 
   const currentMarketPrice = currentMarketPrices.filter(
-    (item) => item.futuresType == closedPosition.futuresType
+    (item) => item.assetType == closedPosition.assetType
   )[0].price;
 
   // Calculate realized profit or loss

@@ -8,7 +8,7 @@
     "positions": [
       {
         "id": 1728653526080,
-        "futuresType": "SOL",
+        "assetType": "SOL",
         "positionType": "Long",
         "orderType": "market",
         "orderLimit": 0,
@@ -21,7 +21,7 @@
       },
       {
         "id": 1728653566453,
-        "futuresType": "XRP",
+        "assetType": "XRP",
         "positionType": "Long",
         "orderType": "market",
         "orderLimit": 0,
@@ -36,7 +36,7 @@
     "closedPositions": [
       {
         "id": 1728651096711,
-        "futuresType": "ETH",
+        "assetType": "ETH",
         "positionType": "Long",
         "orderType": "market",
         "orderLimit": 0,
@@ -52,7 +52,7 @@
       },
       {
         "id": 1728651197571,
-        "futuresType": "ETH",
+        "assetType": "ETH",
         "positionType": "Short",
         "orderType": "limit",
         "orderLimit": 1,
@@ -68,7 +68,7 @@
       },
       {
         "id": 1728651283170,
-        "futuresType": "BTC",
+        "assetType": "BTC",
         "positionType": "Short",
         "orderType": "limit",
         "orderLimit": 0,
@@ -84,7 +84,7 @@
       },
       {
         "id": 1728651096711,
-        "futuresType": "ETH",
+        "assetType": "ETH",
         "positionType": "Long",
         "orderType": "market",
         "orderLimit": 0,
@@ -100,7 +100,7 @@
       },
       {
         "id": 1728651096711,
-        "futuresType": "ETH",
+        "assetType": "ETH",
         "positionType": "Long",
         "orderType": "market",
         "orderLimit": 0,
@@ -116,7 +116,7 @@
       },
       {
         "id": 1728653566453,
-        "futuresType": "XRP",
+        "assetType": "XRP",
         "positionType": "Long",
         "orderType": "market",
         "orderLimit": 0,
@@ -132,7 +132,7 @@
       },
       {
         "id": 1728653527881,
-        "futuresType": "SOL",
+        "assetType": "SOL",
         "positionType": "Short",
         "orderType": "market",
         "orderLimit": 0,
@@ -148,7 +148,7 @@
       },
       {
         "id": 1728651209217,
-        "futuresType": "ETH",
+        "assetType": "ETH",
         "positionType": "Long",
         "orderType": "limit",
         "orderLimit": 0,
@@ -160,6 +160,64 @@
         "entryPrice": 2422.77,
         "exitPrice": 2436.2,
         "realizedPL": 66297.1722449915,
+        "closedReason": 0
+      }
+    ]
+  },
+  "tiger": {
+    "password": "$2a$08$V6dQqUGfz7GR8jZ/ZacUfO.b.jS0a6Cnss7WcBrwQLTE.93SVC.cS",
+    "virtualBalance": 104963.75732129122,
+    "balance": 104963.75732129122,
+    "privateKey": "key11",
+    "address": "0xb3ad63d24fa85ea509c121d7a502b6127bbe0c54",
+    "positions": [],
+    "closedPositions": [
+      {
+        "id": 1728686271893,
+        "assetType": "BTC",
+        "positionType": "Long",
+        "orderType": "market",
+        "orderLimit": 0,
+        "amount": 22323,
+        "leverage": 23,
+        "tp": 34,
+        "sl": 0,
+        "limitPrice": 0,
+        "entryPrice": 62535.86,
+        "exitPrice": 62540.69,
+        "realizedPL": 39.6550406438945,
+        "closedReason": 1
+      },
+      {
+        "id": 1728686252911,
+        "assetType": "BTC",
+        "positionType": "Long",
+        "orderType": "market",
+        "orderLimit": 0,
+        "amount": 22323,
+        "leverage": 23,
+        "tp": 70000,
+        "sl": 70000,
+        "limitPrice": 0,
+        "entryPrice": 62523.35,
+        "exitPrice": 62405.87,
+        "realizedPL": -964.7218026544948,
+        "closedReason": 2
+      },
+      {
+        "id": 1728686464538,
+        "assetType": "BTC",
+        "positionType": "Long",
+        "orderType": "market",
+        "orderLimit": 0,
+        "amount": 22323,
+        "leverage": 23,
+        "tp": 100000000,
+        "sl": 0,
+        "limitPrice": 0,
+        "entryPrice": 62382.31,
+        "exitPrice": 63097.81,
+        "realizedPL": 5888.824083301821,
         "closedReason": 0
       }
     ]
