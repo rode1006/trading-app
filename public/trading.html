@@ -1304,8 +1304,8 @@
           </div>
         </div>
 
-        <div id="now-price" style="margin: 10px; margin-top: 80px;"></div>
-        <div id="total-statistics"></div>
+        <div id="total-statistics" style="margin-top:80px;"></div>
+        <div id="now-price" style="margin: 10px;"></div>
         <div id="futures" class="tabcontent trading-panel">
           <div id="futures-statistics"></div>
           <!-- <div id="assets-statistics"></div> -->
@@ -1314,6 +1314,7 @@
               Asset Type:<select id="futures-asset-type" style="width: 80px"></select>&nbsp;&nbsp;&nbsp;
               <span class="money-type">Current Price:</span>
               <span id="futures-current-price" class="money-value">Loading...</span>
+              <span class="money-unit">USDT</span>
             </div>
             <div>
               <label style="color: rgb(255, 0, 0); font-size: 24px">Market
@@ -1324,7 +1325,7 @@
                 id="bet-amount"
                 min="1"
                 max="100"
-                style="width: 80px; font-size: 20px" />&nbsp;&nbsp;
+                style="width: 80px; font-size: 20px" /><span class="money-unit">(USDT)</span>&nbsp;&nbsp;
               <label>Leverage:</label>
               <input
                 type="number"
@@ -1353,7 +1354,7 @@
                 id="limit-amount"
                 min="1"
                 max="100"
-                style="width: 80px; font-size: 20px" />&nbsp;&nbsp;
+                style="width: 80px; font-size: 20px" /><span class="money-unit">(USDT)</span>&nbsp;&nbsp;
               <label>Leverage:</label>
               <input
                 type="number"
@@ -1366,7 +1367,7 @@
               <input
                 type="number"
                 id="limit-price"
-                style="width: 100px; font-size: 20px" />&nbsp;&nbsp;
+                style="width: 100px; font-size: 20px" /><span class="money-unit">(USDT)</span>&nbsp;&nbsp;
               <button
                 id="limit-long-button"
                 class="playbutttton"
@@ -1394,7 +1395,7 @@
             <div>
               Asset Type:<select id="spot-asset-type" style="width: 80px"></select>&nbsp;&nbsp;&nbsp;
               <span class="money-type">Current Price:</span>
-              <span id="spot-current-price" class="money-value">Loading...</span>&nbsp;&nbsp;&nbsp;&nbsp;
+              <span id="spot-current-price" class="money-value">Loading...</span><span class="money-unit">USDT</span>&nbsp;&nbsp;&nbsp;&nbsp;
             </div>
             <div>
               <label style="color: rgb(255, 0, 0); font-size: 24px">Market: </label>&nbsp;&nbsp;
@@ -1404,7 +1405,7 @@
                 id="spot-market-amount"
                 min="1"
                 max="100"
-                style="width: 80px; font-size: 20px" />&nbsp;&nbsp;
+                style="width: 80px; font-size: 20px" /><span class="money-unit" id="spot-market-unit"></span>&nbsp;&nbsp;
               <button
                 id="market-buy-button"
                 class="playbutttton"
@@ -1424,14 +1425,14 @@
                 id="spot-limit-amount"
                 min="1"
                 max="100"
-                style="width: 80px; font-size: 20px" />&nbsp;&nbsp;
+                style="width: 80px; font-size: 20px" /><span class="money-unit" id="spot-limit-unit"></span>&nbsp;&nbsp;
               <label>Price:</label>
               <input
                 type="number"
                 id="spot-limit-price"
                 min="1"
                 max="100"
-                style="width: 80px; font-size: 20px" />&nbsp;&nbsp;
+                style="width: 80px; font-size: 20px" /><span class="money-unit">(USDT)</span>&nbsp;&nbsp;
               <button
                 id="limit-buy-button"
                 class="playbutttton"
@@ -1477,6 +1478,8 @@
       let futuresAssetType = "BTC";
       let spotAssetType = "BTC";
 
+      let totalUSDTBalance = 0;
+      let totalValue = 0;
       let futuresUSDTBalance = 0; // Initialize balance
       let spotUSDTBalance = 0; // Initialize balance
 
@@ -2077,14 +2080,14 @@
                     new Intl.NumberFormat('en-US').format(balance.toFixed(2)) +
                     "</span>";
                     statisticsBar +=
-                    "<span class='money-type'> USDT</span>";
+                    "<span class='money-unit'> USDT</span>";
                   }else{
                     statisticsBar +=
                     "<span class='money-value'>" +
                       new Intl.NumberFormat('en-US').format(balance.toFixed(2)) +
                     "</span>";
                     statisticsBar +=
-                    "<span class='money-type'> " + assetTypes[index-1] + "</span>";
+                    "<span class='money-unit'> " + assetTypes[index-1] + "</span>";
                   }
                   statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;";
                   if (index % 10 == 9) statisticsBar += "<br>";
@@ -2092,6 +2095,38 @@
 
                 document.getElementById("spot-assets-statistics").innerHTML =
                   statisticsBar;
+                
+                //------------------- total statistics --------------------
+                statisticsBar = "";
+                statisticsBar +=
+                  "<span class='money-type'>Est. Total Balance (USDT):</span>";
+                statisticsBar +=
+                  "<span class='money-value'>" +
+                    new Intl.NumberFormat('en-US').format(
+                    (futuresUSDTBalance + spotUSDTBalance).toFixed(2)
+                  ) +
+                  "</span>";
+                statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+                statisticsBar +=
+                  "<span class='money-type'>Est. Total Value (USDT):</span>";
+                totalValue = spotUSDTBalance;
+                spotBalances.forEach((balance, index) => {
+                  if(index > 0){
+                    totalValue+=parseFloat(balance) * currentPrices[index-1].price;
+                  }
+                })
+                totalValue += futuresUSDTBalance + futuresPositionsAmount + futuresUnrealizedPL;
+                statisticsBar +=
+                  "<span class='money-value'>" +
+                    new Intl.NumberFormat('en-US').format(
+                    totalValue.toFixed(2)
+                  ) +
+                  "</span>";
+
+                document.getElementById("total-statistics").innerHTML =
+                  statisticsBar;
+                
+                //---------------------------------------------------------
 
                 fetch("/api/updateValue", {
                   method: "POST",
@@ -2473,10 +2508,13 @@
       };
       document.getElementById("spot-asset-type").onchange = () => {
         spotAssetType = document.getElementById("spot-asset-type").value;
+        document.getElementById('spot-market-unit').textContent = "(" + document.getElementById("spot-asset-type").value + ")"
+        document.getElementById('spot-limit-unit').textContent = "(" + document.getElementById("spot-asset-type").value + ")"
       };
       // Fetch data initially and then every second
       fetchUserData();
       intervalId = setInterval(fetchUserData, 500);
+      document.getElementById("spot-asset-type").onchange()
 
       // Clear the interval when the user leaves the page
       window.addEventListener("beforeunload", () => clearInterval(intervalId));

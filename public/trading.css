@@ -200,6 +200,10 @@ body {
   color: #f4a070;
 }
 
+.money-unit{
+  color: #ed70f4;
+}
+
 .money-value{
   color: #2fda65;
 }
