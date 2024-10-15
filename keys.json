@@ -52,10 +52,6 @@
     "address": "0xd41d8a4ac3dd8fdddbf8f2addb82bc984ef3240d"
   },
   {
-    "privateKey": "key14",
-    "address": "0x09c1d73ad6b24fa85ea53da502b21bbe0c546127"
-  },
-  {
     "privateKey": "key15",
     "address": "0x6b83ec4d7b60ed5fea912f01f5fb2c1870899c4b"
   },
@@ -74,10 +70,6 @@
   {
     "privateKey": "key19",
     "address": "0xdddbfd41ac3dd8fd8a48f2c984ef3240daddb82b"
-  },
-  {
-    "privateKey": "key20",
-    "address": "0xb2b24fa85ea509c1d73ad63da5546127021bbe0c"
   },
   {
     "privateKey": "key21",

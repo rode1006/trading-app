@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="futures.css" />
+    <link rel="stylesheet" href="trading.css" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
@@ -84,7 +84,17 @@
           ">
           <!--left-->
           <div class="nav-left" style="flex-direction: row; display: flex">
-            <div id="now-price" style="margin: 10px"></div>
+            <div class="tab">
+              <button
+                class="tablinks"
+                onclick="selectTrading(event, 'futures')"
+                id="defaultOpen">
+                Futures Trading
+              </button>
+              <button class="tablinks" onclick="selectTrading(event, 'spot')">
+                Spot Trading
+              </button>
+            </div>
           </div>
 
           <!--right-->
@@ -452,9 +462,9 @@
                                 const data = await response.json();
                                 // const balanceText = `${data.balance}`;
                                 // document.getElementById("balance").textContent = balanceText;
-                                document.getElementById(
-                                  "dropdown-balance"
-                                ).textContent = balanceText; // Ensure this line is executed
+                                // document.getElementById(
+                                //   "dropdown-balance"
+                                // ).textContent = balanceText; // Ensure this line is executed
                               } catch (error) {
                                 console.error(
                                   "Error fetching user data:",
@@ -1294,26 +1304,16 @@
           </div>
         </div>
 
-        <div class="tab">
-          <button
-            class="tablinks"
-            onclick="openTrading(event, 'futures')"
-            id="defaultOpen">
-            Futures Trading
-          </button>
-          <button class="tablinks" onclick="openTrading(event, 'spot')">
-            Spot Trading
-          </button>
-        </div>
-
+        <div id="now-price" style="margin: 10px; margin-top: 80px;"></div>
+        <div id="total-statistics"></div>
         <div id="futures" class="tabcontent trading-panel">
-          <div id="futures-statistics"></div><br>
-          <div id="assets-statistics"></div>
+          <div id="futures-statistics"></div>
+          <!-- <div id="assets-statistics"></div> -->
           <div class="order-panel">
             <div>
-              Asset Type:<select id="asset-type" style="width: 80px"></select>&nbsp;&nbsp;&nbsp;
+              Asset Type:<select id="futures-asset-type" style="width: 80px"></select>&nbsp;&nbsp;&nbsp;
               <span class="money-type">Current Price:</span>
-              <span id="current-price" class="money-value">Loading...</span>
+              <span id="futures-current-price" class="money-value">Loading...</span>
             </div>
             <div>
               <label style="color: rgb(255, 0, 0); font-size: 24px">Market
@@ -1388,7 +1388,62 @@
         </div>
 
         <div id="spot" class="tabcontent trading-panel">
-          <h3>There is nothing here yet.</h3>
+          <div id="spot-statistics"></div><br>
+          <div id="spot-assets-statistics"></div>
+          <div class="order-panel">
+            <div>
+              Asset Type:<select id="spot-asset-type" style="width: 80px"></select>&nbsp;&nbsp;&nbsp;
+              <span class="money-type">Current Price:</span>
+              <span id="spot-current-price" class="money-value">Loading...</span>&nbsp;&nbsp;&nbsp;&nbsp;
+            </div>
+            <div>
+              <label style="color: rgb(255, 0, 0); font-size: 24px">Market: </label>&nbsp;&nbsp;
+              <label>Amount:</label>
+              <input
+                type="number"
+                id="spot-market-amount"
+                min="1"
+                max="100"
+                style="width: 80px; font-size: 20px" />&nbsp;&nbsp;
+              <button
+                id="market-buy-button"
+                class="playbutttton"
+                style="margin-top: 15px">
+                Buy</button>&nbsp;&nbsp;
+              <button
+                id="market-sell-button"
+                class="playbutttton"
+                style="margin-top: 15px">
+                Sell</button>
+            </div>
+            <div>
+              <label style="color: rgb(255, 0, 0); font-size: 24px">Limit: </label>&nbsp;&nbsp;
+              <label>Amount:</label>
+              <input
+                type="number"
+                id="spot-limit-amount"
+                min="1"
+                max="100"
+                style="width: 80px; font-size: 20px" />&nbsp;&nbsp;
+              <label>Price:</label>
+              <input
+                type="number"
+                id="spot-limit-price"
+                min="1"
+                max="100"
+                style="width: 80px; font-size: 20px" />&nbsp;&nbsp;
+              <button
+                id="limit-buy-button"
+                class="playbutttton"
+                style="margin-top: 15px">
+                Buy</button>&nbsp;&nbsp;
+              <button
+                id="limit-sell-button"
+                class="playbutttton"
+                style="margin-top: 15px">
+                Sell</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1412,19 +1467,22 @@
     <script>
       let intervalId;
       let futuresUSDTBalance = 0; // Initialize balance
+      let spotUSDTBalance = 0; // Initialize balance
       let positionsCount = 0;
       let closedPositionsCount = 0;
       let closingPosition;
 
-      const assetTypes = ["BTC", "ETH", "BNB", "NEO", "LTC", "SOL", "XRP"];
-      let assetType = "BTC";
+      const assetTypes = ["BTC", "ETH", "BNB", "NEO", "LTC", "SOL", "XRP", "DOT"];
+      let futuresAssetType = "BTC";
+      let spotAssetType = "BTC";
       let tmp = "";
 
       assetTypes.forEach((futures, index) => {
         tmp += "<option>" + futures + "</option>";
       });
 
-      document.getElementById("asset-type").innerHTML = tmp;
+      document.getElementById("futures-asset-type").innerHTML = tmp;
+      document.getElementById("spot-asset-type").innerHTML = tmp;
 
       function fetchUserData() {
         fetch("/api/getBalance", {
@@ -1437,14 +1495,15 @@
           .then((response) => response.json())
           .then((data) => {
             futuresUSDTBalance = data.futuresUSDTBalance; // Update futuresUSDTBalance from the server
+            spotUSDTBalance = data.spotUSDTBalance; // Update spotUSDTBalance from the server
             // document.getElementById("credit-value").textContent = balance.toFixed(2);
             // updateBalanceDisplay();
           })
           .catch((error) => console.error("Error fetching balance:", error));
 
           
-        let futuresBalances = [];
-        futuresBalances.push(futuresUSDTBalance);
+        let spotBalances = [];
+        spotBalances.push(spotUSDTBalance);
         // Fetch current market price
         fetch("/api/getCurrentPrice", {
           method: "POST",
@@ -1458,7 +1517,7 @@
 
             let priceText = "";
             priceData.currentPrices.forEach((price, index) => {
-              futuresBalances.push(0);
+              spotBalances.push(0);
               priceText +=
                 "<span class='money-type'>" + price["assetType"] + ":</span>";
               priceText +=
@@ -1466,14 +1525,18 @@
                   new Intl.NumberFormat('en-US').format(price["price"]) +
                 "</span>";
               priceText += "&nbsp;&nbsp;&nbsp;&nbsp;";
-              if (index % 5 == 4) priceText += "<br>";
+              if (index % 8 == 7) priceText += "<br>";
             });
 
             document.getElementById("now-price").innerHTML = priceText;
 
-            document.getElementById("current-price").textContent = Intl.NumberFormat('en-US').format(
+            document.getElementById("futures-current-price").textContent = Intl.NumberFormat('en-US').format(
               currentPrices.filter(
-                (item) => item["assetType"] == assetType
+                (item) => item["assetType"] == futuresAssetType
+              )[0].price);
+            document.getElementById("spot-current-price").textContent = Intl.NumberFormat('en-US').format(
+              currentPrices.filter(
+                (item) => item["assetType"] == spotAssetType
               )[0].price);
 
             fetch("/api/getPositions", {
@@ -1491,13 +1554,13 @@
                   document.getElementById("closed-positions");
 
                 let count = 0;
-                let totalUnrealizedPL = 0;
-                let totalPositionAmount = 0;
+                let futuresUnrealizedPL = 0;
+                let futuresPositionsAmount = 0;
 
-                if (data.positions) {
+                if (data.futuresPositions) {
                   count =
-                    data.positions.length +
-                    data.positions.filter(
+                    data.futuresPositions.length +
+                    data.futuresPositions.filter(
                       (position) => position.orderLimit == 1
                     ).length;
                   if (count !== positionsCount) {
@@ -1505,8 +1568,8 @@
                     limitOrdersDiv.innerHTML = ""; // Clear previous limit orders
                   }
 
-                  data.positions.forEach((position) => {
-                    futuresBalances[assetTypes.indexOf(position.assetType) + 1] += position.amount;
+                  data.futuresPositions.forEach((position) => {
+                    // futuresBalances[assetTypes.indexOf(position.assetType) + 1] += position.amount;
                     currentPrice = currentPrices.filter(
                       (item) => item["assetType"] == position.assetType
                     )[0].price;
@@ -1552,21 +1615,21 @@
                       unrealizedPL < 0 &&
                       Math.abs(unrealizedPL) >= position.amount * 0.8
                     ) {
-                      totalUnrealizedPL -= position.amount;
-                      totalPositionAmount += position.amount;
-                      closePosition(position, 3);
+                      futuresUnrealizedPL -= position.amount;
+                      futuresPositionsAmount += position.amount;
+                      closeFuturesPosition(position, 3);
                       return;
                     } else {
-                      totalUnrealizedPL += unrealizedPL;
+                      futuresUnrealizedPL += unrealizedPL;
                       // if (!position.orderLimit)
-                      totalPositionAmount += position.amount;
+                      futuresPositionsAmount += position.amount;
                       if (
                         (position.positionType == "Long" &&
                           currentPrice > position.tp) ||
                         (position.positionType == "Short" &&
                           currentPrice < position.tp)
                       ) {
-                        closePosition(position, 1);
+                        closeFuturesPosition(position, 1);
                         return;
                       }
                       if (
@@ -1575,7 +1638,7 @@
                         (position.positionType == "Short" &&
                           currentPrice > position.sl)
                       ) {
-                        closePosition(position, 2);
+                        closeFuturesPosition(position, 2);
                         return;
                       } else {
                         if (count !== positionsCount) {
@@ -1650,7 +1713,7 @@
                             closingPosition = position;
                             partialClosingModal.style.display = "block";
                           };
-                          // closeButton.onclick = () => closePosition(position, 0);
+                          // closeButton.onclick = () => closeFuturesPosition(position, 0);
                           positionDiv.appendChild(closeButton); // Add close button to position div
 
                           if (position.orderType == "market") {
@@ -1689,12 +1752,13 @@
                   });
                   positionsCount = count;
                 }
-                if (data.closedPositions) {
-                  count = data.closedPositions.length;
+
+                if (data.closedFuturesPositions) {
+                  count = data.closedFuturesPositions.length;
                   if (count !== closedPositionsCount)
                     closedPositionsDiv.innerHTML = ""; // Clear previous closed positions
 
-                  data.closedPositions.forEach((position) => {
+                  data.closedFuturesPositions.forEach((position) => {
                     let positionDiv = document.createElement("div");
 
                     if (count !== closedPositionsCount) {
@@ -1789,35 +1853,85 @@
                   closedPositionsCount = count;
                 }
 
+                if (data.spotPositions) {
+                  data.spotPositions.forEach((position) => {
+                    if(position.positionType=='buy'){
+                      spotBalances[assetTypes.indexOf(position.assetType) + 1] += position.amount;
+                    }
+                    if(position.positionType=='sell'){
+                      spotBalances[assetTypes.indexOf(position.assetType) + 1] -= position.amount;
+                    }
+                  });
+                }
+
+                //---------------futures statistics--------------------------------
                 let statisticsBar = "";
                 statisticsBar +=
-                  "<span class='money-type'>Est. Total Value (USDT):</span>";
+                  "<span class='money-type'>Est. Futures Balance (USDT):</span>";
                 statisticsBar +=
                   "<span class='money-value'>" +
                     new Intl.NumberFormat('en-US').format(
-                    (futuresUSDTBalance + totalPositionAmount + totalUnrealizedPL).toFixed(2)
+                    futuresUSDTBalance.toFixed(2)
                   ) +
                   "</span>";
                 statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
                 statisticsBar +=
-                  "<span class='money-type'>Est. Total Cost (USDT):</span>";
+                  "<span class='money-type'>Est. Futures Value (USDT):</span>";
                 statisticsBar +=
                   "<span class='money-value'>" +
-                    Intl.NumberFormat('en-US').format(totalPositionAmount) +
+                    new Intl.NumberFormat('en-US').format(
+                    (futuresUSDTBalance + futuresPositionsAmount + futuresUnrealizedPL).toFixed(2)
+                  ) +
                   "</span>";
                 statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
                 statisticsBar +=
-                  "<span class='money-type'>Est. Total Unrealized PNL (USDT):</span>";
+                  "<span class='money-type'>Est. Futures Cost (USDT):</span>";
                 statisticsBar +=
                   "<span class='money-value'>" +
-                    Intl.NumberFormat('en-US').format(totalUnrealizedPL.toFixed(2)) +
+                    Intl.NumberFormat('en-US').format(futuresPositionsAmount) +
+                  "</span>";
+                statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+                statisticsBar +=
+                  "<span class='money-type'>Est. Futures Unrealized PNL (USDT):</span>";
+                statisticsBar +=
+                  "<span class='money-value'>" +
+                    Intl.NumberFormat('en-US').format(futuresUnrealizedPL.toFixed(2)) +
                   "</span>";
 
                 document.getElementById("futures-statistics").innerHTML =
                   statisticsBar;
 
+                //----------------spot statistics---------------------------------------
                 statisticsBar = "";
-                futuresBalances.forEach((balance, index) => {
+                statisticsBar +=
+                  "<span class='money-type'>Est. Spot Balance (USDT):</span>";
+                statisticsBar +=
+                  "<span class='money-value'>" +
+                    new Intl.NumberFormat('en-US').format(
+                    spotUSDTBalance.toFixed(2)
+                  ) +
+                  "</span>";
+                statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+                statisticsBar +=
+                  "<span class='money-type'>Est. Spot Value (USDT):</span>";
+                let spotValue = spotUSDTBalance;
+                spotBalances.forEach((balance, index) => {
+                  if(index > 0){
+                    spotValue+=parseFloat(balance) * currentPrices[index-1].price;
+                  }
+                })
+                statisticsBar +=
+                  "<span class='money-value'>" +
+                    new Intl.NumberFormat('en-US').format(
+                    spotValue.toFixed(2)
+                  ) +
+                  "</span>";
+
+                document.getElementById("spot-statistics").innerHTML =
+                  statisticsBar;
+                //---------------spot asset statistics-----------------------------------
+                statisticsBar = "<span class='money-type'>Est. Balances: </span>";
+                spotBalances.forEach((balance, index) => {
                   if(!index){
                     statisticsBar +=
                     "<span class='money-value'>" +
@@ -1834,22 +1948,23 @@
                     "<span class='money-type'> " + assetTypes[index-1] + "</span>";
                   }
                   statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;";
-                  if (index % 8 == 7) statisticsBar += "<br>";
+                  if (index % 10 == 9) statisticsBar += "<br>";
                 });
 
-                document.getElementById("assets-statistics").innerHTML =
+                document.getElementById("spot-assets-statistics").innerHTML =
                   statisticsBar;
 
-                fetch("/api/updatebalance", {
+                fetch("/api/updateValue", {
                   method: "POST",
                   headers: {
                     Authorization: "Bearer " + localStorage.getItem("token"),
                     "Content-Type": "application/json",
                   },
                   body: JSON.stringify({
-                    unrealizepl: (
-                      totalPositionAmount + totalUnrealizedPL
-                    ).toFixed(2),
+                      futuresPositionsAmount,
+                      futuresUnrealizedPL,
+                      spotPositionsAmount,
+                      spotUnrealizedPL,
                   }),
                 })
                   .then((response) => response.json())
@@ -1884,7 +1999,7 @@
       }
 
       // Place a long or short bet
-      function placeBet(positionType, orderType) {
+      function futuresTrading(positionType, orderType) {
         let betAmount = 0;
         let leverage = 0;
         let limitPrice = 0;
@@ -1913,14 +2028,14 @@
           return;
         }
 
-        fetch("/api/openPosition", {
+        fetch("/api/openFuturesPosition", {
           method: "POST",
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token"),
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            assetType,
+            futuresAssetType,
             positionType: positionType === "long" ? "Long" : "Short",
             orderType: orderType,
             amount: betAmount,
@@ -1944,9 +2059,59 @@
           });
       }
 
+      function spotTrading(positionType, orderType) {
+        let amount = 0;
+        let limitPrice = 0;
+        if (orderType == "market") {
+          amount = parseFloat(document.getElementById("spot-market-amount").value);
+        }
+        if (orderType == "limit") {
+          amount = parseFloat(document.getElementById("spot-limit-amount").value);
+          limitPrice = parseFloat(document.getElementById("spot-limit-price").value);
+          if (isNaN(limitPrice)) {
+            alert("Please enter a valid Limit Price");
+            return;
+          }
+        }
+
+        if (isNaN(amount) || amount <= 0) {
+          alert("Please enter a valid amount.");
+          return;
+        }
+
+        fetch("/api/openSpotPosition", {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            spotAssetType,
+            positionType,
+            orderType,
+            amount,
+            limitPrice,
+          }),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Network response was not ok");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            fetchUserData();
+            alert(`${positionType} ${amount} ${spotAssetType}`);
+          })
+          .catch((error) => {
+            console.error("Error placing bet:", error);
+            alert("Error placing bet. Please try again.");
+          });
+      }
+
       // Close position function
-      function closePosition(position, reason) {
-        fetch("/api/closePosition", {
+      function closeFuturesPosition(position, reason) {
+        fetch("/api/closeFuturesPosition", {
           method: "POST",
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token"),
@@ -2024,10 +2189,6 @@
           .catch((error) => console.error("Error saving TP & SL:", error));
       }
 
-      // function updateBalanceDisplay() {
-      //     document.getElementById('balance').textContent = balance.toFixed(2); // Update futuresUSDTBalance display
-      // }
-
       // Get the <span> element that closes the modal
       var span = document.getElementsByClassName("close")[0];
       var partialClosingModal = document.getElementById("partialClosingModal");
@@ -2051,7 +2212,7 @@
           alert("Please select a valid percent");
         }
         if (percent == 100) {
-          closePosition(closingPosition, 0);
+          closeFuturesPosition(closingPosition, 0);
         } else {
           fetch("/api/partialClosePosition", {
             method: "POST",
@@ -2087,7 +2248,7 @@
         partialClosingModal.style.display = "none";
       }
 
-      function openTrading(evt, cityName) {
+      function selectTrading(evt, divId) {
         var i, tabcontent, tablinks;
         tabcontent = document.getElementsByClassName("tabcontent");
         for (i = 0; i < tabcontent.length; i++) {
@@ -2097,7 +2258,7 @@
         for (i = 0; i < tablinks.length; i++) {
           tablinks[i].className = tablinks[i].className.replace(" active", "");
         }
-        document.getElementById(cityName).style.display = "block";
+        document.getElementById(divId).style.display = "block";
         evt.currentTarget.className += " active";
       }
 
@@ -2106,16 +2267,30 @@
 
       // Long and short buttons functionality
       document.getElementById("long-button").onclick = () =>
-        placeBet("long", "market");
+        futuresTrading("long", "market");
       document.getElementById("short-button").onclick = () =>
-        placeBet("short", "market");
+        futuresTrading("short", "market");
 
       document.getElementById("limit-long-button").onclick = () =>
-        placeBet("long", "limit");
+        futuresTrading("long", "limit");
       document.getElementById("limit-short-button").onclick = () =>
-        placeBet("short", "limit");
-      document.getElementById("asset-type").onchange = () => {
-        assetType = document.getElementById("asset-type").value;
+        futuresTrading("short", "limit");
+
+      document.getElementById("market-buy-button").onclick = () =>
+        spotTrading("buy", "market");
+      document.getElementById("market-sell-button").onclick = () =>
+        spotTrading("sell", "market");
+
+      document.getElementById("limit-buy-button").onclick = () =>
+        spotTrading("buy", "limit");
+      document.getElementById("limit-sell-button").onclick = () =>
+        spotTrading("sell", "limit");
+
+      document.getElementById("futures-asset-type").onchange = () => {
+        futuresAssetType = document.getElementById("futures-asset-type").value;
+      };
+      document.getElementById("spot-asset-type").onchange = () => {
+        spotAssetType = document.getElementById("spot-asset-type").value;
       };
       // Fetch data initially and then every second
       fetchUserData();

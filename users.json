@@ -1,11 +1,14 @@
 {
   "s": {
     "password": "$2a$08$i.AMZFb3y.bXLS5pqCnHi.xHeX0vkBrel3qrR1SUxxX4wByVkmHWG",
-    "totalValue": 252180.1516137703,
+    "totalValue": 0,
+    "futuresValue": 252180.1516137703,
     "futuresUSDTBalance": 117342.0316137703,
+    "spotValue": 0,
+    "spotUSDTBalance": 0,
     "privateKey": "key24",
     "address": "0xad63da502b21bbec1d0c546509b24f1275ea873a",
-    "positions": [
+    "futuresPositions": [
       {
         "id": 1728653526080,
         "assetType": "SOL",
@@ -33,7 +36,7 @@
         "entryPrice": 0.5364
       }
     ],
-    "closedPositions": [
+    "closedFuturesPositions": [
       {
         "id": 1728651096711,
         "assetType": "ETH",
@@ -166,11 +169,14 @@
   },
   "tiger": {
     "password": "$2a$08$V6dQqUGfz7GR8jZ/ZacUfO.b.jS0a6Cnss7WcBrwQLTE.93SVC.cS",
-    "totalValue": 101889.68732129122,
+    "totalValue": 115292.03064339225,
+    "futuresValue": 112402.08264339225,
     "futuresUSDTBalance": 91963.75732129122,
+    "spotValue": 2889.948,
+    "spotUSDTBalance": 2889.948,
     "privateKey": "key11",
     "address": "0xb3ad63d24fa85ea509c121d7a502b6127bbe0c54",
-    "positions": [
+    "futuresPositions": [
       {
         "id": 1728896590691,
         "assetType": "BTC",
@@ -198,7 +204,7 @@
         "entryPrice": 64368
       }
     ],
-    "closedPositions": [
+    "closedFuturesPositions": [
       {
         "id": 1728686271893,
         "assetType": "BTC",
@@ -262,6 +268,111 @@
         "exitPrice": 153.36,
         "realizedPL": -5000,
         "closedReason": 3
+      }
+    ],
+    "spotPositions": [
+      {
+        "id": 1729009698849,
+        "assetType": "ETH",
+        "positionType": "buy",
+        "orderType": "market",
+        "orderLimit": 0,
+        "amount": 2,
+        "limitPrice": 0,
+        "entryPrice": 2593.09
+      },
+      {
+        "id": 1729009893881,
+        "assetType": "BNB",
+        "positionType": "buy",
+        "orderType": "market",
+        "orderLimit": 0,
+        "amount": 5,
+        "limitPrice": 0,
+        "entryPrice": 592.4
+      },
+      {
+        "id": 1729009908905,
+        "assetType": "ETH",
+        "positionType": "sell",
+        "orderType": "market",
+        "orderLimit": 0,
+        "amount": 0.4,
+        "limitPrice": 0,
+        "entryPrice": 2595.32
+      }
+    ]
+  },
+  "a": {
+    "password": "$2a$08$BtOQgEkJCmkQNv/evjMgU.lvpIMckSf9CeksiazBD8rPmKZnx4fJm",
+    "futuresValue": 99762.28,
+    "futuresUSDTBalance": 87000,
+    "privateKey": "key20",
+    "address": "0xb2b24fa85ea509c1d73ad63da5546127021bbe0c",
+    "futuresPositions": [
+      {
+        "id": 1728918065161,
+        "assetType": "BTC",
+        "positionType": "Long",
+        "orderType": "market",
+        "orderLimit": 0,
+        "amount": 5000,
+        "leverage": 10,
+        "tp": 100000000,
+        "sl": 0,
+        "limitPrice": 0,
+        "entryPrice": 65914.01
+      },
+      {
+        "id": 1728918073573,
+        "assetType": "ETH",
+        "positionType": "Long",
+        "orderType": "market",
+        "orderLimit": 0,
+        "amount": 5000,
+        "leverage": 10,
+        "tp": 100000000,
+        "sl": 0,
+        "limitPrice": 0,
+        "entryPrice": 2621.54
+      },
+      {
+        "id": 1728918091517,
+        "assetType": "LTC",
+        "positionType": "Long",
+        "orderType": "market",
+        "orderLimit": 0,
+        "amount": 3000,
+        "leverage": 10,
+        "tp": 100000000,
+        "sl": 0,
+        "limitPrice": 0,
+        "entryPrice": 66.54
+      }
+    ]
+  },
+  "k": {
+    "password": "$2a$08$qMKVIrB6KPVqQ4cn1JDN/OVcT9r/w.Nt8NvX25dkBsgInvepCh49O",
+    "totalValue": 10395.084676886669,
+    "futuresValue": 395.0846768866686,
+    "futuresUSDTBalance": 95.0846768866686,
+    "spotValue": 10000,
+    "spotUSDTBalance": 10000,
+    "privateKey": "key14",
+    "address": "0x09c1d73ad6b24fa85ea53da502b21bbe0c546127",
+    "futuresPositions": [
+      {
+        "id": 1728969026835,
+        "assetType": "BTC",
+        "positionType": "Long",
+        "orderType": "limit",
+        "orderLimit": 1,
+        "amount": 300,
+        "leverage": 100,
+        "tp": 100000000,
+        "sl": 0,
+        "limitPrice": 66000,
+        "entryPrice": 65480
       }
     ]
   }

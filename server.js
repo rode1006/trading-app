@@ -6,7 +6,7 @@ const fs = require("fs");
 const nodemailer = require("nodemailer");
 const axios = require("axios");
 const app = express();
-const assetTypes = ["BTC", "ETH", "BNB", "NEO", "LTC", "SOL", "XRP"];
+const assetTypes = ["BTC", "ETH", "BNB", "NEO", "LTC", "SOL", "XRP", "DOT"];
 
 app.use(bodyParser.json());
 
@@ -177,7 +177,10 @@ app.post("/register", (req, res) => {
   users[username] = {
     password: hashedPassword,
     totalValue: 0,
-    futuresUSDTBalance: 0, // Initial balance (change if needed)
+    futuresValue: 0,
+    futuresUSDTBalance: 0,
+    spotValue: 0,
+    spotUSDTBalance: 0,
     privateKey: selectedKey.privateKey,
     address: selectedKey.address,
   }; // Save user with initial balance
@@ -200,7 +203,7 @@ app.post("/login", (req, res) => {
   }
   const token = jwt.sign({ username }, "your_jwt_secret", { expiresIn: "1h" }); // Create a token
   // Respond with token and redirect URL
-  res.json({ token, redirectTo: "/futures.html" });
+  res.json({ token, redirectTo: "/trading.html" });
 });
 
 // Middleware to verify JWT token
@@ -233,6 +236,7 @@ app.post("/api/getBalance", authenticateToken, (req, res) => {
   res.json({
     username,
     futuresUSDTBalance: user.futuresUSDTBalance,
+    spotUSDTBalance: user.spotUSDTBalance,
     address: user.address,
     // privateKey: user.privateKey
   });
@@ -258,18 +262,18 @@ async function fetchCurrentMarketPrices() {
   }
 }
 
-app.post("/api/openPosition", authenticateToken, async (req, res) => {
-  const { assetType, positionType, orderType, amount, leverage, limitPrice } =
+app.post("/api/openFuturesPosition", authenticateToken, async (req, res) => {
+  const { futuresAssetType, positionType, orderType, amount, leverage, limitPrice } =
     req.body;
   const username = req.user.username;
   const users = loadUsers();
   const user = users[username];
   let orderLimit = 0;
 
-  if (orderType == "limit" && user.positions) {
-    orderLimit = 1;
+  if (orderType == "limit") orderLimit=1;
+  if (orderType == "limit" && user.futuresPositions) {
     if (
-      user.positions.filter((position) => position.orderLimit == 1).length == 5
+      user.futuresPositions.filter((position) => position.orderLimit == 1).length == 5
     ) {
       return res.status(404).send("Limit Orders limited to 5");
     }
@@ -288,7 +292,7 @@ app.post("/api/openPosition", authenticateToken, async (req, res) => {
   }
 
   const currentMarketPrice = currentMarketPrices.filter(
-    (item) => item.assetType == assetType
+    (item) => item.assetType == futuresAssetType
   )[0].price;
   // if(orderType=='market')user.futuresUSDTBalance -= amount; // Deduct the amount from user's balance
   user.futuresUSDTBalance -= amount; // Deduct the amount from user's balance
@@ -306,7 +310,7 @@ app.post("/api/openPosition", authenticateToken, async (req, res) => {
   }
   const position = {
     id: positionId,
-    assetType,
+    assetType: futuresAssetType,
     positionType,
     orderType,
     orderLimit,
@@ -319,17 +323,86 @@ app.post("/api/openPosition", authenticateToken, async (req, res) => {
   };
 
   // Initialize positions array if not exists
-  if (!user.positions) {
-    user.positions = [];
+  if (!user.futuresPositions) {
+    user.futuresPositions = [];
   }
 
-  user.positions.push(position);
+  user.futuresPositions.push(position);
   saveUsers(users);
   sendPositionOpenEmail(username, position);
 
-  res.json({ positions: user.positions, newfuturesUSDTBalance: user.futuresUSDTBalance });
+  res.json({ futuresPositions: user.futuresPositions, newfuturesUSDTBalance: user.futuresUSDTBalance });
 });
 
+app.post("/api/openSpotPosition", authenticateToken, async (req, res) => {
+    const { spotAssetType, positionType, orderType, amount, limitPrice } =
+      req.body;
+    const username = req.user.username;
+    const users = loadUsers();
+    const user = users[username];
+    let orderLimit = 0;
+  
+    if (orderType == "limit") orderLimit=1;
+    if (orderType == "limit" && user.spotPositions) {
+      if (
+        user.spotPositions.filter((position) => position.orderLimit == 1).length == 5
+      ) {
+        return res.status(404).send("Limit Orders limited to 5");
+      }
+    }
+  
+    if (!user) return res.status(404).send("User not found");
+    
+    const currentMarketPrices = await fetchCurrentMarketPrices();
+  
+    if (currentMarketPrices === null) {
+      return res.status(500).send("Error fetching market price");
+    }
+  
+    const currentMarketPrice = currentMarketPrices.filter(
+      (item) => item.assetType == spotAssetType
+    )[0].price;
+    
+    if(positionType=='buy'){
+        if (user.spotUSDTBalance < amount * currentMarketPrice) {
+            console.log('---------------');
+            console.log(user.spotUSDTBalance);
+            console.log(amount);
+            console.log(currentMarketPrice);
+            return res.status(400).send("Insufficient balance");
+        }
+        user.spotUSDTBalance -= amount * currentMarketPrice;
+    }
+
+    if(positionType=='sell'){
+        user.spotUSDTBalance += amount * currentMarketPrice;
+    }
+      
+    const positionId = Date.now(); // Unique ID for the position (can be replaced with a more robust method)
+    
+    const position = {
+      id: positionId,
+      assetType: spotAssetType,
+      positionType,
+      orderType,
+      orderLimit,
+      amount,
+      limitPrice,
+      entryPrice: currentMarketPrice,
+    };
+  
+    // Initialize positions array if not exists
+    if (!user.spotPositions) {
+      user.spotPositions = [];
+    }
+  
+    user.spotPositions.push(position);
+    saveUsers(users);
+    sendPositionOpenEmail(username, position);
+  
+    res.json({ spotPositions: user.spotPositions, newspotUSDTBalance: user.spotUSDTBalance });
+});
+  
 app.post("/api/getPositions", authenticateToken, (req, res) => {
   const username = req.user.username;
   const users = loadUsers();
@@ -338,8 +411,9 @@ app.post("/api/getPositions", authenticateToken, (req, res) => {
   if (!user) return res.status(404).send("User not found");
 
   res.json({
-    positions: user.positions,
-    closedPositions: user.closedPositions,
+    futuresPositions: user.futuresPositions,
+    closedFuturesPositions: user.closedFuturesPositions,
+    spotPositions: user.spotPositions,
   });
 });
 
@@ -369,21 +443,21 @@ app.post("/api/saveTPSL", authenticateToken, async (req, res) => {
   if (!user) return res.status(404).send("User not found");
 
   // Find the position to close
-  const positionIndex = user.positions.findIndex(
+  const positionIndex = user.futuresPositions.findIndex(
     (pos) => pos.id === positionId
   );
   if (positionIndex === -1) return res.status(404).send("Position not found");
 
-  const oldTP = user.positions[positionIndex].tp;
-  user.positions[positionIndex].tp = tp;
-  if(oldTP != tp)sendPositionTPEmail(username, user.positions[positionIndex]);
+  const oldTP = user.futuresPositions[positionIndex].tp;
+  user.futuresPositions[positionIndex].tp = tp;
+  if(oldTP != tp)sendPositionTPEmail(username, user.futuresPositions[positionIndex]);
 
-  const oldSL = user.positions[positionIndex].sl;
-  user.positions[positionIndex].sl = sl;
-  if(oldSL != sl)sendPositionTPEmail(username, user.positions[positionIndex]);
+  const oldSL = user.futuresPositions[positionIndex].sl;
+  user.futuresPositions[positionIndex].sl = sl;
+  if(oldSL != sl)sendPositionTPEmail(username, user.futuresPositions[positionIndex]);
   
   saveUsers(users);
-  res.json({ positions: user.positions });
+  res.json({ futuresPositions: user.futuresPositions });
 });
 
 app.post("/api/startTrade", authenticateToken, async (req, res) => {
@@ -391,22 +465,33 @@ app.post("/api/startTrade", authenticateToken, async (req, res) => {
   const username = req.user.username;
   const users = loadUsers();
   const user = users[username];
+  let futures = 0;
 
   if (!user) return res.status(404).send("User not found");
 
   // Find the position to close
-  const positionIndex = user.positions.findIndex(
+  let positionIndex = user.futuresPositions.findIndex(
     (pos) => pos.id === positionId
   );
-  if (positionIndex === -1) return res.status(404).send("Position not found");
+  if (positionIndex === -1){
+    positionIndex = user.spotPositions.findIndex(
+        (pos) => pos.id === positionId
+    );
+    if(positionIndex === -1)return res.status(404).send("Position not found");
+    user.spotPositions[positionIndex].orderLimit = 0;
+  }else{
+    user.futuresPositions[positionIndex].orderLimit = 0;
+  } 
 
-  user.positions[positionIndex].orderLimit = 0;
-  // user.futuresUSDTBalance -= user.positions[positionIndex].amount;
+  // user.futuresUSDTBalance -= user.futuresPositions[positionIndex].amount;
   saveUsers(users);
-  res.json({ positions: user.positions });
+  res.json({ 
+    futuresPositions: user.futuresPositions,
+    spotPositions: user.spotPositions
+   });
 });
 
-app.post("/api/closePosition", authenticateToken, async (req, res) => {
+app.post("/api/closeFuturesPosition", authenticateToken, async (req, res) => {
   const { positionId, reason } = req.body;
   const username = req.user.username;
   const users = loadUsers();
@@ -415,12 +500,12 @@ app.post("/api/closePosition", authenticateToken, async (req, res) => {
   if (!user) return res.status(404).send("User not found");
 
   // Find the position to close
-  const positionIndex = user.positions.findIndex(
+  const positionIndex = user.futuresPositions.findIndex(
     (pos) => pos.id === positionId
   );
   if (positionIndex === -1) return res.status(404).send("Position not found");
 
-  const closedPosition = user.positions.splice(positionIndex, 1)[0];
+  const closedPosition = user.futuresPositions.splice(positionIndex, 1)[0];
 
   // Fetch the current market price
   const currentMarketPrices = await fetchCurrentMarketPrices();
@@ -449,10 +534,10 @@ app.post("/api/closePosition", authenticateToken, async (req, res) => {
   user.futuresUSDTBalance += closedPosition.amount + profitLoss; // Add the amount and profit/loss
 
   // Log the closed position with realized P/L
-  if (!user.closedPositions) {
-    user.closedPositions = [];
+  if (!user.closedFuturesPositions) {
+    user.closedFuturesPositions = [];
   }
-  user.closedPositions.push({
+  user.closedFuturesPositions.push({
     ...closedPosition,
     exitPrice: currentMarketPrice,
     realizedPL: profitLoss,
@@ -462,9 +547,67 @@ app.post("/api/closePosition", authenticateToken, async (req, res) => {
   sendPositionClosedEmail(username, closedPosition, currentMarketPrice);
 
   saveUsers(users);
-  res.json({ positions: user.positions, newfuturesUSDTBalance: user.futuresUSDTBalance, profitLoss });
+  res.json({ futuresPositions: user.futuresPositions, newFuturesUSDTBalance: user.futuresUSDTBalance, profitLoss });
 });
 
+// app.post("/api/closeSpotPosition", authenticateToken, async (req, res) => {
+//     const { positionId } = req.body;
+//     const username = req.user.username;
+//     const users = loadUsers();
+//     const user = users[username];
+  
+//     if (!user) return res.status(404).send("User not found");
+  
+//     // Find the position to close
+//     const positionIndex = user.spotPositions.findIndex(
+//       (pos) => pos.id === positionId
+//     );
+//     if (positionIndex === -1) return res.status(404).send("Position not found");
+  
+//     const closedPosition = user.spotPositions.splice(positionIndex, 1)[0];
+  
+//     // Fetch the current market price
+//     const currentMarketPrices = await fetchCurrentMarketPrices();
+//     if (currentMarketPrices === null) {
+//       return res.status(500).send("Error fetching market price");
+//     }
+  
+//     const currentMarketPrice = currentMarketPrices.filter(
+//       (item) => item.assetType == closedPosition.assetType
+//     )[0].price;
+  
+//     // Calculate realized profit or loss
+//     const priceDiff =
+//       (currentMarketPrice - closedPosition.entryPrice) *
+//       (closedPosition.positionType === "Long" ? 1 : -1);
+//     let profitLoss =
+//       closedPosition.amount *
+//       closedPosition.leverage *
+//       (priceDiff / closedPosition.entryPrice);
+  
+//     if (closedPosition.orderLimit) profitLoss = 0;
+  
+//     // Update balance
+//     if (reason == 3) profitLoss = -closedPosition.amount; // liquidation
+//     // if(!closedPosition.orderLimit)user.futuresUSDTBalance += closedPosition.amount + profitLoss; // Add the amount and profit/loss
+//     user.spotUSDTBalance += closedPosition.amount + profitLoss; // Add the amount and profit/loss
+  
+//     // Log the closed position with realized P/L
+//     if (!user.closedSpotPositions) {
+//       user.closedSpotPositions = [];
+//     }
+//     user.closedSpotPositions.push({
+//       ...closedPosition,
+//       exitPrice: currentMarketPrice,
+//       realizedPL: profitLoss,
+//     });
+  
+//     sendPositionClosedEmail(username, closedPosition, currentMarketPrice);
+  
+//     saveUsers(users);
+//     res.json({ spotPositions: user.spotPositions, newSpotUSDTBalance: user.spotUSDTBalance, profitLoss });
+// });
+ 
 app.post("/api/partialClosePosition", authenticateToken, async (req, res) => {
   const { positionId, percent } = req.body;
   const username = req.user.username;
@@ -475,13 +618,13 @@ app.post("/api/partialClosePosition", authenticateToken, async (req, res) => {
   if (!user) return res.status(404).send("User not found");
 
   // Find the position to close
-  const positionIndex = user.positions.findIndex(
+  const positionIndex = user.futuresPositions.findIndex(
     (pos) => pos.id === positionId
   );
   if (positionIndex === -1) return res.status(404).send("Position not found");
 
-  // const closedPosition = user.positions.splice(positionIndex, 1)[0];
-  closedPosition = user.positions[positionIndex];
+  // const closedPosition = user.futuresPositions.splice(positionIndex, 1)[0];
+  closedPosition = user.futuresPositions[positionIndex];
 
   // Fetch the current market price
   const currentMarketPrices = await fetchCurrentMarketPrices();
@@ -509,44 +652,46 @@ app.post("/api/partialClosePosition", authenticateToken, async (req, res) => {
   closedPosition.amount *= percent / 100;
 
   // Log the closed position with realized P/L
-  if (!user.closedPositions) {
-    user.closedPositions = [];
+  if (!user.closedFuturesPositions) {
+    user.closedFuturesPositions = [];
   }
-  user.closedPositions.push({
+  user.closedFuturesPositions.push({
     ...closedPosition,
     exitPrice: currentMarketPrice,
     realizedPL: profitLoss,
     closedReason: reason,
   });
 
-  user.positions[positionIndex].amount *= 100 / percent;
-  user.positions[positionIndex].amount *= 1 - percent / 100;
+  user.futuresPositions[positionIndex].amount *= 100 / percent;
+  user.futuresPositions[positionIndex].amount *= 1 - percent / 100;
 
   saveUsers(users);
-  res.json({ positions: user.positions, newfuturesUSDTBalance: user.futuresUSDTBalance, profitLoss });
+  res.json({ futuresPositions: user.futuresPositions, newfuturesUSDTBalance: user.futuresUSDTBalance, profitLoss });
 });
 
-app.post("/api/getClosedPositions", authenticateToken, (req, res) => {
+// app.post("/api/getClosedPositions", authenticateToken, (req, res) => {
+//   const username = req.user.username;
+//   const users = loadUsers();
+//   const user = users[username];
+
+//   if (!user) return res.status(404).send("User not found");
+
+//   res.json({ closedFuturesPositions: user.closedFuturesPositions });
+// });
+
+app.post("/api/updateValue", authenticateToken, (req, res) => {
   const username = req.user.username;
   const users = loadUsers();
   const user = users[username];
 
   if (!user) return res.status(404).send("User not found");
 
-  res.json({ closedPositions: user.closedPositions });
-});
-
-app.post("/api/updatebalance", authenticateToken, (req, res) => {
-  const username = req.user.username;
-  const users = loadUsers();
-  const user = users[username];
-
-  if (!user) return res.status(404).send("User not found");
-
-  user.totalValue = user.futuresUSDTBalance + parseFloat(req.body.unrealizepl); // Using user.futuresUSDTBalance directly
+  user.futuresValue = user.futuresUSDTBalance + parseFloat(req.body.futuresPositionsAmount)+ parseFloat(req.body.futuresUnrealizedPL);
+  user.spotValue = user.spotUSDTBalance + parseFloat(req.body.spotPositionsAmount)+ parseFloat(req.body.spotUnrealizedPL);
+  user.totalValue = user.futuresValue + user.spotValue;
   saveUsers(users);
   res.json({
     futuresUSDTBalance: user.futuresUSDTBalance,
-    totalValue: user.totalValue,
+    futuresValue: user.futuresValue,
   });
 });
