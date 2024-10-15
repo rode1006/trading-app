@@ -173,7 +173,7 @@
     "futuresValue": 112402.08264339225,
     "futuresUSDTBalance": 91963.75732129122,
     "spotValue": 2889.948,
-    "spotUSDTBalance": 2889.948,
+    "spotUSDTBalance": 6791.472999999999,
     "privateKey": "key11",
     "address": "0xb3ad63d24fa85ea509c121d7a502b6127bbe0c54",
     "futuresPositions": [
@@ -300,6 +300,72 @@
         "amount": 0.4,
         "limitPrice": 0,
         "entryPrice": 2595.32
+      },
+      {
+        "id": 1729029611125,
+        "assetType": "ETH",
+        "positionType": "sell",
+        "orderType": "market",
+        "orderLimit": 0,
+        "amount": 0.5,
+        "limitPrice": 0,
+        "entryPrice": 2588.63
+      },
+      {
+        "id": 1729029662187,
+        "assetType": "ETH",
+        "positionType": "buy",
+        "orderType": "limit",
+        "orderLimit": 0,
+        "amount": 1,
+        "limitPrice": 2600,
+        "entryPrice": 2587.84
+      }
+    ],
+    "closedSpotPositions": [
+      {
+        "id": 1729031934705,
+        "assetType": "ETH",
+        "positionType": "sell",
+        "orderType": "limit",
+        "orderLimit": 1,
+        "amount": 0.5,
+        "limitPrice": 2610,
+        "entryPrice": 2598.99,
+        "exitPrice": 2598.59
+      },
+      {
+        "id": 1729031979384,
+        "assetType": "ETH",
+        "positionType": "sell",
+        "orderType": "limit",
+        "orderLimit": 1,
+        "amount": 0.5,
+        "limitPrice": 2610,
+        "entryPrice": 2596.06,
+        "exitPrice": 2595.01
+      },
+      {
+        "id": 1729032356610,
+        "assetType": "LTC",
+        "positionType": "buy",
+        "orderType": "limit",
+        "orderLimit": 1,
+        "amount": 5,
+        "limitPrice": 70,
+        "entryPrice": 70.08,
+        "exitPrice": 70.08
+      },
+      {
+        "id": 1729032368469,
+        "assetType": "LTC",
+        "positionType": "buy",
+        "orderType": "limit",
+        "orderLimit": 1,
+        "amount": 5,
+        "limitPrice": 70,
+        "entryPrice": 70.09,
+        "exitPrice": 70.09
       }
     ]
   },

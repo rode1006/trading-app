@@ -365,10 +365,6 @@ app.post("/api/openSpotPosition", authenticateToken, async (req, res) => {
     
     if(positionType=='buy'){
         if (user.spotUSDTBalance < amount * currentMarketPrice) {
-            console.log('---------------');
-            console.log(user.spotUSDTBalance);
-            console.log(amount);
-            console.log(currentMarketPrice);
             return res.status(400).send("Insufficient balance");
         }
         user.spotUSDTBalance -= amount * currentMarketPrice;
@@ -414,6 +410,7 @@ app.post("/api/getPositions", authenticateToken, (req, res) => {
     futuresPositions: user.futuresPositions,
     closedFuturesPositions: user.closedFuturesPositions,
     spotPositions: user.spotPositions,
+    closedSpotPositions: user.closedSpotPositions,
   });
 });
 
@@ -550,63 +547,55 @@ app.post("/api/closeFuturesPosition", authenticateToken, async (req, res) => {
   res.json({ futuresPositions: user.futuresPositions, newFuturesUSDTBalance: user.futuresUSDTBalance, profitLoss });
 });
 
-// app.post("/api/closeSpotPosition", authenticateToken, async (req, res) => {
-//     const { positionId } = req.body;
-//     const username = req.user.username;
-//     const users = loadUsers();
-//     const user = users[username];
+app.post("/api/closeSpotPosition", authenticateToken, async (req, res) => {
+    const { positionId } = req.body;
+    const username = req.user.username;
+    const users = loadUsers();
+    const user = users[username];
   
-//     if (!user) return res.status(404).send("User not found");
+    if (!user) return res.status(404).send("User not found");
   
-//     // Find the position to close
-//     const positionIndex = user.spotPositions.findIndex(
-//       (pos) => pos.id === positionId
-//     );
-//     if (positionIndex === -1) return res.status(404).send("Position not found");
+    // Find the position to close
+    const positionIndex = user.spotPositions.findIndex(
+      (pos) => pos.id === positionId
+    );
+    if (positionIndex === -1) return res.status(404).send("Position not found");
   
-//     const closedPosition = user.spotPositions.splice(positionIndex, 1)[0];
+    const closedPosition = user.spotPositions.splice(positionIndex, 1)[0];
   
-//     // Fetch the current market price
-//     const currentMarketPrices = await fetchCurrentMarketPrices();
-//     if (currentMarketPrices === null) {
-//       return res.status(500).send("Error fetching market price");
-//     }
+    if(!closedPosition.orderLimit) return res.status(400).send("Open position can't be closed in spot trading");
+    // Fetch the current market price
+    const currentMarketPrices = await fetchCurrentMarketPrices();
+    if (currentMarketPrices === null) {
+      return res.status(500).send("Error fetching market price");
+    }
   
-//     const currentMarketPrice = currentMarketPrices.filter(
-//       (item) => item.assetType == closedPosition.assetType
-//     )[0].price;
+    const currentMarketPrice = currentMarketPrices.filter(
+      (item) => item.assetType == closedPosition.assetType
+    )[0].price;
   
-//     // Calculate realized profit or loss
-//     const priceDiff =
-//       (currentMarketPrice - closedPosition.entryPrice) *
-//       (closedPosition.positionType === "Long" ? 1 : -1);
-//     let profitLoss =
-//       closedPosition.amount *
-//       closedPosition.leverage *
-//       (priceDiff / closedPosition.entryPrice);
+    if(closedPosition.positionType=='buy'){
+      user.spotUSDTBalance += closedPosition.amount * closedPosition.entryPrice; // Add the amount and profit/loss
+    }
+    if(closedPosition.positionType=='sell'){
+      user.spotUSDTBalance -= closedPosition.amount * closedPosition.entryPrice; // Add the amount and profit/loss
+    }
+    
   
-//     if (closedPosition.orderLimit) profitLoss = 0;
+    // Log the closed position with realized P/L
+    if (!user.closedSpotPositions) {
+      user.closedSpotPositions = [];
+    }
+    user.closedSpotPositions.push({
+      ...closedPosition,
+      exitPrice: currentMarketPrice
+    });
   
-//     // Update balance
-//     if (reason == 3) profitLoss = -closedPosition.amount; // liquidation
-//     // if(!closedPosition.orderLimit)user.futuresUSDTBalance += closedPosition.amount + profitLoss; // Add the amount and profit/loss
-//     user.spotUSDTBalance += closedPosition.amount + profitLoss; // Add the amount and profit/loss
+    sendPositionClosedEmail(username, closedPosition, currentMarketPrice);
   
-//     // Log the closed position with realized P/L
-//     if (!user.closedSpotPositions) {
-//       user.closedSpotPositions = [];
-//     }
-//     user.closedSpotPositions.push({
-//       ...closedPosition,
-//       exitPrice: currentMarketPrice,
-//       realizedPL: profitLoss,
-//     });
-  
-//     sendPositionClosedEmail(username, closedPosition, currentMarketPrice);
-  
-//     saveUsers(users);
-//     res.json({ spotPositions: user.spotPositions, newSpotUSDTBalance: user.spotUSDTBalance, profitLoss });
-// });
+    saveUsers(users);
+    res.json({ spotPositions: user.spotPositions, newSpotUSDTBalance: user.spotUSDTBalance });
+});
  
 app.post("/api/partialClosePosition", authenticateToken, async (req, res) => {
   const { positionId, percent } = req.body;
