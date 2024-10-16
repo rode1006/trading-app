@@ -177,6 +177,7 @@ app.post("/register", (req, res) => {
   users[username] = {
     password: hashedPassword,
     totalValue: 0,
+    totalUSDTBalance : 0,
     futuresValue: 0,
     futuresUSDTBalance: 0,
     spotValue: 0,
@@ -676,8 +677,9 @@ app.post("/api/updateValue", authenticateToken, (req, res) => {
   if (!user) return res.status(404).send("User not found");
 
   user.futuresValue = user.futuresUSDTBalance + parseFloat(req.body.futuresPositionsAmount)+ parseFloat(req.body.futuresUnrealizedPL);
-  user.spotValue = user.spotUSDTBalance + parseFloat(req.body.spotPositionsAmount)+ parseFloat(req.body.spotUnrealizedPL);
-  user.totalValue = user.futuresValue + user.spotValue;
+  user.spotValue = parseFloat(req.body.spotValue);
+  user.totalValue = parseFloat(req.body.totalValue);
+  user.totalUSDTBalance = user.futuresUSDTBalance + user.spotUSDTBalance;
   saveUsers(users);
   res.json({
     futuresUSDTBalance: user.futuresUSDTBalance,

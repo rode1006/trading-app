@@ -2,6 +2,7 @@
   "s": {
     "password": "$2a$08$i.AMZFb3y.bXLS5pqCnHi.xHeX0vkBrel3qrR1SUxxX4wByVkmHWG",
     "totalValue": 0,
+    "totalUSDTBalance": 0,
     "futuresValue": 252180.1516137703,
     "futuresUSDTBalance": 117342.0316137703,
     "spotValue": 0,
@@ -169,10 +170,11 @@
   },
   "tiger": {
     "password": "$2a$08$V6dQqUGfz7GR8jZ/ZacUfO.b.jS0a6Cnss7WcBrwQLTE.93SVC.cS",
-    "totalValue": 115292.03064339225,
-    "futuresValue": 112402.08264339225,
+    "totalValue": 131250.0611054614,
+    "totalUSDTBalance": 98755.23032129122,
+    "futuresValue": 115990.09810546142,
     "futuresUSDTBalance": 91963.75732129122,
-    "spotValue": 2889.948,
+    "spotValue": 15259.963,
     "spotUSDTBalance": 6791.472999999999,
     "privateKey": "key11",
     "address": "0xb3ad63d24fa85ea509c121d7a502b6127bbe0c54",
@@ -369,57 +371,10 @@
       }
     ]
   },
-  "a": {
-    "password": "$2a$08$BtOQgEkJCmkQNv/evjMgU.lvpIMckSf9CeksiazBD8rPmKZnx4fJm",
-    "futuresValue": 99762.28,
-    "futuresUSDTBalance": 87000,
-    "privateKey": "key20",
-    "address": "0xb2b24fa85ea509c1d73ad63da5546127021bbe0c",
-    "futuresPositions": [
-      {
-        "id": 1728918065161,
-        "assetType": "BTC",
-        "positionType": "Long",
-        "orderType": "market",
-        "orderLimit": 0,
-        "amount": 5000,
-        "leverage": 10,
-        "tp": 100000000,
-        "sl": 0,
-        "limitPrice": 0,
-        "entryPrice": 65914.01
-      },
-      {
-        "id": 1728918073573,
-        "assetType": "ETH",
-        "positionType": "Long",
-        "orderType": "market",
-        "orderLimit": 0,
-        "amount": 5000,
-        "leverage": 10,
-        "tp": 100000000,
-        "sl": 0,
-        "limitPrice": 0,
-        "entryPrice": 2621.54
-      },
-      {
-        "id": 1728918091517,
-        "assetType": "LTC",
-        "positionType": "Long",
-        "orderType": "market",
-        "orderLimit": 0,
-        "amount": 3000,
-        "leverage": 10,
-        "tp": 100000000,
-        "sl": 0,
-        "limitPrice": 0,
-        "entryPrice": 66.54
-      }
-    ]
-  },
   "k": {
     "password": "$2a$08$qMKVIrB6KPVqQ4cn1JDN/OVcT9r/w.Nt8NvX25dkBsgInvepCh49O",
     "totalValue": 10395.084676886669,
+    "totalUSDTBalance": 0,
     "futuresValue": 395.0846768866686,
     "futuresUSDTBalance": 95.0846768866686,
     "spotValue": 10000,

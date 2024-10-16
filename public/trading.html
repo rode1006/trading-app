@@ -2090,7 +2090,7 @@
                     "<span class='money-unit'> " + assetTypes[index-1] + "</span>";
                   }
                   statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;";
-                  if (index % 10 == 9) statisticsBar += "<br>";
+                  if (index % 10 == 9) statisticsBar += "<br>"; 
                 });
 
                 document.getElementById("spot-assets-statistics").innerHTML =
@@ -2137,8 +2137,8 @@
                   body: JSON.stringify({
                       futuresPositionsAmount,
                       futuresUnrealizedPL,
-                      spotPositionsAmount,
-                      spotUnrealizedPL,
+                      spotValue,
+                      totalValue,
                   }),
                 })
                   .then((response) => response.json())
