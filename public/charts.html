@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Binance Perpetual Futures Chart</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <h1>Binance Futures Chart</h1>
+
+  <!-- Symbol Selector (Dropdown) -->
+  <div>
+    <label for="symbolSelect">Select Trading Pair:</label>
+    <select id="symbolSelect" onchange="updateSymbol()">
+      <!-- Pairs will be loaded dynamically here -->
+    </select>
+  </div>
+
+  <!-- Time Frame Buttons -->
+  <div>
+    <button onclick="fetchData('1m')">1 Min</button>
+    <button onclick="fetchData('3m')">3 Min</button>
+    <button onclick="fetchData('5m')">5 Min</button>
+    <button onclick="fetchData('15m')">15 Min</button>
+    <button onclick="fetchData('30m')">30 Min</button>
+    <button onclick="fetchData('1h')">1 Hour</button>
+    <button onclick="fetchData('2h')">2 Hours</button>
+    <button onclick="fetchData('4h')">4 Hours</button>
+    <button onclick="fetchData('8h')">8 Hours</button>
+    <button onclick="fetchData('12h')">12 Hours</button>
+    <button onclick="fetchData('1d')">1 Day</button>
+    <button onclick="fetchData('2d')">2 Days</button>
+    <button onclick="fetchData('1w')">1 Week</button>
+    <button onclick="fetchData('1M')">1 Month</button>
+  </div>
+
+  <!-- Canvas for Chart.js -->
+  <canvas id="chart" width="800" height="400"></canvas>
+
+  <script>
+    let chartInstance;
+    let currentSymbol = 'BTCUSDT';  // Default pair
+
+    // Fetch available perpetual futures trading pairs
+    function loadTradingPairs() {
+      fetch('https://fapi.binance.com/fapi/v1/exchangeInfo')
+        .then(response => response.json())
+        .then(data => {
+          const symbolSelect = document.getElementById('symbolSelect');
+          data.symbols.forEach(symbol => {
+            if (symbol.contractType === 'PERPETUAL') { // Only perpetual futures
+              const option = document.createElement('option');
+              option.value = symbol.symbol;
+              option.text = symbol.symbol;
+              symbolSelect.appendChild(option);
+            }
+          });
+        })
+        .catch(error => console.error('Error fetching trading pairs:', error));
+    }
+
+    // Update the current trading pair when user selects a new one
+    function updateSymbol() {
+      const symbolSelect = document.getElementById('symbolSelect');
+      currentSymbol = symbolSelect.value;
+      fetchData('1d');  // Fetch default time frame when symbol changes
+    }
+
+    // Fetch and display chart data for the selected trading pair and time frame
+    function fetchData(timeFrame) {
+      const endpoint = `https://fapi.binance.com/fapi/v1/klines?symbol=${currentSymbol}&interval=${timeFrame}`;
+
+      fetch(endpoint)
+        .then(response => response.json())
+        .then(data => {
+          const formattedData = formatChartData(data);
+          updateChart(formattedData);
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    }
+
+    // Format Binance kline data for Chart.js
+    function formatChartData(data) {
+      return data.map(item => ({
+        time: new Date(item[0]),
+        open: parseFloat(item[1]),
+        high: parseFloat(item[2]),
+        low: parseFloat(item[3]),
+        close: parseFloat(item[4])
+      }));
+    }
+
+    // Update the chart with new data
+    function updateChart(chartData) {
+      const labels = chartData.map(candle => candle.time.toLocaleString());
+      const chartDataset = {
+        labels: labels,
+        datasets: [{
+          label: currentSymbol,  // Display the selected symbol on the chart
+          data: chartData.map(candle => ({
+            x: candle.time,
+            y: [candle.open, candle.high, candle.low, candle.close]
+          })),
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 1
+        }]
+      };
+
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+
+      const ctx = document.getElementById('chart').getContext('2d');
+      chartInstance = new Chart(ctx, {
+        type: 'candlestick', // Use candlestick chart type
+        data: chartDataset,
+        options: {
+          responsive: true,
+          scales: {
+            x: {
+              type: 'time',
+              time: {
+                unit: 'minute'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Auto-load daily chart for BTCUSDT by default
+    window.onload = function() {
+      loadTradingPairs();  // Load available trading pairs
+      fetchData('1d');     // Load default daily chart for BTCUSDT
+    };
+  </script>
+
+</body>
+</html>

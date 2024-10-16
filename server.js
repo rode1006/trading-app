@@ -682,7 +682,53 @@ app.post("/api/updateValue", authenticateToken, (req, res) => {
   user.totalUSDTBalance = user.futuresUSDTBalance + user.spotUSDTBalance;
   saveUsers(users);
   res.json({
-    futuresUSDTBalance: user.futuresUSDTBalance,
     futuresValue: user.futuresValue,
+    spotValue: user.spotValue,
   });
+});
+
+app.post("/api/updateBalance", authenticateToken, (req, res) => {
+  const username = req.user.username;
+  const users = loadUsers();
+  const user = users[username];
+
+  if (!user) return res.status(404).send("User not found");
+
+  user.futuresUSDTBalance = parseFloat(req.body.futuresUSDTBalance);
+  user.spotUSDTBalance = parseFloat(req.body.spotUSDTBalance);
+  user.totalUSDTBalance = user.futuresUSDTBalance + user.spotUSDTBalance;
+  saveUsers(users);
+  res.json({
+    futuresUSDTBalance: user.futuresUSDTBalance,
+    spotUSDTBalance: user.spotUSDTBalance,
+  });
+});
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Route to get all perpetual futures trading pairs
+app.get('/api/pairs', async (req, res) => {
+  try {
+    const response = await axios.get('https://fapi.binance.com/fapi/v1/exchangeInfo');
+    const pairs = response.data.symbols.filter(symbol => symbol.contractType === 'PERPETUAL');
+    res.json(pairs);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching trading pairs' });
+  }
+});
+
+// Route to get candle data for a specific trading pair and time frame
+app.get('/api/candles', async (req, res) => {
+  const { symbol, interval } = req.query;
+  
+  if (!symbol || !interval) {
+    return res.status(400).json({ error: 'Missing symbol or interval' });
+  }
+
+  try {
+    const endpoint = `https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=${interval}`;
+    const response = await axios.get(endpoint);
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching candlestick data' });
+  }
 });
