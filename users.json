@@ -170,42 +170,15 @@
   },
   "tiger": {
     "password": "$2a$08$V6dQqUGfz7GR8jZ/ZacUfO.b.jS0a6Cnss7WcBrwQLTE.93SVC.cS",
-    "totalValue": 82110.03055289344,
+    "totalValue": 47777.38826129123,
     "totalUSDTBalance": 47755.23032129122,
-    "futuresValue": 52751.569552893445,
+    "futuresValue": 26963.757321291225,
     "futuresUSDTBalance": 26963.757321291225,
-    "spotValue": 29358.461,
+    "spotValue": 20813.63094,
     "spotUSDTBalance": 20791.472999999998,
     "privateKey": "key11",
     "address": "0xb3ad63d24fa85ea509c121d7a502b6127bbe0c54",
-    "futuresPositions": [
-      {
-        "id": 1728896590691,
-        "assetType": "BTC",
-        "positionType": "Long",
-        "orderType": "market",
-        "orderLimit": 0,
-        "amount": 5000,
-        "leverage": 10,
-        "tp": 100000000,
-        "sl": 0,
-        "limitPrice": 0,
-        "entryPrice": 64465.91
-      },
-      {
-        "id": 1728897150962,
-        "assetType": "BTC",
-        "positionType": "Long",
-        "orderType": "limit",
-        "orderLimit": 0,
-        "amount": 3000,
-        "leverage": 100,
-        "tp": 100000000,
-        "sl": 0,
-        "limitPrice": 64500,
-        "entryPrice": 64368
-      }
-    ],
+    "futuresPositions": [],
     "closedFuturesPositions": [
       {
         "id": 1728686271893,
@@ -269,6 +242,38 @@
         "entryPrice": 152.14,
         "exitPrice": 153.36,
         "realizedPL": -5000,
+        "closedReason": 3
+      },
+      {
+        "id": 1728896590691,
+        "assetType": "BTC",
+        "positionType": "Long",
+        "orderType": "market",
+        "orderLimit": 0,
+        "amount": 5000,
+        "leverage": 10,
+        "tp": 100000000,
+        "sl": 0,
+        "limitPrice": 0,
+        "entryPrice": 64465.91,
+        "exitPrice": null,
+        "realizedPL": -5000,
+        "closedReason": 3
+      },
+      {
+        "id": 1728897150962,
+        "assetType": "BTC",
+        "positionType": "Long",
+        "orderType": "limit",
+        "orderLimit": 0,
+        "amount": 3000,
+        "leverage": 100,
+        "tp": 100000000,
+        "sl": 0,
+        "limitPrice": 64500,
+        "entryPrice": 64368,
+        "exitPrice": null,
+        "realizedPL": -3000,
         "closedReason": 3
       }
     ],

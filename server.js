@@ -7,6 +7,9 @@ const nodemailer = require("nodemailer");
 const axios = require("axios");
 const app = express();
 const assetTypes = ["BTC", "ETH", "BNB", "NEO", "LTC", "SOL", "XRP", "DOT"];
+// Mexc API URL
+const PRICE_API_URL = 'https://www.mexc.com/open/api/v2/market/ticker';
+let cryptoCurrencyPrices = [];
 
 app.use(bodyParser.json());
 
@@ -142,6 +145,42 @@ function sendPositionPartialClosedEmail(username, position, exitPrice) {
   transporterSendMail(mailOptions);
 }
 //===============================================================================================
+async function fetchCurrentMarketPrices() {
+  // try {
+  //   const promises = assetTypes.map(async (assetType) => {
+  //     const response = await axios.get(
+  //       "https://api.binance.com/api/v3/ticker/price",
+  //       {
+  //         params: { symbol: assetType + "USDT" },
+  //       }
+  //     );
+  //     return { assetType, price: parseFloat(response.data.price) };
+  //   });
+
+  //   const results = await Promise.all(promises);
+  //   return results;
+  // } catch (error) {
+  //   console.error("Error fetching prices from Binance:", error);
+  //   return null;
+  // }
+  try {
+    const response = await axios.get(PRICE_API_URL);
+    const prices = response.data.data
+      .filter(item => assetTypes.includes(item.symbol.split('_')[0]) && item.symbol.split('_')[1]=='USDT')
+      .map(item => ({
+        assetType: item.symbol.split('_')[0], 
+        price: parseFloat(item.last)
+      }));
+    
+    cryptoCurrencyPrices = prices;
+    return prices; 
+  } catch (error) {
+    console.error('Error fetching data from Mexc API:', error);
+    // return [];
+    return cryptoCurrencyPrices;
+  }
+}
+//======================================================================================================
 // Withdrawal Request API
 app.post("/api/withdrawRequest", authenticateToken, (req, res) => {
   const { address, amount } = req.body;
@@ -252,26 +291,6 @@ app.post("/api/getBalance", authenticateToken, (req, res) => {
     // privateKey: user.privateKey
   });
 });
-
-async function fetchCurrentMarketPrices() {
-  try {
-    const promises = assetTypes.map(async (assetType) => {
-      const response = await axios.get(
-        "https://api.binance.com/api/v3/ticker/price",
-        {
-          params: { symbol: assetType + "USDT" },
-        }
-      );
-      return { assetType, price: parseFloat(response.data.price) };
-    });
-
-    const results = await Promise.all(promises);
-    return results;
-  } catch (error) {
-    console.error("Error fetching prices from Binance:", error);
-    return null;
-  }
-}
 
 app.post("/api/openFuturesPosition", authenticateToken, async (req, res) => {
   const { futuresAssetType, positionType, orderType, amount, leverage, limitPrice } =
@@ -462,7 +481,7 @@ app.post("/api/saveTPSL", authenticateToken, async (req, res) => {
 
   const oldSL = user.futuresPositions[positionIndex].sl;
   user.futuresPositions[positionIndex].sl = sl;
-  if(oldSL != sl)sendPositionTPEmail(username, user.futuresPositions[positionIndex]);
+  if(oldSL != sl)sendPositionSLEmail(username, user.futuresPositions[positionIndex]);
   
   saveUsers(users);
   res.json({ futuresPositions: user.futuresPositions });
@@ -666,7 +685,7 @@ app.post("/api/partialClosePosition", authenticateToken, async (req, res) => {
   user.futuresPositions[positionIndex].amount *= 1 - percent / 100;
 
   sendPositionPartialClosedEmail(username, closedPosition, currentMarketPrice);
-  
+
   saveUsers(users);
   res.json({ futuresPositions: user.futuresPositions, newfuturesUSDTBalance: user.futuresUSDTBalance, profitLoss });
 });
