@@ -131,6 +131,16 @@ function sendPositionClosedEmail(username, position, exitPrice) {
     };
     transporterSendMail(mailOptions);
 }
+// Send email with position partial closing
+function sendPositionPartialClosedEmail(username, position, exitPrice) {
+  const mailOptions = {
+      from: "gagenikolov50@gmail.com", // Replace with your admin email
+      to: "gagenikolov.z@gmail.com", // Replace with the recipient (admin) email
+      subject: "Position closed",
+      text: ` ${position.id} user ${username} partially closes position, Exit price: ${exitPrice}`,
+  };
+  transporterSendMail(mailOptions);
+}
 //===============================================================================================
 // Withdrawal Request API
 app.post("/api/withdrawRequest", authenticateToken, (req, res) => {
@@ -614,7 +624,7 @@ app.post("/api/partialClosePosition", authenticateToken, async (req, res) => {
   if (positionIndex === -1) return res.status(404).send("Position not found");
 
   // const closedPosition = user.futuresPositions.splice(positionIndex, 1)[0];
-  closedPosition = user.futuresPositions[positionIndex];
+  const closedPosition = user.futuresPositions[positionIndex];
 
   // Fetch the current market price
   const currentMarketPrices = await fetchCurrentMarketPrices();
@@ -655,6 +665,8 @@ app.post("/api/partialClosePosition", authenticateToken, async (req, res) => {
   user.futuresPositions[positionIndex].amount *= 100 / percent;
   user.futuresPositions[positionIndex].amount *= 1 - percent / 100;
 
+  sendPositionPartialClosedEmail(username, closedPosition, currentMarketPrice);
+  
   saveUsers(users);
   res.json({ futuresPositions: user.futuresPositions, newfuturesUSDTBalance: user.futuresUSDTBalance, profitLoss });
 });
