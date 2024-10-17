@@ -872,6 +872,8 @@
 
               transferBtn.addEventListener("click", () => {
                 transferUSDTModal.style.display="block";
+                document.getElementById("transfer-modal-futures-USDT").textContent = futuresUSDTBalance;
+                document.getElementById("transfer-modal-spot-USDT").textContent = spotUSDTBalance;
               });
 
               depositBtn.addEventListener("click", () => {
@@ -1482,19 +1484,26 @@
 
     <div id="transfer-USDT-modal" class="modal">
       <!-- Modal content -->
-      <div class="modal-content">
+      <div class="modal-content-transfer">
         <span class="close">&times;</span>
-        <h2 style="color: #16171a">USDT Transfer</h2>
+        <h2>USDT Transfer</h2>
         <br />
-        <p style="color: #16171a; font-size: 20px">
+        <p>
+          <span class="money-type">Est. Futures Balance(USDT)</span>
+          <span class="money-value" id="transfer-modal-futures-USDT"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+          <span class="money-type">Est. Spot Balance(USDT)</span>
+          <span class="money-value" id="transfer-modal-spot-USDT"></span>
+        </p>
+        <br>
+        <p style="font-size: 20px">
           <span>Mode:</span>
           <select name="transferType" id="transfer-USDT-type">
             <option value="fromFutures" selected>Futures -> Spot</option>
             <option value="fromSpot" selected>Spot -> Futures</option>
-          </select><br>
+          </select>
           <span>Amount:</span>
           <input type="number" min="1" max="100" id="transfer-USDT-amount" style="font-size: 20px;margin: 10px;">
-          <span class="money-unit">(USDT)</span><br>
+          <span class="money-unit">(USDT)</span>
           <button id="transfer-USDT-btn" onclick="transferUSDT()">Transfer</button>
         </p>
       </div>
@@ -2457,6 +2466,8 @@
             console.log(futuresUSDTBalance, spotUSDTBalance);
           }
         }
+        document.getElementById("transfer-modal-futures-USDT").textContent = futuresUSDTBalance;
+        document.getElementById("transfer-modal-spot-USDT").textContent = spotUSDTBalance;
         fetch("/api/updateBalance", {
           method: "POST",
           headers: {

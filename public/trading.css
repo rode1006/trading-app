@@ -257,6 +257,15 @@ body {
   color: #ffffff;
 }
 
+.modal-content-transfer {
+  background-color: #282759;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 10px;
+  width: 800px;
+  color: #ffffff;
+}
+
 .close {
   color: #aaaaaa;
   float: right;
