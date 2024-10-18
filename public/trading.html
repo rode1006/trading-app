@@ -6,7 +6,8 @@
     <link rel="stylesheet" href="trading.css" />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
     <script>
       const currencyFormatter = new Intl.NumberFormat("en-US", {
         style: "currency",
@@ -64,6 +65,8 @@
         syncWelcomeMessages();
       });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
   </head>
   <body>
     <div class="container">
@@ -81,14 +84,16 @@
             z-index: 100;
             align-self: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-          ">
+          "
+        >
           <!--left-->
           <div class="nav-left" style="flex-direction: row; display: flex">
             <div class="tab">
               <button
                 class="tablinks"
                 onclick="selectTrading(event, 'futures')"
-                id="defaultOpen">
+                id="defaultOpen"
+              >
                 Futures Trading
               </button>
               <button class="tablinks" onclick="selectTrading(event, 'spot')">
@@ -99,8 +104,16 @@
 
           <!--right-->
           <div class="nav-right" style="flex-direction: row; display: flex">
-            <button style="height: 60px;width: 120px;margin-right: 10px;" class="deposit-btn" id="transfer-USDT-btn">
-              <i style="margin-right: 10px" class="fas fa-arrow-right-arrow-left"></i>Transfer
+            <button
+              style="height: 60px; width: 120px; margin-right: 10px"
+              class="deposit-btn"
+              id="transfer-USDT-btn"
+            >
+              <i
+                style="margin-right: 10px"
+                class="fas fa-arrow-right-arrow-left"
+              ></i
+              >Transfer
             </button>
             <button style="height: 60px" class="deposit-btn" id="deposit-btn">
               <i style="margin-right: 10px" class="fas fa-wallet"></i>Deposit
@@ -114,7 +127,8 @@
                     <img
                       src="img/close.png"
                       id="popup-close-btn"
-                      class="closee" />
+                      class="closee"
+                    />
                     <h2 style="font-size: 20px">Transfer Crypto</h2>
                   </div>
                   <div class="deposit-header"></div>
@@ -126,7 +140,8 @@
                         border-radius: 10px;
                         padding-top: 11px;
                       "
-                      class="toggle-button-custom active">
+                      class="toggle-button-custom active"
+                    >
                       Deposit
                     </button>
                     <button
@@ -136,19 +151,22 @@
                         border-radius: 10px;
                         padding-top: 11px;
                       "
-                      class="toggle-button-custom">
+                      class="toggle-button-custom"
+                    >
                       Withdraw
                     </button>
                   </div>
                   <!-- DEPOSIT -->
                   <div
                     id="deposit-content-custom"
-                    class="content-section-custom active">
+                    class="content-section-custom active"
+                  >
                     <div id="network-selectors">
                       <!--Asset Dropdown-->
                       <div
                         class="custom-dropdown"
-                        style="flex: 1; font-weight: 550; font-size: 15px">
+                        style="flex: 1; font-weight: 550; font-size: 15px"
+                      >
                         <label class="choose">Choose Asset</label>
                         <div
                           class="custom-dropdown-selected"
@@ -163,18 +181,22 @@
                             padding: 10px;
                             border-radius: 8px;
                           "
-                          id="network-selector2">
-                          <span
-                            class="custom-dropdown-selected-text">USDT</span>
-                          <span class="custom-dropdown-arrow"><img width="14px"
-                              src="img/arrow-right.png" /></span>
+                          id="network-selector2"
+                        >
+                          <span class="custom-dropdown-selected-text"
+                            >USDT</span
+                          >
+                          <span class="custom-dropdown-arrow"
+                            ><img width="14px" src="img/arrow-right.png"
+                          /></span>
                         </div>
                         <div class="custom-dropdown-options">
                           <hr class="separator2" />
                           <div class="custom-dropdown-option">
                             <img
                               src="img/ETH.png"
-                              style="width: 24px; margin-left: 10px" />
+                              style="width: 24px; margin-left: 10px"
+                            />
                             <span style="margin-left: 10px">ETH</span>
                           </div>
                           <div class="custom-dropdown-option">
@@ -184,31 +206,36 @@
                                 width: 25px;
                                 height: 25px;
                                 margin-left: 10px;
-                              " />
+                              "
+                            />
                             <span style="margin-left: 10px">BRETT</span>
                           </div>
                           <div class="custom-dropdown-option">
                             <img
                               src="img/people.png"
-                              style="width: 22px; margin-left: 10px" />
+                              style="width: 22px; margin-left: 10px"
+                            />
                             <span style="margin-left: 10px">PEOPLE</span>
                           </div>
                           <div class="custom-dropdown-option">
                             <img
                               src="img/USDT.png"
-                              style="width: 22px; margin-left: 10px" />
+                              style="width: 22px; margin-left: 10px"
+                            />
                             <span style="margin-left: 10px">USDT</span>
                           </div>
                           <div class="custom-dropdown-option">
                             <img
                               src="img/USDC.png"
-                              style="width: 22px; margin-left: 10px" />
+                              style="width: 22px; margin-left: 10px"
+                            />
                             <span style="margin-left: 10px">USDC</span>
                           </div>
                           <div class="custom-dropdown-option">
                             <img
                               src="img/BNB.png"
-                              style="width: 22px; margin-left: 10px" />
+                              style="width: 22px; margin-left: 10px"
+                            />
                             <span style="margin-left: 10px">BNB</span>
                           </div>
                         </div>
@@ -216,7 +243,8 @@
                       <!--Network Dropdown-->
                       <div
                         class="custom-dropdown"
-                        style="flex: 1; font-weight: 550; font-size: 15px">
+                        style="flex: 1; font-weight: 550; font-size: 15px"
+                      >
                         <label class="choose">Choose Network</label>
                         <div
                           class="custom-dropdown-selected"
@@ -231,11 +259,14 @@
                             padding: 10px;
                             border-radius: 8px;
                           "
-                          id="network-selector2">
-                          <span
-                            class="custom-dropdown-selected-text">ERC-20</span>
-                          <span class="custom-dropdown-arrow"><img width="14px"
-                              src="img/arrow-right.png" /></span>
+                          id="network-selector2"
+                        >
+                          <span class="custom-dropdown-selected-text"
+                            >ERC-20</span
+                          >
+                          <span class="custom-dropdown-arrow"
+                            ><img width="14px" src="img/arrow-right.png"
+                          /></span>
                         </div>
                         <div class="custom-dropdown-options">
                           <hr class="separator2" />
@@ -247,7 +278,8 @@
                                 height: 24px;
                                 width: 15px;
                                 margin-left: 15px;
-                              " />
+                              "
+                            />
                             <span style="margin-left: 10px">ERC-20</span>
                           </div>
                           <div class="custom-dropdown-option">
@@ -257,19 +289,22 @@
                                 width: 25px;
                                 height: 25px;
                                 margin-left: 10px;
-                              " />
+                              "
+                            />
                             <span style="margin-left: 10px">BSC</span>
                           </div>
                           <div class="custom-dropdown-option">
                             <img
                               src="img/base.png"
-                              style="width: 22px; margin-left: 10px" />
+                              style="width: 22px; margin-left: 10px"
+                            />
                             <span style="margin-left: 10px">Base</span>
                           </div>
                           <div class="custom-dropdown-option">
                             <img
                               src="img/arb.png"
-                              style="width: 22px; margin-left: 10px" />
+                              style="width: 22px; margin-left: 10px"
+                            />
                             <span style="margin-left: 10px">Arbitrum One</span>
                           </div>
                         </div>
@@ -289,12 +324,14 @@
                           src="img/copy.png"
                           style="width: 21px; margin-top: 15px"
                           id="copy-icon"
-                          onclick="copyAddress()" />
+                          onclick="copyAddress()"
+                        />
                       </div>
                     </div>
                     <div
                       id="warningContainer"
-                      class="warning-container-darkblue">
+                      class="warning-container-darkblue"
+                    >
                       <p class="warning-text">
                         <img src="img/warning2.png" class="warning-icon" />
                         Minimum Deposit: $1.5 ∼ 1.5 USDT
@@ -306,7 +343,8 @@
                   <div
                     id="withdraw-content-custom"
                     class="content-section-custom"
-                    style="font-weight: bold">
+                    style="font-weight: bold"
+                  >
                     <div id="network-selectors">
                       <!--Asset Dropdown-->
                       <div class="custom-dropdown" style="flex: 1">
@@ -323,12 +361,16 @@
                             padding: 10px;
                             border-radius: 8px;
                           "
-                          id="network-selector1">
+                          id="network-selector1"
+                        >
                           <span
                             class="custom-dropdown-selected-text"
-                            style="font-size: 15px">USDT</span>
-                          <span class="custom-dropdown-arrow"><img width="14px"
-                              src="img/arrow-right.png" /></span>
+                            style="font-size: 15px"
+                            >USDT</span
+                          >
+                          <span class="custom-dropdown-arrow"
+                            ><img width="14px" src="img/arrow-right.png"
+                          /></span>
                         </div>
                         <div class="custom-dropdown-options">
                           <hr class="separator2" />
@@ -340,11 +382,13 @@
                               align-items: center;
                               justify-content: space-between;
                               padding: 10px;
-                            ">
+                            "
+                          >
                             <div style="display: flex; align-items: center">
                               <img
                                 src="img/ETH.png"
-                                style="width: 24px; height: 24px" />
+                                style="width: 24px; height: 24px"
+                              />
                               <span style="margin-left: 10px">ETH</span>
                             </div>
                             <span
@@ -352,7 +396,9 @@
                                 font-size: 14px;
                                 font-weight: bold;
                                 color: #929292;
-                              ">0.00</span>
+                              "
+                              >0.00</span
+                            >
                           </div>
                           <div
                             class="custom-dropdown-option"
@@ -362,11 +408,13 @@
                               align-items: center;
                               justify-content: space-between;
                               padding: 10px;
-                            ">
+                            "
+                          >
                             <div style="display: flex; align-items: center">
                               <img
                                 src="img/brett.png"
-                                style="width: 24px; height: 24px" />
+                                style="width: 24px; height: 24px"
+                              />
                               <span style="margin-left: 10px">BRETT</span>
                             </div>
                             <span
@@ -375,7 +423,9 @@
                                 font-weight: bold;
                                 display: flex;
                                 color: #afafaf;
-                              ">0.00</span>
+                              "
+                              >0.00</span
+                            >
                           </div>
                           <div
                             class="custom-dropdown-option"
@@ -385,11 +435,13 @@
                               align-items: center;
                               justify-content: space-between;
                               padding: 10px;
-                            ">
+                            "
+                          >
                             <div style="display: flex; align-items: center">
                               <img
                                 src="img/people.png"
-                                style="width: 24px; height: 24px" />
+                                style="width: 24px; height: 24px"
+                              />
                               <span style="margin-left: 10px">PEOPLE</span>
                             </div>
                             <span
@@ -398,7 +450,9 @@
                                 font-weight: bold;
                                 display: flex;
                                 color: #afafaf;
-                              ">0.00</span>
+                              "
+                              >0.00</span
+                            >
                           </div>
 
                           <div
@@ -408,11 +462,13 @@
                               display: flex;
                               justify-content: space-between;
                               padding: 10px;
-                            ">
+                            "
+                          >
                             <div style="display: flex; align-items: center">
                               <img
                                 src="img/USDT.png"
-                                style="width: 24px; height: 24px" />
+                                style="width: 24px; height: 24px"
+                              />
                               <span style="margin-left: 10px">USDT</span>
                             </div>
                             <span
@@ -422,7 +478,9 @@
                                 font-weight: bold;
                                 display: flex;
                                 color: #afafaf;
-                              ">0.00</span>
+                              "
+                              >0.00</span
+                            >
                           </div>
                           <div
                             class="custom-dropdown-option"
@@ -431,11 +489,13 @@
                               display: flex;
                               justify-content: space-between;
                               padding: 10px;
-                            ">
+                            "
+                          >
                             <div style="display: flex; align-items: center">
                               <img
                                 src="img/USDC.png"
-                                style="width: 24px; height: 24px" />
+                                style="width: 24px; height: 24px"
+                              />
                               <span style="margin-left: 10px">USDC</span>
                             </div>
                             <span
@@ -445,7 +505,9 @@
                                 display: flex;
                                 align-items: center;
                                 color: #afafaf;
-                              ">0.00</span>
+                              "
+                              >0.00</span
+                            >
                           </div>
                           <script>
                             async function loadUserData() {
@@ -488,11 +550,13 @@
                               align-items: center;
                               justify-content: space-between;
                               padding: 10px;
-                            ">
+                            "
+                          >
                             <div style="display: flex; align-items: center">
                               <img
                                 src="img/BNB.png"
-                                style="width: 24px; height: 24px" />
+                                style="width: 24px; height: 24px"
+                              />
                               <span style="margin-left: 10px">BNB</span>
                             </div>
                             <span
@@ -502,14 +566,17 @@
                                 display: flex;
                                 align-items: center;
                                 color: #afafaf;
-                              ">0.00</span>
+                              "
+                              >0.00</span
+                            >
                           </div>
                         </div>
                       </div>
                       <!--Network Dropdown-->
                       <div
                         class="custom-dropdown"
-                        style="flex: 1; font-size: 15px">
+                        style="flex: 1; font-size: 15px"
+                      >
                         <label class="choose">Choose Network</label>
                         <div
                           class="custom-dropdown-selected"
@@ -523,11 +590,14 @@
                             padding: 10px;
                             border-radius: 8px;
                           "
-                          id="network-selector2">
-                          <span
-                            class="custom-dropdown-selected-text">ERC-20</span>
-                          <span class="custom-dropdown-arrow"><img width="14px"
-                              src="img/arrow-right.png" /></span>
+                          id="network-selector2"
+                        >
+                          <span class="custom-dropdown-selected-text"
+                            >ERC-20</span
+                          >
+                          <span class="custom-dropdown-arrow"
+                            ><img width="14px" src="img/arrow-right.png"
+                          /></span>
                         </div>
                         <div class="custom-dropdown-options">
                           <hr class="separator2" />
@@ -539,7 +609,8 @@
                                 height: 24px;
                                 width: 15px;
                                 margin-left: 15px;
-                              " />
+                              "
+                            />
                             <span style="margin-left: 10px">ERC-20</span>
                           </div>
                           <div class="custom-dropdown-option">
@@ -549,19 +620,22 @@
                                 width: 25px;
                                 height: 25px;
                                 margin-left: 10px;
-                              " />
+                              "
+                            />
                             <span style="margin-left: 10px">BSC</span>
                           </div>
                           <div class="custom-dropdown-option">
                             <img
                               src="img/base.png"
-                              style="width: 22px; margin-left: 10px" />
+                              style="width: 22px; margin-left: 10px"
+                            />
                             <span style="margin-left: 10px">Base</span>
                           </div>
                           <div class="custom-dropdown-option">
                             <img
                               src="img/arb.png"
-                              style="width: 22px; margin-left: 10px" />
+                              style="width: 22px; margin-left: 10px"
+                            />
                             <span style="margin-left: 10px">Arbitrum One</span>
                           </div>
                         </div>
@@ -570,11 +644,14 @@
 
                     <span
                       id="welcome-message"
-                      style="pointer-events: none; color: transparent">Login</span>
+                      style="pointer-events: none; color: transparent"
+                      >Login</span
+                    >
                     <div class="amount-sectionz">
                       <div class="razss">
-                        <label style="margin: 0" class="choose">Withdraw
-                          Address</label>
+                        <label style="margin: 0" class="choose"
+                          >Withdraw Address</label
+                        >
                         <div id="error-message2" class="error-message2"></div>
                       </div>
                       <div class="input-wrapperz">
@@ -587,7 +664,8 @@
                           "
                           placeholder="0xc4.."
                           class="inputz"
-                          id="addressInput" />
+                          id="addressInput"
+                        />
                       </div>
                     </div>
                     <div class="amount-sectionz">
@@ -606,7 +684,8 @@
                           "
                           placeholder="10"
                           class="inputz"
-                          type="number" />
+                          type="number"
+                        />
                       </div>
                     </div>
 
@@ -615,7 +694,9 @@
                       <span
                         style="font-weight: bold"
                         id="availableAmount"
-                        class="available-valuez">0.000</span>
+                        class="available-valuez"
+                        >0.000</span
+                      >
                     </div>
                     <div class="memo-sectionz">
                       <label class="choose">MEMO (Optional)</label>
@@ -623,13 +704,16 @@
                         type="text"
                         style="font-size: 12px; color: #dcd9ff"
                         class="inputz"
-                        placeholder />
+                        placeholder
+                      />
                     </div>
                     <div class="network-feez">
-                      <span style="color: #dcd9ff; font-size: 14px">Network
-                        Fee</span>
-                      <span style="font-size: 14px" class="fee-valuez">&lt; 0.01
-                        USDT</span>
+                      <span style="color: #dcd9ff; font-size: 14px"
+                        >Network Fee</span
+                      >
+                      <span style="font-size: 14px" class="fee-valuez"
+                        >&lt; 0.01 USDT</span
+                      >
                     </div>
                     <button class="withdraw-button33" id="withdrawButton">
                       Withdraw
@@ -871,9 +955,13 @@
               );
 
               transferBtn.addEventListener("click", () => {
-                transferUSDTModal.style.display="block";
-                document.getElementById("transfer-modal-futures-USDT").textContent = futuresUSDTBalance;
-                document.getElementById("transfer-modal-spot-USDT").textContent = spotUSDTBalance;
+                transferUSDTModal.style.display = "block";
+                document.getElementById(
+                  "transfer-modal-futures-USDT"
+                ).textContent = futuresUSDTBalance;
+                document.getElementById(
+                  "transfer-modal-spot-USDT"
+                ).textContent = spotUSDTBalance;
               });
 
               depositBtn.addEventListener("click", () => {
@@ -952,7 +1040,8 @@
                 height: 45px;
                 display: flex;
                 align-items: center;
-              ">
+              "
+            >
               <span>Wallets</span>
             </a>
 
@@ -968,11 +1057,13 @@
                   border-radius: 10px;
                   z-index: 10;
                   box-shadow: 0 4px 8px rgba(0.3, 0.3, 0.3, 0.3);
-                ">
+                "
+              >
                 <!-- Center the profile picture and welcome message -->
                 <div class="balance-info">
-                  <span class="balance-text"><img style="width: 20px"
-                      src="img/USDT.png" /></span>
+                  <span class="balance-text"
+                    ><img style="width: 20px" src="img/USDT.png"
+                  /></span>
                 </div>
                 <hr
                   class="separator3"
@@ -983,7 +1074,8 @@
                     height: 1.8px;
                     background: linear-gradient(to right, #ff8c00, #ff0080);
                     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-                  " />
+                  "
+                />
 
                 <!-- Main menu items -->
                 <a
@@ -994,7 +1086,8 @@
                     align-items: center;
                     text-decoration: none;
                     margin-bottom: 8px;
-                  ">
+                  "
+                >
                   <img
                     src="img/activity.png"
                     style="
@@ -1002,7 +1095,8 @@
                       height: 22px;
                       margin-right: 20px;
                       margin-left: 5px;
-                    " />
+                    "
+                  />
                   <p style="margin: 0; font-size: 16px">Spot</p>
                 </a>
 
@@ -1014,7 +1108,8 @@
                     align-items: center;
                     text-decoration: none;
                     margin-bottom: 8px;
-                  ">
+                  "
+                >
                   <img
                     src="img/lock.png"
                     style="
@@ -1022,7 +1117,8 @@
                       height: 20px;
                       margin-right: 20px;
                       margin-left: 4px;
-                    " />
+                    "
+                  />
                   <p style="margin: 0; font-size: 16px">Futures</p>
                 </a>
 
@@ -1034,7 +1130,8 @@
                     align-items: center;
                     text-decoration: none;
                     margin-bottom: 8px;
-                  ">
+                  "
+                >
                   <img
                     src="img/contact.png"
                     style="
@@ -1042,7 +1139,8 @@
                       height: 20px;
                       margin-right: 20px;
                       margin-left: 4px;
-                    " />
+                    "
+                  />
                   <p style="margin: 0; font-size: 16px">Copy Trade</p>
                 </a>
               </div>
@@ -1061,7 +1159,8 @@
                 );
                 display: flex;
                 align-items: center;
-              ">
+              "
+            >
               <img class="pfp" src="img/pfp.png" style="pointer-events: none" />
               <div
                 class="icon"
@@ -1070,10 +1169,13 @@
                   height: 20px;
                   margin: 4px 20px 0 10px;
                   pointer-events: none;
-                ">
+                "
+              >
                 <span
                   id="welcome-message-duplicate"
-                  style="pointer-events: none; color: #dcdcdc">Login</span>
+                  style="pointer-events: none; color: #dcdcdc"
+                  >Login</span
+                >
               </div>
               <img
                 src="img/arrow-down.png"
@@ -1082,7 +1184,8 @@
                   height: 16px;
                   margin-left: 10px;
                   pointer-events: none;
-                " />
+                "
+              />
             </a>
             <div id="icon3">
               <!-- Main dropdown content -->
@@ -1096,7 +1199,8 @@
                   border-radius: 10px;
                   z-index: 10;
                   box-shadow: 0 4px 8px rgba(0.3, 0.3, 0.3, 0.3);
-                ">
+                "
+              >
                 <!-- Center the profile picture and welcome message -->
                 <div
                   style="
@@ -1104,11 +1208,13 @@
                     flex-direction: column;
                     align-items: center;
                     margin-bottom: 5px;
-                  ">
+                  "
+                >
                   <img
                     src="img/pfp.png"
                     class="pfp-large"
-                    style="width: 100px; height: 100px; border-radius: 50%" />
+                    style="width: 100px; height: 100px; border-radius: 50%"
+                  />
                 </div>
                 <hr
                   class="separator3"
@@ -1119,7 +1225,8 @@
                     height: 1.8px;
                     background: linear-gradient(to right, #ff8c00, #ff0080);
                     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-                  " />
+                  "
+                />
 
                 <!-- Main menu items -->
                 <a
@@ -1130,7 +1237,8 @@
                     align-items: center;
                     text-decoration: none;
                     margin-bottom: 8px;
-                  ">
+                  "
+                >
                   <img
                     src="img/activity.png"
                     style="
@@ -1138,7 +1246,8 @@
                       height: 22px;
                       margin-right: 20px;
                       margin-left: 5px;
-                    " />
+                    "
+                  />
                   <p style="margin: 0; font-size: 16px">Activity</p>
                 </a>
 
@@ -1150,7 +1259,8 @@
                     align-items: center;
                     text-decoration: none;
                     margin-bottom: 8px;
-                  ">
+                  "
+                >
                   <img
                     src="img/lock.png"
                     style="
@@ -1158,7 +1268,8 @@
                       height: 20px;
                       margin-right: 20px;
                       margin-left: 4px;
-                    " />
+                    "
+                  />
                   <p style="margin: 0; font-size: 16px">Privacy & security</p>
                 </a>
 
@@ -1170,7 +1281,8 @@
                     align-items: center;
                     text-decoration: none;
                     margin-bottom: 8px;
-                  ">
+                  "
+                >
                   <img
                     src="img/contact.png"
                     style="
@@ -1178,7 +1290,8 @@
                       height: 20px;
                       margin-right: 20px;
                       margin-left: 4px;
-                    " />
+                    "
+                  />
                   <p style="margin: 0; font-size: 16px">Contact</p>
                 </a>
 
@@ -1189,10 +1302,12 @@
                     display: flex;
                     align-items: center;
                     text-decoration: none;
-                  ">
+                  "
+                >
                   <img
                     src="img/logout.png"
-                    style="width: 25px; height: 25px; margin-right: 20px" />
+                    style="width: 25px; height: 25px; margin-right: 20px"
+                  />
                   <p style="margin: 0; font-size: 16px">Login / Logout</p>
                 </a>
               </div>
@@ -1313,29 +1428,102 @@
             </script>
           </div>
         </div>
-
-        <div id="total-statistics" style="margin-top:80px;"></div>
-        <div id="now-price" style="margin: 10px;"></div>
+        <div id="total-statistics" style="margin-top: 80px"></div>
         <div id="futures" class="tabcontent trading-panel">
           <div id="futures-statistics"></div>
+          <div id="futures-now-price" style="margin: 10px"></div>
+          <br />
           <!-- <div id="assets-statistics"></div> -->
+          <h3>MEXC Futures Asset Price Chart</h3>
+          <canvas
+            id="futuresChart"
+            width="400"
+            height="100"
+            style="margin: 20px"
+          ></canvas>
+          <div class="btn-div">
+            <button
+              class="futures-chart-btn"
+              id="btn-1s"
+              onclick="changeFuturesInterval(this)"
+            >
+              1m
+            </button>
+            <button
+              class="futures-chart-btn"
+              id="btn-1m"
+              onclick="changeFuturesInterval(this)"
+            >
+              5m
+            </button>
+            <button
+              class="futures-chart-btn"
+              id="btn-5m"
+              onclick="changeFuturesInterval(this)"
+            >
+              30m
+            </button>
+            <button
+              class="futures-chart-btn active"
+              id="btn-15m"
+              onclick="changeFuturesInterval(this)"
+            >
+              1h
+            </button>
+            <button
+              class="futures-chart-btn"
+              id="btn-1H"
+              onclick="changeFuturesInterval(this)"
+            >
+              4h
+            </button>
+            <button
+              class="futures-chart-btn"
+              id="btn-1D"
+              onclick="changeFuturesInterval(this)"
+            >
+              1d
+            </button>
+            <button
+              class="futures-chart-btn"
+              id="btn-1W"
+              onclick="changeFuturesInterval(this)"
+            >
+              1W
+            </button>
+            <button
+              class="futures-chart-btn"
+              id="btn-1M"
+              onclick="changeFuturesInterval(this)"
+            >
+              1M
+            </button>
+          </div>
           <div class="order-panel">
             <div>
-              Asset Type:<select id="futures-asset-type" style="width: 80px"></select>&nbsp;&nbsp;&nbsp;
+              Asset Type:<select
+                id="futures-asset-type"
+                style="width: 80px"
+              ></select
+              >&nbsp;&nbsp;&nbsp;
               <span class="money-type">Current Price:</span>
-              <span id="futures-current-price" class="money-value">Loading...</span>
+              <span id="futures-current-price" class="money-value"
+                >Loading...</span
+              >
               <span class="money-unit">USDT</span>
             </div>
             <div>
-              <label style="color: rgb(255, 0, 0); font-size: 24px">Market
-                Order: </label>&nbsp;&nbsp;
+              <label style="color: rgb(255, 0, 0); font-size: 24px"
+                >Market Order: </label
+              >&nbsp;&nbsp;
               <label>Bet Amount:</label>
               <input
                 type="number"
                 id="bet-amount"
                 min="1"
                 max="100"
-                style="width: 80px; font-size: 20px" /><span class="money-unit">(USDT)</span>&nbsp;&nbsp;
+                style="width: 80px; font-size: 20px"
+              /><span class="money-unit">(USDT)</span>&nbsp;&nbsp;
               <label>Leverage:</label>
               <input
                 type="number"
@@ -1343,28 +1531,35 @@
                 min="1"
                 max="300"
                 value="1"
-                style="width: 50px; font-size: 20px" />&nbsp;&nbsp;
+                style="width: 50px; font-size: 20px"
+              />&nbsp;&nbsp;
               <button
                 id="long-button"
                 class="playbutttton"
-                style="margin-top: 15px">
-                Long</button>&nbsp;&nbsp;
+                style="margin-top: 15px"
+              >
+                Long</button
+              >&nbsp;&nbsp;
               <button
                 id="short-button"
                 class="playbutttton"
-                style="margin-top: 15px">
-                Short</button>&nbsp;&nbsp;
+                style="margin-top: 15px"
+              >
+                Short</button
+              >&nbsp;&nbsp;
             </div>
             <div>
-              <label style="color: rgb(255, 0, 0); font-size: 24px">Limit Order:
-              </label>&nbsp;&nbsp;
+              <label style="color: rgb(255, 0, 0); font-size: 24px"
+                >Limit Order: </label
+              >&nbsp;&nbsp;
               <label>Bet Amount:</label>
               <input
                 type="number"
                 id="limit-amount"
                 min="1"
                 max="100"
-                style="width: 80px; font-size: 20px" /><span class="money-unit">(USDT)</span>&nbsp;&nbsp;
+                style="width: 80px; font-size: 20px"
+              /><span class="money-unit">(USDT)</span>&nbsp;&nbsp;
               <label>Leverage:</label>
               <input
                 type="number"
@@ -1372,22 +1567,28 @@
                 min="1"
                 max="300"
                 value="1"
-                style="width: 50px; font-size: 20px" />&nbsp;&nbsp;
+                style="width: 50px; font-size: 20px"
+              />&nbsp;&nbsp;
               <label>Limit Price:</label>
               <input
                 type="number"
                 id="limit-price"
-                style="width: 100px; font-size: 20px" /><span class="money-unit">(USDT)</span>&nbsp;&nbsp;
+                style="width: 100px; font-size: 20px"
+              /><span class="money-unit">(USDT)</span>&nbsp;&nbsp;
               <button
                 id="limit-long-button"
                 class="playbutttton"
-                style="margin-top: 15px">
-                Long</button>&nbsp;&nbsp;
+                style="margin-top: 15px"
+              >
+                Long</button
+              >&nbsp;&nbsp;
               <button
                 id="limit-short-button"
                 class="playbutttton"
-                style="margin-top: 15px">
-                Short</button>&nbsp;&nbsp;
+                style="margin-top: 15px"
+              >
+                Short</button
+              >&nbsp;&nbsp;
             </div>
           </div>
           <h3 style="color: #ff8c00">Open Positions</h3>
@@ -1399,60 +1600,149 @@
         </div>
 
         <div id="spot" class="tabcontent trading-panel">
-          <div id="spot-statistics"></div><br>
+          <div id="spot-statistics"></div>
+          <div id="spot-now-price" style="margin: 10px"></div>
+          <br />
           <div id="spot-assets-statistics"></div>
+          <h3>MEXC Spot Asset Price Chart</h3>
+          <canvas
+            id="spotChart"
+            width="400"
+            height="100"
+            style="margin: 20px"
+          ></canvas>
+          <div class="btn-div">
+            <button
+              class="spot-chart-btn"
+              id="btn-1s"
+              onclick="changeSpotInterval(this)"
+            >
+              1m
+            </button>
+            <button
+              class="spot-chart-btn"
+              id="btn-1m"
+              onclick="changeSpotInterval(this)"
+            >
+              5m
+            </button>
+            <button
+              class="spot-chart-btn"
+              id="btn-5m"
+              onclick="changeSpotInterval(this)"
+            >
+              30m
+            </button>
+            <button
+              class="spot-chart-btn active"
+              id="btn-15m"
+              onclick="changeSpotInterval(this)"
+            >
+              1h
+            </button>
+            <button
+              class="spot-chart-btn"
+              id="btn-1H"
+              onclick="changeSpotInterval(this)"
+            >
+              4h
+            </button>
+            <button
+              class="spot-chart-btn"
+              id="btn-1D"
+              onclick="changeFuturesInterval(this)"
+            >
+              1d
+            </button>
+            <button
+              class="spot-chart-btn"
+              id="btn-1W"
+              onclick="changeSpotInterval(this)"
+            >
+              1W
+            </button>
+            <button
+              class="spot-chart-btn"
+              id="btn-1M"
+              onclick="changeSpotInterval(this)"
+            >
+              1M
+            </button>
+          </div>
           <div class="order-panel">
             <div>
-              Asset Type:<select id="spot-asset-type" style="width: 80px"></select>&nbsp;&nbsp;&nbsp;
+              Asset Type:<select
+                id="spot-asset-type"
+                style="width: 80px"
+              ></select
+              >&nbsp;&nbsp;&nbsp;
               <span class="money-type">Current Price:</span>
-              <span id="spot-current-price" class="money-value">Loading...</span><span class="money-unit">USDT</span>&nbsp;&nbsp;&nbsp;&nbsp;
+              <span id="spot-current-price" class="money-value">Loading...</span
+              ><span class="money-unit">USDT</span>&nbsp;&nbsp;&nbsp;&nbsp;
             </div>
             <div>
-              <label style="color: rgb(255, 0, 0); font-size: 24px">Market: </label>&nbsp;&nbsp;
+              <label style="color: rgb(255, 0, 0); font-size: 24px"
+                >Market: </label
+              >&nbsp;&nbsp;
               <label>Amount:</label>
               <input
                 type="number"
                 id="spot-market-amount"
                 min="1"
                 max="100"
-                style="width: 80px; font-size: 20px" /><span class="money-unit" id="spot-market-unit"></span>&nbsp;&nbsp;
+                style="width: 80px; font-size: 20px"
+              /><span class="money-unit" id="spot-market-unit"></span
+              >&nbsp;&nbsp;
               <button
                 id="market-buy-button"
                 class="playbutttton"
-                style="margin-top: 15px">
-                Buy</button>&nbsp;&nbsp;
+                style="margin-top: 15px"
+              >
+                Buy</button
+              >&nbsp;&nbsp;
               <button
                 id="market-sell-button"
                 class="playbutttton"
-                style="margin-top: 15px">
-                Sell</button>
+                style="margin-top: 15px"
+              >
+                Sell
+              </button>
             </div>
             <div>
-              <label style="color: rgb(255, 0, 0); font-size: 24px">Limit: </label>&nbsp;&nbsp;
+              <label style="color: rgb(255, 0, 0); font-size: 24px"
+                >Limit: </label
+              >&nbsp;&nbsp;
               <label>Amount:</label>
               <input
                 type="number"
                 id="spot-limit-amount"
                 min="1"
                 max="100"
-                style="width: 80px; font-size: 20px" /><span class="money-unit" id="spot-limit-unit"></span>&nbsp;&nbsp;
+                style="width: 80px; font-size: 20px"
+              /><span class="money-unit" id="spot-limit-unit"></span
+              >&nbsp;&nbsp;
               <label>Price:</label>
               <input
                 type="number"
                 id="spot-limit-price"
                 min="1"
                 max="100"
-                style="width: 80px; font-size: 20px" /><span class="money-unit">(USDT)</span>&nbsp;&nbsp;
+                style="width: 80px; font-size: 20px"
+              /><span class="money-unit">(USDT)</span>&nbsp;&nbsp;
               <button
                 id="limit-buy-button"
                 class="playbutttton"
-                style="margin-top: 15px">
-                Buy</button>&nbsp;&nbsp;
+                style="margin-top: 15px"
+              >
+                Buy</button
+              >&nbsp;&nbsp;
               <button
                 id="limit-sell-button"
                 class="playbutttton"
-                style="margin-top: 15px">
-                Sell</button>
+                style="margin-top: 15px"
+              >
+                Sell
+              </button>
             </div>
           </div>
           <h3 style="color: #ff8c00">Open Positions</h3>
@@ -1476,7 +1766,8 @@
             type="number"
             min="1"
             max="100"
-            value="100" />%&nbsp;&nbsp;
+            value="100"
+          />%&nbsp;&nbsp;
           <button onclick="partialClose()">Confirm</button>
         </p>
       </div>
@@ -1490,11 +1781,12 @@
         <br />
         <p>
           <span class="money-type">Est. Futures Balance(USDT)</span>
-          <span class="money-value" id="transfer-modal-futures-USDT"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+          <span class="money-value" id="transfer-modal-futures-USDT"></span
+          >&nbsp;&nbsp;&nbsp;&nbsp;
           <span class="money-type">Est. Spot Balance(USDT)</span>
           <span class="money-value" id="transfer-modal-spot-USDT"></span>
         </p>
-        <br>
+        <br />
         <p style="font-size: 20px">
           <span>Mode:</span>
           <select name="transferType" id="transfer-USDT-type">
@@ -1502,16 +1794,33 @@
             <option value="fromSpot" selected>Spot -> Futures</option>
           </select>
           <span>Amount:</span>
-          <input type="number" min="1" max="100" id="transfer-USDT-amount" style="font-size: 20px;margin: 10px;">
+          <input
+            type="number"
+            min="1"
+            max="100"
+            id="transfer-USDT-amount"
+            style="font-size: 20px; margin: 10px"
+          />
           <span class="money-unit">(USDT)</span>
-          <button id="transfer-USDT-btn" onclick="transferUSDT()">Transfer</button>
+          <button id="transfer-USDT-btn" onclick="transferUSDT()">
+            Transfer
+          </button>
         </p>
       </div>
     </div>
     <script>
       let intervalId;
 
-      const assetTypes = ["BTC", "ETH", "BNB", "NEO", "LTC", "SOL", "XRP", "DOT"];
+      const assetTypes = [
+        "BTC",
+        "ETH",
+        "BNB",
+        "NEO",
+        "LTC",
+        "SOL",
+        "XRP",
+        "DOT",
+      ];
       let futuresAssetType = "BTC";
       let spotAssetType = "BTC";
 
@@ -1528,18 +1837,26 @@
       let closingPosition;
 
       let spotBalances = [];
-      let currentPrices = [];
+      let futuresCurrentPrices = [];
+      let spotCurrentPrices = [];
+
+      let futuresChart;
+      let spotChart;
+      let chartDelay = 0;
+      let futuresInterval = "1h";
+      let spotInterval = "1h";
 
       let tmp = "";
 
-      assetTypes.forEach((futures, index) => {
-        tmp += "<option>" + futures + "</option>";
+      assetTypes.forEach((assetType, index) => {
+        tmp += "<option>" + assetType + "</option>";
       });
 
       document.getElementById("futures-asset-type").innerHTML = tmp;
       document.getElementById("spot-asset-type").innerHTML = tmp;
 
       function fetchUserData() {
+        chartDelay++;
         fetch("/api/getBalance", {
           method: "POST",
           headers: {
@@ -1556,7 +1873,6 @@
           })
           .catch((error) => console.error("Error fetching balance:", error));
 
-          
         spotBalances = [];
         spotBalances.push(spotUSDTBalance);
         // Fetch current market price
@@ -1565,10 +1881,13 @@
           headers: {
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({
+            accountType: "futures",
+          }),
         })
           .then((response) => response.json())
           .then((priceData) => {
-            currentPrices = priceData.currentPrices;
+            futuresCurrentPrices = priceData.currentPrices;
 
             let priceText = "";
             priceData.currentPrices.forEach((price, index) => {
@@ -1577,258 +1896,190 @@
                 "<span class='money-type'>" + price["assetType"] + ":</span>";
               priceText +=
                 "<span class='money-value'>" +
-                  new Intl.NumberFormat('en-US').format(price["price"]) +
+                new Intl.NumberFormat("en-US").format(price["price"]) +
                 "</span>";
               priceText += "&nbsp;&nbsp;&nbsp;&nbsp;";
               if (index % 8 == 7) priceText += "<br>";
             });
 
-            document.getElementById("now-price").innerHTML = priceText;
+            document.getElementById("futures-now-price").innerHTML = priceText;
 
-            document.getElementById("futures-current-price").textContent = Intl.NumberFormat('en-US').format(
-              currentPrices.filter(
-                (item) => item["assetType"] == futuresAssetType
-              )[0].price);
-            document.getElementById("spot-current-price").textContent = Intl.NumberFormat('en-US').format(
-              currentPrices.filter(
-                (item) => item["assetType"] == spotAssetType
-              )[0].price);
+            document.getElementById("futures-current-price").textContent =
+              Intl.NumberFormat("en-US").format(
+                futuresCurrentPrices.filter(
+                  (item) => item["assetType"] == futuresAssetType
+                )[0].price
+              );
+          })
+          .catch((error) => {
+            console.error("Error fetching current price:", error);
+            return;
+          });
+        // Fetch current market price
+        fetch("/api/getCurrentPrice", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            accountType: "spot",
+          }),
+        })
+          .then((response) => response.json())
+          .then((priceData) => {
+            spotCurrentPrices = priceData.currentPrices;
 
-            fetch("/api/getPositions", {
-              method: "POST",
-              headers: {
-                Authorization: "Bearer " + localStorage.getItem("token"),
-                "Content-Type": "application/json",
-              },
-            })
-              .then((response) => response.json())
-              .then((data) => {
-                const futuresPositionsDiv = document.getElementById("futures-open-positions");
-                const futuresOpenOrdersDiv = document.getElementById("futures-open-orders");
-                const futuresClosedPositionsDiv = document.getElementById("futures-closed-positions");
-        
-                const spotPositionsDiv = document.getElementById("spot-open-positions");
-                const spotOpenOrdersDiv = document.getElementById("spot-open-orders");
-                const spotClosedPositionsDiv = document.getElementById("spot-closed-positions");
+            let priceText = "";
+            priceData.currentPrices.forEach((price, index) => {
+              spotBalances.push(0);
+              priceText +=
+                "<span class='money-type'>" + price["assetType"] + ":</span>";
+              priceText +=
+                "<span class='money-value'>" +
+                new Intl.NumberFormat("en-US").format(price["price"]) +
+                "</span>";
+              priceText += "&nbsp;&nbsp;&nbsp;&nbsp;";
+              if (index % 8 == 7) priceText += "<br>";
+            });
 
-                let count = 0;
-                let futuresUnrealizedPL = 0;
-                let futuresPositionsAmount = 0;
+            document.getElementById("spot-now-price").innerHTML = priceText;
+            document.getElementById("spot-current-price").textContent =
+              Intl.NumberFormat("en-US").format(
+                spotCurrentPrices.filter(
+                  (item) => item["assetType"] == spotAssetType
+                )[0].price
+              );
+          })
+          .catch((error) => {
+            console.error("Error fetching current price:", error);
+            return;
+          });
 
-                if (data.futuresPositions) {
-                  count =
-                    data.futuresPositions.length +
-                    data.futuresPositions.filter(
-                      (position) => position.orderLimit == 1
-                    ).length;
-                  if (count !== futuresPositionsCount) {
-                    futuresPositionsDiv.innerHTML = ""; // Clear previous positions
-                    futuresOpenOrdersDiv.innerHTML = ""; // Clear previous limit orders
+        fetch("/api/getPositions", {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            const futuresPositionsDiv = document.getElementById(
+              "futures-open-positions"
+            );
+            const futuresOpenOrdersDiv = document.getElementById(
+              "futures-open-orders"
+            );
+            const futuresClosedPositionsDiv = document.getElementById(
+              "futures-closed-positions"
+            );
+
+            const spotPositionsDiv = document.getElementById(
+              "spot-open-positions"
+            );
+            const spotOpenOrdersDiv =
+              document.getElementById("spot-open-orders");
+            const spotClosedPositionsDiv = document.getElementById(
+              "spot-closed-positions"
+            );
+
+            let count = 0;
+            let futuresUnrealizedPL = 0;
+            let futuresPositionsAmount = 0;
+
+            if (data.futuresPositions) {
+              count =
+                data.futuresPositions.length +
+                data.futuresPositions.filter(
+                  (position) => position.orderLimit == 1
+                ).length;
+              if (count !== futuresPositionsCount) {
+                futuresPositionsDiv.innerHTML = ""; // Clear previous positions
+                futuresOpenOrdersDiv.innerHTML = ""; // Clear previous limit orders
+              }
+
+              data.futuresPositions.forEach((position) => {
+                // futuresBalances[assetTypes.indexOf(position.assetType) + 1] += position.amount;
+                let currentPrice = futuresCurrentPrices.filter(
+                  (item) => item["assetType"] == position.assetType
+                )[0].price;
+                let unrealizedPL = calculateUnrealizedPL(
+                  position.entryPrice,
+                  currentPrice,
+                  position.amount,
+                  position.leverage,
+                  position.positionType
+                );
+                let positionDiv = document.createElement("div");
+
+                if (position.orderLimit == 1) {
+                  let startTrading = 0;
+                  if (
+                    (position.entryPrice < position.limitPrice &&
+                      position.limitPrice < currentPrice) ||
+                    (position.entryPrice > position.limitPrice &&
+                      position.limitPrice > currentPrice)
+                  ) {
+                    fetch("/api/startTrade", {
+                      method: "POST",
+                      headers: {
+                        Authorization:
+                          "Bearer " + localStorage.getItem("token"),
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify({
+                        positionId: position.id,
+                      }),
+                    })
+                      .then((response) => response.json())
+                      .catch((error) =>
+                        console.error("Error starting Trade:", error)
+                      );
+
+                    position.orderLimit = 0;
+                  } else {
+                    unrealizedPL = 0;
                   }
-
-                  data.futuresPositions.forEach((position) => {
-                    // futuresBalances[assetTypes.indexOf(position.assetType) + 1] += position.amount;
-                    let currentPrice = currentPrices.filter(
-                      (item) => item["assetType"] == position.assetType
-                    )[0].price;
-                    let unrealizedPL = calculateUnrealizedPL(
-                      position.entryPrice,
-                      currentPrice,
-                      position.amount,
-                      position.leverage,
-                      position.positionType
-                    );
-                    let positionDiv = document.createElement("div");
-
-                    if (position.orderLimit == 1) {
-                      let startTrading = 0;
-                      if (
-                        (position.entryPrice < position.limitPrice &&
-                          position.limitPrice < currentPrice) ||
-                        (position.entryPrice > position.limitPrice &&
-                          position.limitPrice > currentPrice)
-                      ) {
-                        fetch("/api/startTrade", {
-                          method: "POST",
-                          headers: {
-                            Authorization:
-                              "Bearer " + localStorage.getItem("token"),
-                            "Content-Type": "application/json",
-                          },
-                          body: JSON.stringify({
-                            positionId: position.id,
-                          }),
-                        })
-                          .then((response) => response.json())
-                          .catch((error) =>
-                            console.error("Error starting Trade:", error)
-                          );
-
-                        position.orderLimit = 0;
-                      } else {
-                        unrealizedPL = 0;
-                      }
-                    }
-                    if (
-                      unrealizedPL < 0 &&
-                      Math.abs(unrealizedPL) >= position.amount * 0.8
-                    ) {
-                      futuresUnrealizedPL -= position.amount;
-                      futuresPositionsAmount += position.amount;
-                      closeFuturesPosition(position, 3);
-                      return;
-                    } else {
-                      futuresUnrealizedPL += unrealizedPL;
-                      // if (!position.orderLimit)
-                      futuresPositionsAmount += position.amount;
-                      if (
-                        (position.positionType == "Long" &&
-                          currentPrice > position.tp) ||
-                        (position.positionType == "Short" &&
-                          currentPrice < position.tp)
-                      ) {
-                        closeFuturesPosition(position, 1);
-                        return;
-                      }
-                      if (
-                        (position.positionType == "Long" &&
-                          currentPrice < position.sl) ||
-                        (position.positionType == "Short" &&
-                          currentPrice > position.sl)
-                      ) {
-                        closeFuturesPosition(position, 2);
-                        return;
-                      } else {
-                        if (count !== futuresPositionsCount) {
-                          positionDiv.textContent = `
+                }
+                if (
+                  unrealizedPL < 0 &&
+                  Math.abs(unrealizedPL) >= position.amount * 0.8
+                ) {
+                  futuresUnrealizedPL -= position.amount;
+                  futuresPositionsAmount += position.amount;
+                  closeFuturesPosition(position, 3);
+                  return;
+                } else {
+                  futuresUnrealizedPL += unrealizedPL;
+                  // if (!position.orderLimit)
+                  futuresPositionsAmount += position.amount;
+                  if (
+                    (position.positionType == "Long" &&
+                      currentPrice > position.tp) ||
+                    (position.positionType == "Short" &&
+                      currentPrice < position.tp)
+                  ) {
+                    closeFuturesPosition(position, 1);
+                    return;
+                  }
+                  if (
+                    (position.positionType == "Long" &&
+                      currentPrice < position.sl) ||
+                    (position.positionType == "Short" &&
+                      currentPrice > position.sl)
+                  ) {
+                    closeFuturesPosition(position, 2);
+                    return;
+                  } else {
+                    if (count !== futuresPositionsCount) {
+                      positionDiv.textContent = `
                                         ${1 - position.orderLimit}-${
-                            position.orderType
-                          }-${position.positionType}- ${position.assetType}- 
+                        position.orderType
+                      }-${position.positionType}- ${position.assetType}- 
                                         Amount: $${position.amount},
                                         Leverage: ${position.leverage}X, 
                                         Entry: $${position.entryPrice},
                                     `;
-                          if (position.orderType == "limit")
-                            positionDiv.textContent += ` Limit Price: $${position.limitPrice},`;
-
-                          let liquidationPrice = 0;
-                          if (position.positionType == "Short")
-                            liquidationPrice =
-                              (position.entryPrice *
-                                (125 + position.leverage / 100)) /
-                              125;
-                          if (position.positionType == "Long")
-                            liquidationPrice =
-                              (position.entryPrice *
-                                (125 - 100 / position.leverage)) /
-                              125;
-
-                          positionDiv.textContent += ` Liquidation: $${liquidationPrice.toFixed(
-                            2
-                          )},`;
-
-                          const unPLLabel = document.createElement("label");
-                          unPLLabel.textContent = `Unrealized P/L: $${unrealizedPL.toFixed(
-                            2
-                          )},`;
-                          unPLLabel.id = "un" + position.id;
-                          positionDiv.appendChild(unPLLabel);
-
-                          const tpLabel = document.createElement("label");
-                          tpLabel.textContent = "TP: ";
-                          positionDiv.appendChild(tpLabel);
-
-                          const tpInput = document.createElement("input");
-                          tpInput.type = "number";
-                          tpInput.id = "tp" + position.id;
-                          tpInput.style.width = "80px";
-                          if (position.tp > 0 && position.tp < 10000000)
-                            tpInput.value = position.tp;
-                          positionDiv.appendChild(tpInput);
-
-                          const slLabel = document.createElement("label");
-                          slLabel.textContent = "SL: ";
-                          positionDiv.appendChild(slLabel);
-
-                          const slInput = document.createElement("input");
-                          slInput.type = "number";
-                          slInput.id = "sl" + position.id;
-                          slInput.style.width = "80px";
-                          if (position.sl > 0 && position.sl < 10000000)
-                            slInput.value = position.sl;
-                          positionDiv.appendChild(slInput);
-
-                          const saveButton = document.createElement("button");
-                          saveButton.textContent = "Save";
-                          saveButton.onclick = () => saveTPSL(position);
-                          positionDiv.appendChild(saveButton);
-                          positionDiv.append(" ");
-
-                          // Create close button
-                          const closeButton = document.createElement("button");
-                          closeButton.textContent = "Close";
-                          closeButton.onclick = () => {
-                            closingPosition = position;
-                            partialClosingModal.style.display = "block";
-                          };
-                          // closeButton.onclick = () => closeFuturesPosition(position, 0);
-                          positionDiv.appendChild(closeButton); // Add close button to position div
-
-                          if (position.orderType == "market") {
-                            if (position.positionType == "Long")
-                              positionDiv.style.backgroundColor = "#232323";
-                            if (position.positionType == "Short")
-                              positionDiv.style.backgroundColor = "#464646";
-                          }
-                          if (position.orderType == "limit") {
-                            if (position.orderLimit == 0) {
-                              if (position.positionType == "Long")
-                                positionDiv.style.backgroundColor = "#853467";
-                              if (position.positionType == "Short")
-                                positionDiv.style.backgroundColor = "#925743";
-                            } else {
-                              if (position.positionType == "Long")
-                                positionDiv.style.backgroundColor = "#295843";
-                              if (position.positionType == "Short")
-                                positionDiv.style.backgroundColor = "#694456";
-                            }
-                          }
-
-                          if (position.orderLimit) {
-                            futuresOpenOrdersDiv.appendChild(positionDiv);
-                          } else {
-                            futuresPositionsDiv.appendChild(positionDiv);
-                          }
-                        } else {
-                          document.getElementById(
-                            "un" + position.id
-                          ).textContent =
-                            "Unrealized P/L: " + unrealizedPL.toFixed(2) + ",";
-                        }
-                      }
-                    }
-                  });
-                  futuresPositionsCount = count;
-                }
-
-                if (data.closedFuturesPositions) {
-                  count = data.closedFuturesPositions.length;
-                  if (count !== futuresClosedPositionsCount)
-                    futuresClosedPositionsDiv.innerHTML = ""; // Clear previous closed positions
-
-                  data.closedFuturesPositions.forEach((position) => {
-                    let positionDiv = document.createElement("div");
-
-                    if (count !== futuresClosedPositionsCount) {
-                      positionDiv.textContent = `
-                                    ${1 - position.orderLimit}-${
-                        position.orderType
-                      }-${position.positionType}-${position.assetType}- 
-                                    Amount: $${position.amount},
-                                    Leverage: ${position.leverage}X, 
-                                    Entry: $${position.entryPrice},
-                                    Exit: $${position.exitPrice},
-                                `;
                       if (position.orderType == "limit")
                         positionDiv.textContent += ` Limit Price: $${position.limitPrice},`;
 
@@ -1848,42 +2099,52 @@
                         2
                       )},`;
 
-                      if (position.tp != 0 && position.tp != 100000000) {
-                        positionDiv.textContent += ` TP: $${position.tp.toFixed(
-                          2
-                        )},`;
-                      }
-
-                      if (position.sl != 0 && position.sl != 100000000) {
-                        positionDiv.textContent += ` SL: $${position.sl.toFixed(
-                          2
-                        )},`;
-                      }
-
-                      positionDiv.textContent += ` realized P/L: $${position.realizedPL.toFixed(
+                      const unPLLabel = document.createElement("label");
+                      unPLLabel.textContent = `Unrealized P/L: $${unrealizedPL.toFixed(
                         2
                       )},`;
+                      unPLLabel.id = "un" + position.id;
+                      positionDiv.appendChild(unPLLabel);
 
-                      let closedReason = "";
-                      switch (position.closedReason) {
-                        case 0:
-                          closedReason = "by User";
-                          break;
-                        case 1:
-                          closedReason = "by TP";
-                          break;
-                        case 2:
-                          closedReason = "by SL";
-                          break;
-                        case 3:
-                          closedReason = "by Liquidaion";
-                          break;
-                        case 4:
-                          closedReason = "partially";
-                          break;
-                      }
+                      const tpLabel = document.createElement("label");
+                      tpLabel.textContent = "TP: ";
+                      positionDiv.appendChild(tpLabel);
 
-                      positionDiv.textContent += ` closed ${closedReason},`;
+                      const tpInput = document.createElement("input");
+                      tpInput.type = "number";
+                      tpInput.id = "tp" + position.id;
+                      tpInput.style.width = "80px";
+                      if (position.tp > 0 && position.tp < 10000000)
+                        tpInput.value = position.tp;
+                      positionDiv.appendChild(tpInput);
+
+                      const slLabel = document.createElement("label");
+                      slLabel.textContent = "SL: ";
+                      positionDiv.appendChild(slLabel);
+
+                      const slInput = document.createElement("input");
+                      slInput.type = "number";
+                      slInput.id = "sl" + position.id;
+                      slInput.style.width = "80px";
+                      if (position.sl > 0 && position.sl < 10000000)
+                        slInput.value = position.sl;
+                      positionDiv.appendChild(slInput);
+
+                      const saveButton = document.createElement("button");
+                      saveButton.textContent = "Save";
+                      saveButton.onclick = () => saveTPSL(position);
+                      positionDiv.appendChild(saveButton);
+                      positionDiv.append(" ");
+
+                      // Create close button
+                      const closeButton = document.createElement("button");
+                      closeButton.textContent = "Close";
+                      closeButton.onclick = () => {
+                        closingPosition = position;
+                        partialClosingModal.style.display = "block";
+                      };
+                      // closeButton.onclick = () => closeFuturesPosition(position, 0);
+                      positionDiv.appendChild(closeButton); // Add close button to position div
 
                       if (position.orderType == "market") {
                         if (position.positionType == "Long")
@@ -1905,289 +2166,407 @@
                         }
                       }
 
-                      futuresClosedPositionsDiv.appendChild(positionDiv);
-                    }
-                  });
-                  futuresClosedPositionsCount = count;
-                }
-
-                if (data.spotPositions) {
-                  count =
-                    data.spotPositions.length +
-                    data.spotPositions.filter(
-                      (position) => position.orderLimit == 1
-                    ).length;
-                  if (count !== spotPositionsCount) {
-                    spotPositionsDiv.innerHTML = ""; // Clear previous positions
-                    spotOpenOrdersDiv.innerHTML = ""; // Clear previous limit orders
-                  }
-
-                  data.spotPositions.forEach((position) => {
-                    if(position.positionType=='buy'){
-                      spotBalances[assetTypes.indexOf(position.assetType) + 1] += position.amount;
-                    }
-                    if(position.positionType=='sell'){
-                      spotBalances[assetTypes.indexOf(position.assetType) + 1] -= position.amount;
-                    }
-
-                    let currentPrice = currentPrices[assetTypes.indexOf(position.assetType)].price;
-
-                    if (position.orderLimit == 1) {
-                      let startTrading = 0;
-                      if (
-                        (position.entryPrice < position.limitPrice &&
-                          position.limitPrice < currentPrice) ||
-                        (position.entryPrice > position.limitPrice &&
-                          position.limitPrice > currentPrice)
-                      ) {
-                        fetch("/api/startTrade", {
-                          method: "POST",
-                          headers: {
-                            Authorization:
-                              "Bearer " + localStorage.getItem("token"),
-                            "Content-Type": "application/json",
-                          },
-                          body: JSON.stringify({
-                            positionId: position.id,
-                          }),
-                        })
-                          .then((response) => response.json())
-                          .catch((error) =>
-                            console.error("Error starting spot Trading:", error)
-                          );
-
-                        position.orderLimit = 0;
-                      }
-                    }
-
-                    let positionDiv = document.createElement("div");
-                    
-                    if (count !== spotPositionsCount) {
-                      positionDiv.textContent = `
-                                    ${1 - position.orderLimit}-${
-                        position.orderType
-                      }-${position.positionType}-  
-                                    Amount: ${position.amount} (${position.assetType})-
-                                    Entry Price: ${position.entryPrice}(USDT),
-                                `;
-                      if (position.orderType == "limit")
-                        positionDiv.textContent += ` Limit Price: $${position.limitPrice},`;
-                     
-                      if (position.orderType == "market") {
-                        if (position.positionType == "buy")
-                          positionDiv.style.backgroundColor = "#232323";
-                        if (position.positionType == "Sell")
-                          positionDiv.style.backgroundColor = "#464646";
-                      }
-                      if (position.orderType == "limit") {
-                        if (position.orderLimit == 0) {
-                          if (position.positionType == "buy")
-                            positionDiv.style.backgroundColor = "#853467";
-                          if (position.positionType == "sell")
-                            positionDiv.style.backgroundColor = "#925743";
-                        } else {
-                          if (position.positionType == "buy")
-                            positionDiv.style.backgroundColor = "#295843";
-                          if (position.positionType == "sell")
-                            positionDiv.style.backgroundColor = "#694456";
-                        }
-                      }
-
                       if (position.orderLimit) {
-                        const closeButton = document.createElement("button");
-                        closeButton.textContent = "Close";
-                        closeButton.onclick = () => {
-                          closeSpotPosition(position);
-                        };
-                        positionDiv.appendChild(closeButton); // Add close button to position div
-
-                        spotOpenOrdersDiv.appendChild(positionDiv);
+                        futuresOpenOrdersDiv.appendChild(positionDiv);
                       } else {
-                        spotPositionsDiv.appendChild(positionDiv);
+                        futuresPositionsDiv.appendChild(positionDiv);
                       }
+                    } else {
+                      document.getElementById("un" + position.id).textContent =
+                        "Unrealized P/L: " + unrealizedPL.toFixed(2) + ",";
                     }
-                  });
-                  spotPositionsCount = count;
+                  }
                 }
-                
-                if (data.closedSpotPositions) {
-                  count = data.closedSpotPositions.length;
-                  if (count !== spotClosedPositionsCount)
-                    spotClosedPositionsDiv.innerHTML = ""; // Clear previous closed positions
+              });
+              futuresPositionsCount = count;
+            }
 
-                  data.closedSpotPositions.forEach((position) => {
-                    let positionDiv = document.createElement("div");
+            if (data.closedFuturesPositions) {
+              count = data.closedFuturesPositions.length;
+              if (count !== futuresClosedPositionsCount)
+                futuresClosedPositionsDiv.innerHTML = ""; // Clear previous closed positions
 
-                    if (count !== spotClosedPositionsCount) {
-                      positionDiv.textContent = `
+              data.closedFuturesPositions.forEach((position) => {
+                let positionDiv = document.createElement("div");
+
+                if (count !== futuresClosedPositionsCount) {
+                  positionDiv.textContent = `
                                     ${1 - position.orderLimit}-${
-                        position.orderType
-                      }-${position.positionType}- 
-                                    Amount: ${position.amount}(${position.assetType}),
+                    position.orderType
+                  }-${position.positionType}-${position.assetType}- 
+                                    Amount: $${position.amount},
+                                    Leverage: ${position.leverage}X, 
+                                    Entry: $${position.entryPrice},
+                                    Exit: $${position.exitPrice},
+                                `;
+                  if (position.orderType == "limit")
+                    positionDiv.textContent += ` Limit Price: $${position.limitPrice},`;
+
+                  let liquidationPrice = 0;
+                  if (position.positionType == "Short")
+                    liquidationPrice =
+                      (position.entryPrice * (125 + position.leverage / 100)) /
+                      125;
+                  if (position.positionType == "Long")
+                    liquidationPrice =
+                      (position.entryPrice * (125 - 100 / position.leverage)) /
+                      125;
+
+                  positionDiv.textContent += ` Liquidation: $${liquidationPrice.toFixed(
+                    2
+                  )},`;
+
+                  if (position.tp != 0 && position.tp != 100000000) {
+                    positionDiv.textContent += ` TP: $${position.tp.toFixed(
+                      2
+                    )},`;
+                  }
+
+                  if (position.sl != 0 && position.sl != 100000000) {
+                    positionDiv.textContent += ` SL: $${position.sl.toFixed(
+                      2
+                    )},`;
+                  }
+
+                  positionDiv.textContent += ` realized P/L: $${position.realizedPL.toFixed(
+                    2
+                  )},`;
+
+                  let closedReason = "";
+                  switch (position.closedReason) {
+                    case 0:
+                      closedReason = "by User";
+                      break;
+                    case 1:
+                      closedReason = "by TP";
+                      break;
+                    case 2:
+                      closedReason = "by SL";
+                      break;
+                    case 3:
+                      closedReason = "by Liquidaion";
+                      break;
+                    case 4:
+                      closedReason = "partially";
+                      break;
+                  }
+
+                  positionDiv.textContent += ` closed ${closedReason},`;
+
+                  if (position.orderType == "market") {
+                    if (position.positionType == "Long")
+                      positionDiv.style.backgroundColor = "#232323";
+                    if (position.positionType == "Short")
+                      positionDiv.style.backgroundColor = "#464646";
+                  }
+                  if (position.orderType == "limit") {
+                    if (position.orderLimit == 0) {
+                      if (position.positionType == "Long")
+                        positionDiv.style.backgroundColor = "#853467";
+                      if (position.positionType == "Short")
+                        positionDiv.style.backgroundColor = "#925743";
+                    } else {
+                      if (position.positionType == "Long")
+                        positionDiv.style.backgroundColor = "#295843";
+                      if (position.positionType == "Short")
+                        positionDiv.style.backgroundColor = "#694456";
+                    }
+                  }
+
+                  futuresClosedPositionsDiv.appendChild(positionDiv);
+                }
+              });
+              futuresClosedPositionsCount = count;
+            }
+
+            if (data.spotPositions) {
+              count =
+                data.spotPositions.length +
+                data.spotPositions.filter(
+                  (position) => position.orderLimit == 1
+                ).length;
+              if (count !== spotPositionsCount) {
+                spotPositionsDiv.innerHTML = ""; // Clear previous positions
+                spotOpenOrdersDiv.innerHTML = ""; // Clear previous limit orders
+              }
+
+              data.spotPositions.forEach((position) => {
+                if (position.positionType == "buy") {
+                  spotBalances[assetTypes.indexOf(position.assetType) + 1] +=
+                    position.amount;
+                }
+                if (position.positionType == "sell") {
+                  spotBalances[assetTypes.indexOf(position.assetType) + 1] -=
+                    position.amount;
+                }
+
+                let currentPrice = spotCurrentPrices.filter(item => item.assetType == position.assetType)[0].price;
+
+                if (position.orderLimit == 1) {
+                  let startTrading = 0;
+                  if (
+                    (position.entryPrice < position.limitPrice &&
+                      position.limitPrice < currentPrice) ||
+                    (position.entryPrice > position.limitPrice &&
+                      position.limitPrice > currentPrice)
+                  ) {
+                    fetch("/api/startTrade", {
+                      method: "POST",
+                      headers: {
+                        Authorization:
+                          "Bearer " + localStorage.getItem("token"),
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify({
+                        positionId: position.id,
+                      }),
+                    })
+                      .then((response) => response.json())
+                      .catch((error) =>
+                        console.error("Error starting spot Trading:", error)
+                      );
+
+                    position.orderLimit = 0;
+                  }
+                }
+
+                let positionDiv = document.createElement("div");
+
+                if (count !== spotPositionsCount) {
+                  positionDiv.textContent = `
+                                    ${1 - position.orderLimit}-${
+                    position.orderType
+                  }-${position.positionType}-  
+                                    Amount: ${position.amount} (${
+                    position.assetType
+                  })-
                                     Entry Price: ${position.entryPrice}(USDT),
                                 `;
-                      if (position.orderType == "limit")
-                        positionDiv.textContent += ` Limit Price: $${position.limitPrice},`;
-                      if (position.orderType == "limit") {
-                        if (position.orderLimit == 1) {
-                          if (position.positionType == "sell")
-                            positionDiv.style.backgroundColor = "#295843";
-                          if (position.positionType == "buy")
-                            positionDiv.style.backgroundColor = "#694456";
-                        }
-                      }
+                  if (position.orderType == "limit")
+                    positionDiv.textContent += ` Limit Price: $${position.limitPrice},`;
 
-                      spotClosedPositionsDiv.appendChild(positionDiv);
+                  if (position.orderType == "market") {
+                    if (position.positionType == "buy")
+                      positionDiv.style.backgroundColor = "#232323";
+                    if (position.positionType == "Sell")
+                      positionDiv.style.backgroundColor = "#464646";
+                  }
+                  if (position.orderType == "limit") {
+                    if (position.orderLimit == 0) {
+                      if (position.positionType == "buy")
+                        positionDiv.style.backgroundColor = "#853467";
+                      if (position.positionType == "sell")
+                        positionDiv.style.backgroundColor = "#925743";
+                    } else {
+                      if (position.positionType == "buy")
+                        positionDiv.style.backgroundColor = "#295843";
+                      if (position.positionType == "sell")
+                        positionDiv.style.backgroundColor = "#694456";
                     }
-                  });
-                  spotClosedPositionsCount = count;
+                  }
+
+                  if (position.orderLimit) {
+                    const closeButton = document.createElement("button");
+                    closeButton.textContent = "Close";
+                    closeButton.onclick = () => {
+                      closeSpotPosition(position);
+                    };
+                    positionDiv.appendChild(closeButton); // Add close button to position div
+
+                    spotOpenOrdersDiv.appendChild(positionDiv);
+                  } else {
+                    spotPositionsDiv.appendChild(positionDiv);
+                  }
                 }
+              });
+              spotPositionsCount = count;
+            }
 
-                //---------------futures statistics--------------------------------
-                let statisticsBar = "";
-                statisticsBar +=
-                  "<span class='money-type'>Est. Futures Balance (USDT):</span>";
-                statisticsBar +=
-                  "<span class='money-value'>" +
-                    new Intl.NumberFormat('en-US').format(
-                    futuresUSDTBalance.toFixed(2)
-                  ) +
-                  "</span>";
-                statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-                statisticsBar +=
-                  "<span class='money-type'>Est. Futures Value (USDT):</span>";
-                statisticsBar +=
-                  "<span class='money-value'>" +
-                    new Intl.NumberFormat('en-US').format(
-                    (futuresUSDTBalance + futuresPositionsAmount + futuresUnrealizedPL).toFixed(2)
-                  ) +
-                  "</span>";
-                statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-                statisticsBar +=
-                  "<span class='money-type'>Est. Futures Cost (USDT):</span>";
-                statisticsBar +=
-                  "<span class='money-value'>" +
-                    Intl.NumberFormat('en-US').format(futuresPositionsAmount) +
-                  "</span>";
-                statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-                statisticsBar +=
-                  "<span class='money-type'>Est. Futures Unrealized PNL (USDT):</span>";
-                statisticsBar +=
-                  "<span class='money-value'>" +
-                    Intl.NumberFormat('en-US').format(futuresUnrealizedPL.toFixed(2)) +
-                  "</span>";
+            if (data.closedSpotPositions) {
+              count = data.closedSpotPositions.length;
+              if (count !== spotClosedPositionsCount)
+                spotClosedPositionsDiv.innerHTML = ""; // Clear previous closed positions
 
-                document.getElementById("futures-statistics").innerHTML =
-                  statisticsBar;
+              data.closedSpotPositions.forEach((position) => {
+                let positionDiv = document.createElement("div");
 
-                //----------------spot statistics---------------------------------------
-                statisticsBar = "";
-                statisticsBar +=
-                  "<span class='money-type'>Est. Spot Balance (USDT):</span>";
-                statisticsBar +=
-                  "<span class='money-value'>" +
-                    new Intl.NumberFormat('en-US').format(
-                    spotUSDTBalance.toFixed(2)
-                  ) +
-                  "</span>";
-                statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-                statisticsBar +=
-                  "<span class='money-type'>Est. Spot Value (USDT):</span>";
-                let spotValue = spotUSDTBalance;
-                spotBalances.forEach((balance, index) => {
-                  if(index > 0){
-                    spotValue+=parseFloat(balance) * currentPrices[index-1].price;
-                  }
-                })
-                statisticsBar +=
-                  "<span class='money-value'>" +
-                    new Intl.NumberFormat('en-US').format(
-                    spotValue.toFixed(2)
-                  ) +
-                  "</span>";
-
-                document.getElementById("spot-statistics").innerHTML =
-                  statisticsBar;
-                //---------------spot asset statistics-----------------------------------
-                statisticsBar = "<span class='money-type'>Est. Balances: </span>";
-                spotBalances.forEach((balance, index) => {
-                  if(!index){
-                    statisticsBar +=
-                    "<span class='money-value'>" +
-                    new Intl.NumberFormat('en-US').format(balance.toFixed(2)) +
-                    "</span>";
-                    statisticsBar +=
-                    "<span class='money-unit'> USDT</span>";
-                  }else{
-                    statisticsBar +=
-                    "<span class='money-value'>" +
-                      new Intl.NumberFormat('en-US').format(balance.toFixed(2)) +
-                    "</span>";
-                    statisticsBar +=
-                    "<span class='money-unit'> " + assetTypes[index-1] + "</span>";
-                  }
-                  statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;";
-                  if (index % 10 == 9) statisticsBar += "<br>"; 
-                });
-
-                document.getElementById("spot-assets-statistics").innerHTML =
-                  statisticsBar;
-                
-                //------------------- total statistics --------------------
-                statisticsBar = "";
-                statisticsBar +=
-                  "<span class='money-type'>Est. Total Balance (USDT):</span>";
-                statisticsBar +=
-                  "<span class='money-value'>" +
-                    new Intl.NumberFormat('en-US').format(
-                    (futuresUSDTBalance + spotUSDTBalance).toFixed(2)
-                  ) +
-                  "</span>";
-                statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-                statisticsBar +=
-                  "<span class='money-type'>Est. Total Value (USDT):</span>";
-                totalValue = spotUSDTBalance;
-                spotBalances.forEach((balance, index) => {
-                  if(index > 0){
-                    totalValue+=parseFloat(balance) * currentPrices[index-1].price;
-                  }
-                })
-                totalValue += futuresUSDTBalance + futuresPositionsAmount + futuresUnrealizedPL;
-                statisticsBar +=
-                  "<span class='money-value'>" +
-                    new Intl.NumberFormat('en-US').format(
-                    totalValue.toFixed(2)
-                  ) +
-                  "</span>";
-
-                document.getElementById("total-statistics").innerHTML =
-                  statisticsBar;
-                
-                //---------------------------------------------------------
-
-                fetch("/api/updateValue", {
-                  method: "POST",
-                  headers: {
-                    Authorization: "Bearer " + localStorage.getItem("token"),
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                      futuresPositionsAmount,
-                      futuresUnrealizedPL,
-                      spotValue,
-                      totalValue,
+                if (count !== spotClosedPositionsCount) {
+                  positionDiv.textContent = `
+                                    ${1 - position.orderLimit}-${
+                    position.orderType
+                  }-${position.positionType}- 
+                                    Amount: ${position.amount}(${
+                    position.assetType
                   }),
-                })
-                  .then((response) => response.json())
-                  .catch((error) => console.error());
-              })
-              .catch((error) =>
-                console.error("Error fetching positions:", error)
-              );
+                                    Entry Price: ${position.entryPrice}(USDT),
+                                `;
+                  if (position.orderType == "limit")
+                    positionDiv.textContent += ` Limit Price: $${position.limitPrice},`;
+                  if (position.orderType == "limit") {
+                    if (position.orderLimit == 1) {
+                      if (position.positionType == "sell")
+                        positionDiv.style.backgroundColor = "#295843";
+                      if (position.positionType == "buy")
+                        positionDiv.style.backgroundColor = "#694456";
+                    }
+                  }
+
+                  spotClosedPositionsDiv.appendChild(positionDiv);
+                }
+              });
+              spotClosedPositionsCount = count;
+            }
+
+            //---------------futures statistics--------------------------------
+            let statisticsBar = "";
+            statisticsBar +=
+              "<span class='money-type'>Est. Futures Balance (USDT):</span>";
+            statisticsBar +=
+              "<span class='money-value'>" +
+              new Intl.NumberFormat("en-US").format(
+                futuresUSDTBalance.toFixed(2)
+              ) +
+              "</span>";
+            statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            statisticsBar +=
+              "<span class='money-type'>Est. Futures Value (USDT):</span>";
+            statisticsBar +=
+              "<span class='money-value'>" +
+              new Intl.NumberFormat("en-US").format(
+                (
+                  futuresUSDTBalance +
+                  futuresPositionsAmount +
+                  futuresUnrealizedPL
+                ).toFixed(2)
+              ) +
+              "</span>";
+            statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            statisticsBar +=
+              "<span class='money-type'>Est. Futures Cost (USDT):</span>";
+            statisticsBar +=
+              "<span class='money-value'>" +
+              Intl.NumberFormat("en-US").format(futuresPositionsAmount) +
+              "</span>";
+            statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            statisticsBar +=
+              "<span class='money-type'>Est. Futures Unrealized PNL (USDT):</span>";
+            statisticsBar +=
+              "<span class='money-value'>" +
+              Intl.NumberFormat("en-US").format(
+                futuresUnrealizedPL.toFixed(2)
+              ) +
+              "</span>";
+
+            document.getElementById("futures-statistics").innerHTML =
+              statisticsBar;
+
+            //----------------spot statistics---------------------------------------
+            statisticsBar = "";
+            statisticsBar +=
+              "<span class='money-type'>Est. Spot Balance (USDT):</span>";
+            statisticsBar +=
+              "<span class='money-value'>" +
+              new Intl.NumberFormat("en-US").format(
+                spotUSDTBalance.toFixed(2)
+              ) +
+              "</span>";
+            statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            statisticsBar +=
+              "<span class='money-type'>Est. Spot Value (USDT):</span>";
+            let spotValue = spotUSDTBalance;
+            spotBalances.forEach((balance, index) => {
+              if (index > 0) {
+                spotValue +=
+                  parseFloat(balance) * spotCurrentPrices.filter(item => item.assetType == assetTypes[index - 1])[0].price;
+              }
+            });
+            statisticsBar +=
+              "<span class='money-value'>" +
+              new Intl.NumberFormat("en-US").format(spotValue.toFixed(2)) +
+              "</span>";
+
+            document.getElementById("spot-statistics").innerHTML =
+              statisticsBar;
+            //---------------spot asset statistics-----------------------------------
+            statisticsBar = "<span class='money-type'>Est. Balances: </span>";
+            spotBalances.forEach((balance, index) => {
+              if (!index) {
+                statisticsBar +=
+                  "<span class='money-value'>" +
+                  new Intl.NumberFormat("en-US").format(balance.toFixed(2)) +
+                  "</span>";
+                statisticsBar += "<span class='money-unit'> USDT</span>";
+              } else {
+                statisticsBar +=
+                  "<span class='money-value'>" +
+                  new Intl.NumberFormat("en-US").format(balance.toFixed(2)) +
+                  "</span>";
+                statisticsBar +=
+                  "<span class='money-unit'> " +
+                  assetTypes[index - 1] +
+                  "</span>";
+              }
+              statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;";
+              if (index % 10 == 9) statisticsBar += "<br>";
+            });
+
+            document.getElementById("spot-assets-statistics").innerHTML =
+              statisticsBar;
+
+            //------------------- total statistics --------------------
+            statisticsBar = "";
+            statisticsBar +=
+              "<span class='money-type'>Est. Total Balance (USDT):</span>";
+            statisticsBar +=
+              "<span class='money-value'>" +
+              new Intl.NumberFormat("en-US").format(
+                (futuresUSDTBalance + spotUSDTBalance).toFixed(2)
+              ) +
+              "</span>";
+            statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            statisticsBar +=
+              "<span class='money-type'>Est. Total Value (USDT):</span>";
+            totalValue = spotUSDTBalance;
+            spotBalances.forEach((balance, index) => {
+              if (index > 0) {
+                totalValue +=
+                  parseFloat(balance) * spotCurrentPrices.filter(item => item.assetType == assetTypes[index - 1])[0].price;
+              }
+            });
+            totalValue +=
+              futuresUSDTBalance + futuresPositionsAmount + futuresUnrealizedPL;
+            statisticsBar +=
+              "<span class='money-value'>" +
+              new Intl.NumberFormat("en-US").format(totalValue.toFixed(2)) +
+              "</span>";
+
+            document.getElementById("total-statistics").innerHTML =
+              statisticsBar;
+
+            //---------------------------------------------------------
+
+            fetch("/api/updateValue", {
+              method: "POST",
+              headers: {
+                Authorization: "Bearer " + localStorage.getItem("token"),
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                futuresPositionsAmount,
+                futuresUnrealizedPL,
+                spotValue,
+                totalValue,
+              }),
+            })
+              .then((response) => response.json())
+              .catch((error) => console.error());
+
+            if (chartDelay > 2) {
+              if(futuresChart == null)futuresRenderChart();
+              if(spotChart == null)spotRenderChart();
+            }
           })
-          .catch((error) =>
-            console.error("Error fetching current price:", error)
-          );
+          .catch((error) => console.error("Error fetching positions:", error));
       }
 
       function calculateUnrealizedPL(
@@ -2274,11 +2653,17 @@
         let amount = 0;
         let limitPrice = 0;
         if (orderType == "market") {
-          amount = parseFloat(document.getElementById("spot-market-amount").value);
+          amount = parseFloat(
+            document.getElementById("spot-market-amount").value
+          );
         }
         if (orderType == "limit") {
-          amount = parseFloat(document.getElementById("spot-limit-amount").value);
-          limitPrice = parseFloat(document.getElementById("spot-limit-price").value);
+          amount = parseFloat(
+            document.getElementById("spot-limit-amount").value
+          );
+          limitPrice = parseFloat(
+            document.getElementById("spot-limit-price").value
+          );
           if (isNaN(limitPrice)) {
             alert("Please enter a valid Limit Price");
             return;
@@ -2290,16 +2675,19 @@
           return;
         }
 
-        if (positionType=='buy'){
-          if(spotUSDTBalance < amount * currentPrices[assetTypes.indexOf(spotAssetType)].price){
+        if (positionType == "buy") {
+          if (
+            spotUSDTBalance <
+            amount * spotCurrentPrices.filter(item => item.assetType == spotAssetType)[0].price
+          ) {
             alert("Insufficient USDT");
             return;
           }
         }
 
-        if (positionType=='sell'){
-          if(amount > spotBalances[assetTypes.indexOf(spotAssetType)+1]){
-            alert("Insufficient "+ spotAssetType);
+        if (positionType == "sell") {
+          if (amount > spotBalances[assetTypes.indexOf(spotAssetType) + 1]) {
+            alert("Insufficient " + spotAssetType);
             return;
           }
         }
@@ -2382,7 +2770,7 @@
       }
 
       function closeSpotPosition(position) {
-        if(!position.orderLimit)return;
+        if (!position.orderLimit) return;
         fetch("/api/closeSpotPosition", {
           method: "POST",
           headers: {
@@ -2443,31 +2831,36 @@
           .catch((error) => console.error("Error saving TP & SL:", error));
       }
 
-      function transferUSDT(){
-        const transferUSDTType = document.getElementById('transfer-USDT-type').value;
-        const transferUSDTAmount = parseFloat(document.getElementById('transfer-USDT-amount').value);
-        if(transferUSDTType=='fromFutures'){
-          if(transferUSDTAmount > futuresUSDTBalance){
+      function transferUSDT() {
+        const transferUSDTType =
+          document.getElementById("transfer-USDT-type").value;
+        const transferUSDTAmount = parseFloat(
+          document.getElementById("transfer-USDT-amount").value
+        );
+        if (transferUSDTType == "fromFutures") {
+          if (transferUSDTAmount > futuresUSDTBalance) {
             alert("Insufficient USDT in the Futures account");
             return;
-          }else{
+          } else {
             futuresUSDTBalance -= transferUSDTAmount;
             spotUSDTBalance += transferUSDTAmount;
           }
         }
-        if(transferUSDTType=='fromSpot'){
-          if(transferUSDTAmount > spotUSDTBalance){
+        if (transferUSDTType == "fromSpot") {
+          if (transferUSDTAmount > spotUSDTBalance) {
             alert("Insufficient USDT in the Spot account");
             return;
-          }else{
+          } else {
             console.log(futuresUSDTBalance, spotUSDTBalance);
             futuresUSDTBalance += transferUSDTAmount;
             spotUSDTBalance -= transferUSDTAmount;
             console.log(futuresUSDTBalance, spotUSDTBalance);
           }
         }
-        document.getElementById("transfer-modal-futures-USDT").textContent = futuresUSDTBalance;
-        document.getElementById("transfer-modal-spot-USDT").textContent = spotUSDTBalance;
+        document.getElementById("transfer-modal-futures-USDT").textContent =
+          futuresUSDTBalance;
+        document.getElementById("transfer-modal-spot-USDT").textContent =
+          spotUSDTBalance;
         fetch("/api/updateBalance", {
           method: "POST",
           headers: {
@@ -2488,7 +2881,9 @@
       // Get the <span> element that closes the modal
       var span1 = document.getElementsByClassName("close")[0];
       var span2 = document.getElementsByClassName("close")[1];
-      var partialClosingModal = document.getElementById("partial-closing-modal");
+      var partialClosingModal = document.getElementById(
+        "partial-closing-modal"
+      );
       var transferUSDTModal = document.getElementById("transfer-USDT-modal");
       // When the user clicks on <span> (x), close the modal
       span1.onclick = function () {
@@ -2593,19 +2988,188 @@
 
       document.getElementById("futures-asset-type").onchange = () => {
         futuresAssetType = document.getElementById("futures-asset-type").value;
+        futuresRenderChart();
       };
       document.getElementById("spot-asset-type").onchange = () => {
         spotAssetType = document.getElementById("spot-asset-type").value;
-        document.getElementById('spot-market-unit').textContent = "(" + document.getElementById("spot-asset-type").value + ")"
-        document.getElementById('spot-limit-unit').textContent = "(" + document.getElementById("spot-asset-type").value + ")"
+        document.getElementById("spot-market-unit").textContent =
+          "(" + document.getElementById("spot-asset-type").value + ")";
+        document.getElementById("spot-limit-unit").textContent =
+          "(" + document.getElementById("spot-asset-type").value + ")";
       };
       // Fetch data initially and then every second
       fetchUserData();
       intervalId = setInterval(fetchUserData, 500);
-      document.getElementById("spot-asset-type").onchange()
+      document.getElementById("spot-asset-type").onchange();
 
       // Clear the interval when the user leaves the page
       window.addEventListener("beforeunload", () => clearInterval(intervalId));
+
+      async function futuresFetchChartData() {
+        const response = await fetch(
+          // "/api/kline?symbol=BTC_USDT&interval=1d"
+          `/api/futures_kline?symbol=${futuresAssetType}_USDT&interval=${futuresInterval}`
+        );
+        const data = await response.json();
+        return data;
+      }
+
+      async function futuresRenderChart() {
+        const klineData = await futuresFetchChartData();
+        const labels = klineData.map((item) =>
+          new Date(item[0] * 1000).toLocaleString()
+        );
+        const prices = klineData.map((item) => item[4]);
+
+        const ctx = document.getElementById("futuresChart").getContext("2d");
+        if (futuresChart) {
+          futuresChart.destroy();
+        }
+
+        futuresChart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label:
+                  futuresAssetType +
+                  "_USDT: " +
+                  futuresCurrentPrices
+                    .filter((item) => item.assetType == futuresAssetType)[0]
+                    .price.toFixed(2),
+                data: prices,
+                borderColor: "rgba(75, 192, 192, 1)",
+                borderWidth: 2,
+              },
+            ],
+          },
+          options: {
+            scales: {
+              x: {
+                ticks: {
+                  color: "#999999",
+                },
+                grid: {
+                  color: "#333333",
+                  lineWidth: 1,
+                },
+              },
+              y: {
+                ticks: {
+                  color: "#999999",
+                },
+                beginAtZero: false,
+                grid: {
+                  color: "#333333",
+                  lineWidth: 1,
+                },
+              },
+            },
+            plugins: {
+              legend: {
+                labels: {
+                  color: "#ffffff",
+                  font: {
+                    size: 20,
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+
+      function changeFuturesInterval(button) {
+        const buttons = document.querySelectorAll(".futures-chart-btn");
+        buttons.forEach((btn) => btn.classList.remove("active"));
+        button.classList.add("active");
+        futuresInterval = button.textContent;
+        futuresRenderChart();
+      }
+
+      async function spotFetchChartData() {
+        const response = await fetch(
+          // "/api/kline?symbol=BTC_USDT&interval=1d"
+          `/api/spot_kline?symbol=${spotAssetType}_USDT&interval=${spotInterval}`
+        );
+        const data = await response.json();
+        return data;
+      }
+
+      async function spotRenderChart() {
+        const klineData = await spotFetchChartData();
+        const labels = klineData.map((item) =>
+          new Date(item[0] * 1000).toLocaleString()
+        );
+        const prices = klineData.map((item) => item[4]);
+
+        const ctx = document.getElementById("spotChart").getContext("2d");
+        if (spotChart) {
+          spotChart.destroy();
+        }
+
+        spotChart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label:
+                  spotAssetType +
+                  "_USDT: " +
+                  spotCurrentPrices
+                    .filter((item) => item.assetType == spotAssetType)[0]
+                    .price.toFixed(2),
+                data: prices,
+                borderColor: "rgba(75, 192, 192, 1)",
+                borderWidth: 2,
+              },
+            ],
+          },
+          options: {
+            scales: {
+              x: {
+                ticks: {
+                  color: "#999999",
+                },
+                grid: {
+                  color: "#333333",
+                  lineWidth: 1,
+                },
+              },
+              y: {
+                ticks: {
+                  color: "#999999",
+                },
+                beginAtZero: false,
+                grid: {
+                  color: "#333333",
+                  lineWidth: 1,
+                },
+              },
+            },
+            plugins: {
+              legend: {
+                labels: {
+                  color: "#ffffff",
+                  font: {
+                    size: 20,
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+
+      function changeSpotInterval(button) {
+        const buttons = document.querySelectorAll(".spot-chart-btn");
+        buttons.forEach((btn) => btn.classList.remove("active"));
+        button.classList.add("active");
+        spotInterval = button.textContent;
+        spotRenderChart();
+      }
     </script>
   </body>
 </html>

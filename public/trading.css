@@ -50,11 +50,31 @@ body {
   /* border-top: none; */
 }
 
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
+.btn-div{
+  display: flex;
+  flex-wrap: wrap;
+}
 
+.futures-chart-btn, .spot-chart-btn{
+  padding: 10px 20px;
+  margin: 5px;
+  background-color: rgb(70, 73, 80);
+  border: none;
+  cursor: pointer;
+  transition: background-color .3s;
+}
 
-
-
+.futures-chart-btn.active, .spot-chart-btn.active{
+  background-color: rgb(135, 135, 145);
+  color: white;
+}
 
 /* Hide the horizontal scrollbar */
 ::-webkit-scrollbar {

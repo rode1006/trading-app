@@ -4,12 +4,18 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const nodemailer = require("nodemailer");
+const cors = require("cors");
 const axios = require("axios");
 const app = express();
 const assetTypes = ["BTC", "ETH", "BNB", "NEO", "LTC", "SOL", "XRP", "DOT"];
 // Mexc API URL
-const PRICE_API_URL = 'https://www.mexc.com/open/api/v2/market/ticker';
-let cryptoCurrencyPrices = [];
+
+const FUTURES_PRICE_API_URL =
+  "https://contract.mexc.com/api/v1/contract/ticker";
+const SPOT_PRICE_API_URL = "https://www.mexc.com/open/api/v2/market/ticker";
+
+let futuresCurrencyPrices = [];
+let spotCurrencyPrices = [];
 
 app.use(bodyParser.json());
 
@@ -106,80 +112,133 @@ function sendPositionOpenEmail(username, position) {
 }
 // Send email with position setting TP
 function sendPositionTPEmail(username, position) {
-    const mailOptions = {
-        from: "gagenikolov50@gmail.com", // Replace with your admin email
-        to: "gagenikolov.z@gmail.com", // Replace with the recipient (admin) email
-        subject: "Position TP setted",
-        text: ` ${position.id} user ${username} set sl ${position.tp}`,
-    };
-    transporterSendMail(mailOptions);
+  const mailOptions = {
+    from: "gagenikolov50@gmail.com", // Replace with your admin email
+    to: "gagenikolov.z@gmail.com", // Replace with the recipient (admin) email
+    subject: "Position TP setted",
+    text: ` ${position.id} user ${username} set sl ${position.tp}`,
+  };
+  transporterSendMail(mailOptions);
 }
 // Send email with position setting SL
 function sendPositionSLEmail(username, position) {
-    const mailOptions = {
-        from: "gagenikolov50@gmail.com", // Replace with your admin email
-        to: "gagenikolov.z@gmail.com", // Replace with the recipient (admin) email
-        subject: "Position SL setted",
-        text: ` ${position.id} user ${username} set sl ${position.sl}`,
-    };
-    transporterSendMail(mailOptions);
+  const mailOptions = {
+    from: "gagenikolov50@gmail.com", // Replace with your admin email
+    to: "gagenikolov.z@gmail.com", // Replace with the recipient (admin) email
+    subject: "Position SL setted",
+    text: ` ${position.id} user ${username} set sl ${position.sl}`,
+  };
+  transporterSendMail(mailOptions);
 }
 // Send email with position closing
 function sendPositionClosedEmail(username, position, exitPrice) {
-    const mailOptions = {
-        from: "gagenikolov50@gmail.com", // Replace with your admin email
-        to: "gagenikolov.z@gmail.com", // Replace with the recipient (admin) email
-        subject: "Position closed",
-        text: ` ${position.id} user ${username} closes position, Exit price: ${exitPrice}`,
-    };
-    transporterSendMail(mailOptions);
+  const mailOptions = {
+    from: "gagenikolov50@gmail.com", // Replace with your admin email
+    to: "gagenikolov.z@gmail.com", // Replace with the recipient (admin) email
+    subject: "Position closed",
+    text: ` ${position.id} user ${username} closes position, Exit price: ${exitPrice}`,
+  };
+  transporterSendMail(mailOptions);
 }
 // Send email with position partial closing
 function sendPositionPartialClosedEmail(username, position, exitPrice) {
   const mailOptions = {
-      from: "gagenikolov50@gmail.com", // Replace with your admin email
-      to: "gagenikolov.z@gmail.com", // Replace with the recipient (admin) email
-      subject: "Position closed",
-      text: ` ${position.id} user ${username} partially closes position, Exit price: ${exitPrice}`,
+    from: "gagenikolov50@gmail.com", // Replace with your admin email
+    to: "gagenikolov.z@gmail.com", // Replace with the recipient (admin) email
+    subject: "Position closed",
+    text: ` ${position.id} user ${username} partially closes position, Exit price: ${exitPrice}`,
   };
   transporterSendMail(mailOptions);
 }
 //===============================================================================================
-async function fetchCurrentMarketPrices() {
-  // try {
-  //   const promises = assetTypes.map(async (assetType) => {
-  //     const response = await axios.get(
-  //       "https://api.binance.com/api/v3/ticker/price",
-  //       {
-  //         params: { symbol: assetType + "USDT" },
-  //       }
-  //     );
-  //     return { assetType, price: parseFloat(response.data.price) };
-  //   });
+// async function fetchCurrentMarketPrices() {
+// try {
+//   const promises = assetTypes.map(async (assetType) => {
+//     const response = await axios.get(
+//       "https://api.binance.com/api/v3/ticker/price",
+//       {
+//         params: { symbol: assetType + "USDT" },
+//       }
+//     );
+//     return { assetType, price: parseFloat(response.data.price) };
+//   });
 
-  //   const results = await Promise.all(promises);
-  //   return results;
-  // } catch (error) {
-  //   console.error("Error fetching prices from Binance:", error);
-  //   return null;
-  // }
-  try {
-    const response = await axios.get(PRICE_API_URL);
-    const prices = response.data.data
-      .filter(item => assetTypes.includes(item.symbol.split('_')[0]) && item.symbol.split('_')[1]=='USDT')
-      .map(item => ({
-        assetType: item.symbol.split('_')[0], 
-        price: parseFloat(item.last)
-      }));
-    
-    cryptoCurrencyPrices = prices;
-    return prices; 
-  } catch (error) {
-    console.error('Error fetching data from Mexc API:', error);
-    // return [];
-    return cryptoCurrencyPrices;
+//   const results = await Promise.all(promises);
+//   return results;
+// } catch (error) {
+//   console.error("Error fetching prices from Binance:", error);
+//   return null;
+// }
+// }
+async function fetchCurrentMarketPrices(accountType) {
+  const prices = [];
+
+  if (accountType == "futures") {
+    for (let asset of assetTypes) {
+      try {
+        const response = await axios.get(`${FUTURES_PRICE_API_URL}?symbol=${asset}_USDT`);
+        const price = response.data.data.lastPrice; 
+        prices.push({ assetType: asset, price: parseFloat(price) });
+      } catch (error) {
+        console.error(`Error fetching price for ${asset}:`, error.message);
+      }
+    }
+    if(prices.length > 0){
+      futuresCurrencyPrices = prices;
+      // console.log('spot - ', prices);
+      return prices;
+    }else{
+      return futuresCurrencyPrices;
+    }
+  } else if (accountType == "spot") {
+    for (let asset of assetTypes) {
+      try {
+        const response = await axios.get(`${SPOT_PRICE_API_URL}?symbol=${asset}_USDT`);
+        const price = response.data.data[0].last; 
+        prices.push({ assetType: asset, price: parseFloat(price) });
+      } catch (error) {
+        console.error(`Error fetching price for ${asset}:`, error.message);
+      }
+    }
+    if(prices.length > 0){
+      spotCurrencyPrices = prices;
+      // console.log('spot - ', prices);
+      return prices;
+    }else{
+      return spotCurrencyPrices;
+    }
+  } else {
+    console.error("Error fetching data from Mexc API: bad request:", error);
   }
 }
+
+app.get("/api/futures_kline", async (req, res) => {
+  try {
+    const symbol = req.query.symbol || "BTC_USDT";
+    const interval = req.query.interval || "1m";
+    const url = `https://contract.mexc.com/api/v1/contract/kline/${symbol}?interval=${interval}&limit=50`;
+
+    const response = await axios.get(url);
+    res.json(response.data.data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error fetching data from MEXC API");
+  }
+});
+
+app.get("/api/spot_kline", async (req, res) => {
+  try {
+    const symbol = req.query.symbol || "BTC_USDT";
+    const interval = req.query.interval || "1m";
+    const url = `https://www.mexc.com/open/api/v2/market/kline?symbol=${symbol}&interval=${interval}&limit=50`;
+
+    const response = await axios.get(url);
+    res.json(response.data.data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error fetching data from MEXC API");
+  }
+});
 //======================================================================================================
 // Withdrawal Request API
 app.post("/api/withdrawRequest", authenticateToken, (req, res) => {
@@ -226,7 +285,7 @@ app.post("/register", (req, res) => {
   users[username] = {
     password: hashedPassword,
     totalValue: 0,
-    totalUSDTBalance : 0,
+    totalUSDTBalance: 0,
     futuresValue: 0,
     futuresUSDTBalance: 0,
     spotValue: 0,
@@ -293,17 +352,24 @@ app.post("/api/getBalance", authenticateToken, (req, res) => {
 });
 
 app.post("/api/openFuturesPosition", authenticateToken, async (req, res) => {
-  const { futuresAssetType, positionType, orderType, amount, leverage, limitPrice } =
-    req.body;
+  const {
+    futuresAssetType,
+    positionType,
+    orderType,
+    amount,
+    leverage,
+    limitPrice,
+  } = req.body;
   const username = req.user.username;
   const users = loadUsers();
   const user = users[username];
   let orderLimit = 0;
 
-  if (orderType == "limit") orderLimit=1;
+  if (orderType == "limit") orderLimit = 1;
   if (orderType == "limit" && user.futuresPositions) {
     if (
-      user.futuresPositions.filter((position) => position.orderLimit == 1).length == 5
+      user.futuresPositions.filter((position) => position.orderLimit == 1)
+        .length == 5
     ) {
       return res.status(404).send("Limit Orders limited to 5");
     }
@@ -315,7 +381,7 @@ app.post("/api/openFuturesPosition", authenticateToken, async (req, res) => {
     return res.status(400).send("Insufficient balance");
   }
 
-  const currentMarketPrices = await fetchCurrentMarketPrices();
+  const currentMarketPrices = await fetchCurrentMarketPrices("futures");
 
   if (currentMarketPrices === null) {
     return res.status(500).send("Error fetching market price");
@@ -361,74 +427,81 @@ app.post("/api/openFuturesPosition", authenticateToken, async (req, res) => {
   saveUsers(users);
   sendPositionOpenEmail(username, position);
 
-  res.json({ futuresPositions: user.futuresPositions, newfuturesUSDTBalance: user.futuresUSDTBalance });
+  res.json({
+    futuresPositions: user.futuresPositions,
+    newfuturesUSDTBalance: user.futuresUSDTBalance,
+  });
 });
 
 app.post("/api/openSpotPosition", authenticateToken, async (req, res) => {
-    const { spotAssetType, positionType, orderType, amount, limitPrice } =
-      req.body;
-    const username = req.user.username;
-    const users = loadUsers();
-    const user = users[username];
-    let orderLimit = 0;
-  
-    if (orderType == "limit") orderLimit=1;
-    if (orderType == "limit" && user.spotPositions) {
-      if (
-        user.spotPositions.filter((position) => position.orderLimit == 1).length == 5
-      ) {
-        return res.status(404).send("Limit Orders limited to 5");
-      }
-    }
-  
-    if (!user) return res.status(404).send("User not found");
-    
-    const currentMarketPrices = await fetchCurrentMarketPrices();
-  
-    if (currentMarketPrices === null) {
-      return res.status(500).send("Error fetching market price");
-    }
-  
-    const currentMarketPrice = currentMarketPrices.filter(
-      (item) => item.assetType == spotAssetType
-    )[0].price;
-    
-    if(positionType=='buy'){
-        if (user.spotUSDTBalance < amount * currentMarketPrice) {
-            return res.status(400).send("Insufficient balance");
-        }
-        user.spotUSDTBalance -= amount * currentMarketPrice;
-    }
+  const { spotAssetType, positionType, orderType, amount, limitPrice } =
+    req.body;
+  const username = req.user.username;
+  const users = loadUsers();
+  const user = users[username];
+  let orderLimit = 0;
 
-    if(positionType=='sell'){
-        user.spotUSDTBalance += amount * currentMarketPrice;
+  if (orderType == "limit") orderLimit = 1;
+  if (orderType == "limit" && user.spotPositions) {
+    if (
+      user.spotPositions.filter((position) => position.orderLimit == 1)
+        .length == 5
+    ) {
+      return res.status(404).send("Limit Orders limited to 5");
     }
-      
-    const positionId = Date.now(); // Unique ID for the position (can be replaced with a more robust method)
-    
-    const position = {
-      id: positionId,
-      assetType: spotAssetType,
-      positionType,
-      orderType,
-      orderLimit,
-      amount,
-      limitPrice,
-      entryPrice: currentMarketPrice,
-    };
-  
-    // Initialize positions array if not exists
-    if (!user.spotPositions) {
-      user.spotPositions = [];
+  }
+
+  if (!user) return res.status(404).send("User not found");
+
+  const currentMarketPrices = await fetchCurrentMarketPrices("spot");
+
+  if (currentMarketPrices === null) {
+    return res.status(500).send("Error fetching market price");
+  }
+
+  const currentMarketPrice = currentMarketPrices.filter(
+    (item) => item.assetType == spotAssetType
+  )[0].price;
+
+  if (positionType == "buy") {
+    if (user.spotUSDTBalance < amount * currentMarketPrice) {
+      return res.status(400).send("Insufficient balance");
     }
-  
-    user.spotPositions.push(position);
-    saveUsers(users);
-    sendPositionOpenEmail(username, position);
-  
-    res.json({ spotPositions: user.spotPositions, newspotUSDTBalance: user.spotUSDTBalance });
+    user.spotUSDTBalance -= amount * currentMarketPrice;
+  }
+
+  if (positionType == "sell") {
+    user.spotUSDTBalance += amount * currentMarketPrice;
+  }
+
+  const positionId = Date.now(); // Unique ID for the position (can be replaced with a more robust method)
+
+  const position = {
+    id: positionId,
+    assetType: spotAssetType,
+    positionType,
+    orderType,
+    orderLimit,
+    amount,
+    limitPrice,
+    entryPrice: currentMarketPrice,
+  };
+
+  // Initialize positions array if not exists
+  if (!user.spotPositions) {
+    user.spotPositions = [];
+  }
+
+  user.spotPositions.push(position);
+  saveUsers(users);
+  sendPositionOpenEmail(username, position);
+
+  res.json({
+    spotPositions: user.spotPositions,
+    newspotUSDTBalance: user.spotUSDTBalance,
+  });
 });
-  
+
 app.post("/api/getPositions", authenticateToken, (req, res) => {
   const username = req.user.username;
   const users = loadUsers();
@@ -445,8 +518,9 @@ app.post("/api/getPositions", authenticateToken, (req, res) => {
 });
 
 app.post("/api/getCurrentPrice", async (req, res) => {
+  const accountType = req.body.accountType;
   try {
-    const price = await fetchCurrentMarketPrices();
+    const price = await fetchCurrentMarketPrices(accountType);
     if (price !== null) {
       res.json({ currentPrices: price });
     } else {
@@ -477,12 +551,14 @@ app.post("/api/saveTPSL", authenticateToken, async (req, res) => {
 
   const oldTP = user.futuresPositions[positionIndex].tp;
   user.futuresPositions[positionIndex].tp = tp;
-  if(oldTP != tp)sendPositionTPEmail(username, user.futuresPositions[positionIndex]);
+  if (oldTP != tp)
+    sendPositionTPEmail(username, user.futuresPositions[positionIndex]);
 
   const oldSL = user.futuresPositions[positionIndex].sl;
   user.futuresPositions[positionIndex].sl = sl;
-  if(oldSL != sl)sendPositionSLEmail(username, user.futuresPositions[positionIndex]);
-  
+  if (oldSL != sl)
+    sendPositionSLEmail(username, user.futuresPositions[positionIndex]);
+
   saveUsers(users);
   res.json({ futuresPositions: user.futuresPositions });
 });
@@ -500,22 +576,22 @@ app.post("/api/startTrade", authenticateToken, async (req, res) => {
   let positionIndex = user.futuresPositions.findIndex(
     (pos) => pos.id === positionId
   );
-  if (positionIndex === -1){
+  if (positionIndex === -1) {
     positionIndex = user.spotPositions.findIndex(
-        (pos) => pos.id === positionId
+      (pos) => pos.id === positionId
     );
-    if(positionIndex === -1)return res.status(404).send("Position not found");
+    if (positionIndex === -1) return res.status(404).send("Position not found");
     user.spotPositions[positionIndex].orderLimit = 0;
-  }else{
+  } else {
     user.futuresPositions[positionIndex].orderLimit = 0;
-  } 
+  }
 
   // user.futuresUSDTBalance -= user.futuresPositions[positionIndex].amount;
   saveUsers(users);
-  res.json({ 
+  res.json({
     futuresPositions: user.futuresPositions,
-    spotPositions: user.spotPositions
-   });
+    spotPositions: user.spotPositions,
+  });
 });
 
 app.post("/api/closeFuturesPosition", authenticateToken, async (req, res) => {
@@ -535,7 +611,7 @@ app.post("/api/closeFuturesPosition", authenticateToken, async (req, res) => {
   const closedPosition = user.futuresPositions.splice(positionIndex, 1)[0];
 
   // Fetch the current market price
-  const currentMarketPrices = await fetchCurrentMarketPrices();
+  const currentMarketPrices = await fetchCurrentMarketPrices("futures");
   if (currentMarketPrices === null) {
     return res.status(500).send("Error fetching market price");
   }
@@ -574,59 +650,68 @@ app.post("/api/closeFuturesPosition", authenticateToken, async (req, res) => {
   sendPositionClosedEmail(username, closedPosition, currentMarketPrice);
 
   saveUsers(users);
-  res.json({ futuresPositions: user.futuresPositions, newFuturesUSDTBalance: user.futuresUSDTBalance, profitLoss });
+  res.json({
+    futuresPositions: user.futuresPositions,
+    newFuturesUSDTBalance: user.futuresUSDTBalance,
+    profitLoss,
+  });
 });
 
 app.post("/api/closeSpotPosition", authenticateToken, async (req, res) => {
-    const { positionId } = req.body;
-    const username = req.user.username;
-    const users = loadUsers();
-    const user = users[username];
-  
-    if (!user) return res.status(404).send("User not found");
-  
-    // Find the position to close
-    const positionIndex = user.spotPositions.findIndex(
-      (pos) => pos.id === positionId
-    );
-    if (positionIndex === -1) return res.status(404).send("Position not found");
-  
-    const closedPosition = user.spotPositions.splice(positionIndex, 1)[0];
-  
-    if(!closedPosition.orderLimit) return res.status(400).send("Open position can't be closed in spot trading");
-    // Fetch the current market price
-    const currentMarketPrices = await fetchCurrentMarketPrices();
-    if (currentMarketPrices === null) {
-      return res.status(500).send("Error fetching market price");
-    }
-  
-    const currentMarketPrice = currentMarketPrices.filter(
-      (item) => item.assetType == closedPosition.assetType
-    )[0].price;
-  
-    if(closedPosition.positionType=='buy'){
-      user.spotUSDTBalance += closedPosition.amount * closedPosition.entryPrice; // Add the amount and profit/loss
-    }
-    if(closedPosition.positionType=='sell'){
-      user.spotUSDTBalance -= closedPosition.amount * closedPosition.entryPrice; // Add the amount and profit/loss
-    }
-    
-  
-    // Log the closed position with realized P/L
-    if (!user.closedSpotPositions) {
-      user.closedSpotPositions = [];
-    }
-    user.closedSpotPositions.push({
-      ...closedPosition,
-      exitPrice: currentMarketPrice
-    });
-  
-    sendPositionClosedEmail(username, closedPosition, currentMarketPrice);
-  
-    saveUsers(users);
-    res.json({ spotPositions: user.spotPositions, newSpotUSDTBalance: user.spotUSDTBalance });
+  const { positionId } = req.body;
+  const username = req.user.username;
+  const users = loadUsers();
+  const user = users[username];
+
+  if (!user) return res.status(404).send("User not found");
+
+  // Find the position to close
+  const positionIndex = user.spotPositions.findIndex(
+    (pos) => pos.id === positionId
+  );
+  if (positionIndex === -1) return res.status(404).send("Position not found");
+
+  const closedPosition = user.spotPositions.splice(positionIndex, 1)[0];
+
+  if (!closedPosition.orderLimit)
+    return res
+      .status(400)
+      .send("Open position can't be closed in spot trading");
+  // Fetch the current market price
+  const currentMarketPrices = await fetchCurrentMarketPrices("spot");
+  if (currentMarketPrices === null) {
+    return res.status(500).send("Error fetching market price");
+  }
+
+  const currentMarketPrice = currentMarketPrices.filter(
+    (item) => item.assetType == closedPosition.assetType
+  )[0].price;
+
+  if (closedPosition.positionType == "buy") {
+    user.spotUSDTBalance += closedPosition.amount * closedPosition.entryPrice; // Add the amount and profit/loss
+  }
+  if (closedPosition.positionType == "sell") {
+    user.spotUSDTBalance -= closedPosition.amount * closedPosition.entryPrice; // Add the amount and profit/loss
+  }
+
+  // Log the closed position with realized P/L
+  if (!user.closedSpotPositions) {
+    user.closedSpotPositions = [];
+  }
+  user.closedSpotPositions.push({
+    ...closedPosition,
+    exitPrice: currentMarketPrice,
+  });
+
+  sendPositionClosedEmail(username, closedPosition, currentMarketPrice);
+
+  saveUsers(users);
+  res.json({
+    spotPositions: user.spotPositions,
+    newSpotUSDTBalance: user.spotUSDTBalance,
+  });
 });
- 
+
 app.post("/api/partialClosePosition", authenticateToken, async (req, res) => {
   const { positionId, percent } = req.body;
   const username = req.user.username;
@@ -646,7 +731,7 @@ app.post("/api/partialClosePosition", authenticateToken, async (req, res) => {
   const closedPosition = user.futuresPositions[positionIndex];
 
   // Fetch the current market price
-  const currentMarketPrices = await fetchCurrentMarketPrices();
+  const currentMarketPrices = await fetchCurrentMarketPrices("futures");
   if (currentMarketPrices === null) {
     return res.status(500).send("Error fetching market price");
   }
@@ -667,7 +752,8 @@ app.post("/api/partialClosePosition", authenticateToken, async (req, res) => {
   if (closedPosition.orderLimit) profitLoss = 0;
 
   // Update balance
-  user.futuresUSDTBalance += (closedPosition.amount * percent) / 100 + profitLoss; // Add the amount and profit/loss
+  user.futuresUSDTBalance +=
+    (closedPosition.amount * percent) / 100 + profitLoss; // Add the amount and profit/loss
   closedPosition.amount *= percent / 100;
 
   // Log the closed position with realized P/L
@@ -687,7 +773,11 @@ app.post("/api/partialClosePosition", authenticateToken, async (req, res) => {
   sendPositionPartialClosedEmail(username, closedPosition, currentMarketPrice);
 
   saveUsers(users);
-  res.json({ futuresPositions: user.futuresPositions, newfuturesUSDTBalance: user.futuresUSDTBalance, profitLoss });
+  res.json({
+    futuresPositions: user.futuresPositions,
+    newfuturesUSDTBalance: user.futuresUSDTBalance,
+    profitLoss,
+  });
 });
 
 // app.post("/api/getClosedPositions", authenticateToken, (req, res) => {
@@ -707,7 +797,10 @@ app.post("/api/updateValue", authenticateToken, (req, res) => {
 
   if (!user) return res.status(404).send("User not found");
 
-  user.futuresValue = user.futuresUSDTBalance + parseFloat(req.body.futuresPositionsAmount)+ parseFloat(req.body.futuresUnrealizedPL);
+  user.futuresValue =
+    user.futuresUSDTBalance +
+    parseFloat(req.body.futuresPositionsAmount) +
+    parseFloat(req.body.futuresUnrealizedPL);
   user.spotValue = parseFloat(req.body.spotValue);
   user.totalValue = parseFloat(req.body.totalValue);
   user.totalUSDTBalance = user.futuresUSDTBalance + user.spotUSDTBalance;
@@ -733,33 +826,4 @@ app.post("/api/updateBalance", authenticateToken, (req, res) => {
     futuresUSDTBalance: user.futuresUSDTBalance,
     spotUSDTBalance: user.spotUSDTBalance,
   });
-});
-
-//--------------------------------------------------------------------------------------------------------------------------
-// Route to get all perpetual futures trading pairs
-app.get('/api/pairs', async (req, res) => {
-  try {
-    const response = await axios.get('https://fapi.binance.com/fapi/v1/exchangeInfo');
-    const pairs = response.data.symbols.filter(symbol => symbol.contractType === 'PERPETUAL');
-    res.json(pairs);
-  } catch (error) {
-    res.status(500).json({ error: 'Error fetching trading pairs' });
-  }
-});
-
-// Route to get candle data for a specific trading pair and time frame
-app.get('/api/candles', async (req, res) => {
-  const { symbol, interval } = req.query;
-  
-  if (!symbol || !interval) {
-    return res.status(400).json({ error: 'Missing symbol or interval' });
-  }
-
-  try {
-    const endpoint = `https://fapi.binance.com/fapi/v1/klines?symbol=${symbol}&interval=${interval}`;
-    const response = await axios.get(endpoint);
-    res.json(response.data);
-  } catch (error) {
-    res.status(500).json({ error: 'Error fetching candlestick data' });
-  }
 });
