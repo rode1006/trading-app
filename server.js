@@ -171,52 +171,113 @@ function sendPositionPartialClosedEmail(username, position, exitPrice) {
 // }
 // }
 async function fetchCurrentMarketPrices(accountType) {
-  const prices = [];
-
+  let response;
   if (accountType == "futures") {
-    for (let asset of assetTypes) {
-      try {
-        const response = await axios.get(`${FUTURES_PRICE_API_URL}?symbol=${asset}_USDT`);
-        const price = response.data.data.lastPrice; 
-        prices.push({ assetType: asset, price: parseFloat(price) });
-      } catch (error) {
-        console.error(`Error fetching price for ${asset}:`, error.message);
-      }
-    }
-    if(prices.length > 0){
+    try {
+      response = await axios.get(FUTURES_PRICE_API_URL);
+      const prices = response.data.data
+        .filter(
+          (item) =>
+            assetTypes.includes(item.symbol.split("_")[0]) &&
+            item.symbol.split("_")[1] == "USDT"
+        )
+        .map((item) => ({
+          assetType: item.symbol.split("_")[0],
+          price: parseFloat(item.lastPrice),
+        }));
+
       futuresCurrencyPrices = prices;
-      // console.log('spot - ', prices);
       return prices;
-    }else{
+    } catch (error) {
+      console.error("Error fetching data from Mexc API:", error);
+      // return [];
       return futuresCurrencyPrices;
     }
   } else if (accountType == "spot") {
-    for (let asset of assetTypes) {
-      try {
-        const response = await axios.get(`${SPOT_PRICE_API_URL}?symbol=${asset}_USDT`);
-        const price = response.data.data[0].last; 
-        prices.push({ assetType: asset, price: parseFloat(price) });
-      } catch (error) {
-        console.error(`Error fetching price for ${asset}:`, error.message);
-      }
-    }
-    if(prices.length > 0){
+    try {
+      response = await axios.get(SPOT_PRICE_API_URL);
+      const prices = response.data.data
+        .filter(
+          (item) =>
+            assetTypes.includes(item.symbol.split("_")[0]) &&
+            item.symbol.split("_")[1] == "USDT"
+        )
+        .map((item) => ({
+          assetType: item.symbol.split("_")[0],
+          price: parseFloat(item.last),
+        }));
+
       spotCurrencyPrices = prices;
-      // console.log('spot - ', prices);
       return prices;
-    }else{
+    } catch (error) {
+      console.error("Error fetching data from Mexc API:", error);
+      // return [];
       return spotCurrencyPrices;
     }
   } else {
     console.error("Error fetching data from Mexc API: bad request:", error);
   }
+  // const prices = [];
+
+  // if (accountType == "futures") {
+  //   for (let asset of assetTypes) {
+  //     try {
+  //       const response = await axios.get(`${FUTURES_PRICE_API_URL}?symbol=${asset}_USDT`);
+  //       const price = response.data.data.lastPrice; 
+  //       prices.push({ assetType: asset, price: parseFloat(price) });
+  //     } catch (error) {
+  //       console.error(`Error fetching price for ${asset}:`, error.message);
+  //     }
+  //   }
+  //   if(prices.length > 0){
+  //     futuresCurrencyPrices = prices;
+  //     // console.log('spot - ', prices);
+  //     return prices;
+  //   }else{
+  //     return futuresCurrencyPrices;
+  //   }
+  // } else if (accountType == "spot") {
+  //   for (let asset of assetTypes) {
+  //     try {
+  //       const response = await axios.get(`${SPOT_PRICE_API_URL}?symbol=${asset}_USDT`);
+  //       const price = response.data.data[0].last; 
+  //       prices.push({ assetType: asset, price: parseFloat(price) });
+  //     } catch (error) {
+  //       console.error(`Error fetching price for ${asset}:`, error.message);
+  //     }
+  //   }
+  //   if(prices.length > 0){
+  //     spotCurrencyPrices = prices;
+  //     // console.log('spot - ', prices);
+  //     return prices;
+  //   }else{
+  //     return spotCurrencyPrices;
+  //   }
+  // } else {
+  //   console.error("Error fetching data from Mexc API: bad request:", error);
+  // }
 }
 
 app.get("/api/futures_kline", async (req, res) => {
   try {
     const symbol = req.query.symbol || "BTC_USDT";
-    const interval = req.query.interval || "1m";
-    const url = `https://contract.mexc.com/api/v1/contract/kline/${symbol}?interval=${interval}&limit=50`;
+    const interval = req.query.interval || "Min1";
+    const intervalValue = {
+      'Min1':1,
+      'Min5':5,
+      'Min30':30,
+      'Min60':60,
+      'Hour4':240,
+      'Day1':1440,
+      'Week1':10080,
+      'Month1':1440 * 30,
+    }
+
+    const nowTime = parseInt(new Date() / 1000);
+    const startTime = nowTime - intervalValue[interval] * 60 * 50;
+    const url = `https://contract.mexc.com/api/v1/contract/kline/${symbol}?interval=${interval}&start=${startTime}&end=${nowTime}`;
+
+    // console.log(url);
 
     const response = await axios.get(url);
     res.json(response.data.data);
@@ -232,6 +293,8 @@ app.get("/api/spot_kline", async (req, res) => {
     const interval = req.query.interval || "1m";
     const url = `https://www.mexc.com/open/api/v2/market/kline?symbol=${symbol}&interval=${interval}&limit=50`;
 
+    // console.log(url);
+    
     const response = await axios.get(url);
     res.json(response.data.data);
   } catch (error) {
