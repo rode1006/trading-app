@@ -18,6 +18,47 @@
         /* height: 20vh; */
       }
     </style>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+
+      .custom-dropdown {
+        position: relative;
+        width: 250px;
+      }
+
+      .order-header{
+        display: flex;
+      }
+
+      .dropdown-selected {
+        padding: 10px;
+        background: #4b4949;
+        border: 1px solid #ffffff;
+        cursor: pointer;
+      }
+
+      .dropdown-options {
+        display: none;
+        position: absolute;
+        background: rgb(68, 67, 67);
+        border: 1px solid #ccc;
+        z-index: 1;
+        width: 100%;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+
+      .dropdown-options .dropdown-option {
+        padding: 10px;
+        cursor: pointer;
+      }
+
+      .dropdown-options .dropdown-option:hover {
+        background: #e0e0e0;
+      }
+    </style>
     <script>
       let intervalId;
 
@@ -120,8 +161,11 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@latest/dist/chartjs-adapter-date-fns.bundle.min.js"></script> -->
-    
-    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+
+    <script
+      type="text/javascript"
+      src="https://s3.tradingview.com/tv.js"
+    ></script>
   </head>
   <body>
     <div class="container">
@@ -1490,7 +1534,7 @@
           <br />
           <!-- <div id="assets-statistics"></div> -->
           <h3>MEXC Futures Asset Price Chart</h3>
-          <br>
+          <br />
           <!-- <canvas
             id="futuresChart"
             width="400"
@@ -1562,13 +1606,14 @@
               style="height: 90%; width: 100%"
             ></div>
           </div>
-          <br>
+          <br />
           <script type="text/javascript">
             // function createTradingViewWidget(symbol, interval) {
             function createFuturesTradingViewWidget(symbol) {
               // console.log(symbol, interval);
-              const widgetContainer =
-                document.getElementById("futures-tradingview-widget");
+              const widgetContainer = document.getElementById(
+                "futures-tradingview-widget"
+              );
               widgetContainer.innerHTML = "";
 
               new TradingView.widget({
@@ -1599,8 +1644,8 @@
                 // fontSize: 12,
                 // noTimeScale: false,
                 // showLegend: true,
-                hide_volume:true,
-                support_host: "https://www.tradingview.com"
+                hide_volume: true,
+                support_host: "https://www.tradingview.com",
               });
             }
 
@@ -1619,17 +1664,21 @@
 
           <div class="order-panel">
             <div>
-              Asset Type:<select
-                id="futures-asset-type"
-                style="width: 80px"
-              ></select
-              >&nbsp;&nbsp;&nbsp;
-              <span class="money-type">Current Price:</span>
-              <span id="futures-current-price" class="money-value"
-                >Loading...</span
-              >
-              <span class="money-unit">USDT</span>
+              <div class="order-header">
+                <div style="margin: 10px;">Select an Asset Type:</div>
+                <div class="custom-dropdown">
+                  <div
+                    class="dropdown-selected"
+                    id="futures-dropdownSelected"
+                  ></div>
+                  <div
+                    class="dropdown-options"
+                    id="futures-dropdownOptions"
+                  ></div>
+                </div>
+              </div>
             </div>
+
             <div>
               <label style="color: rgb(255, 0, 0); font-size: 24px"
                 >Market Order: </label
@@ -1720,8 +1769,6 @@
         <div id="spot" class="tabcontent trading-panel">
           <div id="spot-statistics"></div>
           <div id="spot-now-price" style="margin: 10px"></div>
-          <br />
-          <div id="spot-assets-statistics"></div>
           <br />
           <h3>MEXC Spot Asset Price Chart</h3>
           <br />
@@ -1845,8 +1892,8 @@
                 // fontSize: 12,
                 // noTimeScale: false,
                 // showLegend: true,
-                hide_volume:true,
-                support_host: "https://www.tradingview.com"
+                hide_volume: true,
+                support_host: "https://www.tradingview.com",
               });
             }
 
@@ -1862,18 +1909,20 @@
               createTradingViewWidget(selectedSymbol);
             }
           </script>
-
+      
+          
           <div class="order-panel">
-            <div>
-              Asset Type:<select
-                id="spot-asset-type"
-                style="width: 80px"
-              ></select
-              >&nbsp;&nbsp;&nbsp;
-              <span class="money-type">Current Price:</span>
-              <span id="spot-current-price" class="money-value">Loading...</span
-              ><span class="money-unit">USDT</span>&nbsp;&nbsp;&nbsp;&nbsp;
+            <div class="order-header">
+              <div style="margin: 10px;">Select an Asset Type:</div>
+                
+                <div class="custom-dropdown">
+                  <div class="dropdown-selected" id="spot-dropdownSelected"></div>
+                  <div class="dropdown-options" id="spot-dropdownOptions"></div>
+                </div>
+              <div style="margin: 10px;" id="spot-assets-statistics"></div>
             </div>
+            
+
             <div>
               <label style="color: rgb(255, 0, 0); font-size: 24px"
                 >Market: </label
@@ -2005,12 +2054,12 @@
     <script>
       let tmp = "";
 
-      assetTypes.forEach((assetType, index) => {
-        tmp += "<option>" + assetType + "</option>";
-      });
+      // assetTypes.forEach((assetType, index) => {
+      //   tmp += `<option value="${assetType}">${assetType}</option>`;
+      // });
 
-      document.getElementById("futures-asset-type").innerHTML = tmp;
-      document.getElementById("spot-asset-type").innerHTML = tmp;
+      // document.getElementById("futures-asset-type").innerHTML = tmp;
+      // document.getElementById("spot-asset-type").innerHTML = tmp;
 
       async function fetchFuturesCurrentPrices() {
         const futuresPriceResponse = await fetch("/api/getCurrentPrice", {
@@ -2042,12 +2091,39 @@
 
         document.getElementById("futures-now-price").innerHTML = priceText;
 
-        document.getElementById("futures-current-price").textContent =
-          Intl.NumberFormat("en-US").format(
-            futuresCurrentPrices.find(
-              (item) => item.assetType === futuresAssetType
-            ).price
-          );
+        // document.getElementById("futures-current-price").textContent =
+        // Intl.NumberFormat("en-US").format(
+        //   futuresCurrentPrices.find(
+        //     (item) => item.assetType === futuresAssetType
+        //   ).price
+        //   );
+        tmp = "";
+        assetTypes.forEach((asset, index) => {
+          if(asset != futuresAssetType){
+          tmp += `<div class="dropdown-option" onclick="futuresSelectOption('${asset}')">
+                      <span class="money-type">${asset}_USDT: </span>
+                      <span class="money-value">${Intl.NumberFormat(
+                        "en-US"
+                      ).format(
+                        futuresCurrentPrices.find(
+                          (item) => item.assetType === asset
+                        ).price
+                      )}</span></div>`;
+          }
+        });
+
+        document.getElementById("futures-dropdownOptions").innerHTML = tmp;
+        document.getElementById(
+          "futures-dropdownSelected"
+        ).innerHTML = `<span class="money-type">${futuresAssetType}_USDT: </span>
+                      <span class="money-value">${Intl.NumberFormat(
+                        "en-US"
+                      ).format(
+                        futuresCurrentPrices.find(
+                          (item) => item.assetType === futuresAssetType
+                        ).price
+                      )}</span>`;
+
         setTimeout(fetchFuturesCurrentPrices, 500);
       }
 
@@ -2081,16 +2157,41 @@
 
         document.getElementById("spot-now-price").innerHTML = priceText;
 
-        document.getElementById("spot-current-price").textContent =
-          Intl.NumberFormat("en-US").format(
-            spotCurrentPrices.find((item) => item.assetType === spotAssetType)
-              .price
-          );
+        // document.getElementById("spot-current-price").textContent =
+        //   Intl.NumberFormat("en-US").format(
+        //     spotCurrentPrices.find((item) => item.assetType === spotAssetType)
+        //       .price
+        //   );
+        tmp = "";
+        assetTypes.forEach((asset, index) => {
+          if(asset != spotAssetType){
+          tmp += `<div class="dropdown-option" onclick="spotSelectOption('${asset}')">
+                      <span class="money-type">${asset}_USDT: </span>
+                      <span class="money-value">${Intl.NumberFormat(
+                        "en-US"
+                      ).format(
+                        spotCurrentPrices.find(
+                          (item) => item.assetType === asset
+                        ).price
+                      )}</span></div>`;
+          }
+        });
+
+        document.getElementById("spot-dropdownOptions").innerHTML = tmp;
+        document.getElementById(
+          "spot-dropdownSelected"
+        ).innerHTML = `<span class="money-type">${spotAssetType}_USDT: </span>
+                      <span class="money-value">${Intl.NumberFormat(
+                        "en-US"
+                      ).format(
+                        spotCurrentPrices.find(
+                          (item) => item.assetType === spotAssetType
+                        ).price
+                      )}</span>`;
         setTimeout(fetchSpotCurrentPrices, 500);
       }
 
       async function fetchUserData() {
-        setTimeout(fetchUserData, 500);
         try {
           const balanceResponse = await fetch("/api/getBalance", {
             method: "POST",
@@ -2101,8 +2202,14 @@
           });
 
           if (!balanceResponse.ok) {
+            setTimeout(fetchUserData, 500);
             throw new Error("Failed to fetch balance");
           }
+
+          // assetTypes.forEach((asset, index) => {
+          //   document.getElementById('futures-asset-type').options[index].textContent = asset + "_USDT: " + new Intl.NumberFormat("en-US").format(futuresCurrentPrices.filter(item => item.assetType == asset)[0].price.toFixed(2));
+          //   document.getElementById('spot-asset-type').options[index].textContent = asset + "_USDT: " + new Intl.NumberFormat("en-US").format(spotCurrentPrices.filter(item => item.assetType == asset)[0].price.toFixed(2));
+          // });
 
           const balanceData = await balanceResponse.json();
           futuresUSDTBalance = balanceData.futuresUSDTBalance;
@@ -2132,6 +2239,7 @@
         } catch (error) {
           console.error("Error fetching user data:", error);
         }
+        setTimeout(fetchUserData, 500);
       }
 
       function processPositionsData(data) {
@@ -2454,10 +2562,10 @@
               spotBalances[assetTypes.indexOf(position.assetType) + 1] +=
                 position.amount;
             }
-            if (position.positionType == "sell") {
-              spotBalances[assetTypes.indexOf(position.assetType) + 1] -=
-                position.amount;
-            }
+            // if (position.positionType == "sell") {
+            //   spotBalances[assetTypes.indexOf(position.assetType) + 1] -=
+            //     position.amount;
+            // }
 
             let currentPrice = spotCurrentPrices.filter(
               (item) => item.assetType == position.assetType
@@ -2548,6 +2656,10 @@
             spotClosedPositionsDiv.innerHTML = ""; // Clear previous closed positions
 
           data.closedSpotPositions.forEach((position) => {
+            if (position.positionType == "sell" && position.orderLimit == 0) {
+              spotBalances[assetTypes.indexOf(position.assetType) + 1] -=
+                position.amount;
+            }
             let positionDiv = document.createElement("div");
 
             if (count !== spotClosedPositionsCount) {
@@ -2651,15 +2763,18 @@
               new Intl.NumberFormat("en-US").format(balance.toFixed(2)) +
               "</span>";
             statisticsBar += "<span class='money-unit'> USDT</span>";
+            statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;";
           } else {
-            statisticsBar +=
-              "<span class='money-value'>" +
-              new Intl.NumberFormat("en-US").format(balance.toFixed(2)) +
-              "</span>";
-            statisticsBar +=
-              "<span class='money-unit'> " + assetTypes[index - 1] + "</span>";
+            if(assetTypes[index-1]==spotAssetType){
+              statisticsBar +=
+                "<span class='money-value'>" +
+                new Intl.NumberFormat("en-US").format(balance.toFixed(2)) +
+                "</span>";
+              statisticsBar +=
+                "<span class='money-unit'> " + assetTypes[index - 1] + "</span>";
+                statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;";
+            }
           }
-          statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;";
           if (index % 10 == 9) statisticsBar += "<br>";
         });
 
@@ -2788,7 +2903,7 @@
             return response.json();
           })
           .then((data) => {
-            fetchUserData();
+            //fetchUserData();
             alert(`Placed a ${positionType} bet of $${betAmount}`);
           })
           .catch((error) => {
@@ -2864,7 +2979,7 @@
             return response.json();
           })
           .then((data) => {
-            fetchUserData();
+            //fetchUserData();
             alert(`${positionType} ${amount} ${spotAssetType}`);
           })
           .catch((error) => {
@@ -3137,27 +3252,27 @@
       document.getElementById("limit-sell-button").onclick = () =>
         spotTrading("sell", "limit");
 
-      document.getElementById("futures-asset-type").onchange = () => {
-        futuresAssetType = document.getElementById("futures-asset-type").value;
-        // futuresRenderChart();
-        futuresChartUpdate()
-      };
-      document.getElementById("spot-asset-type").onchange = () => {
-        spotAssetType = document.getElementById("spot-asset-type").value;
-        document.getElementById("spot-market-unit").textContent =
-          "(" + document.getElementById("spot-asset-type").value + ")";
-        document.getElementById("spot-limit-unit").textContent =
-          "(" + document.getElementById("spot-asset-type").value + ")";
-        // spotRenderChart();
-        spotChartUpdate();
-      };
+      // document.getElementById("futures-asset-type").onchange = () => {
+      //   futuresAssetType = document.getElementById("futures-asset-type").value;
+      //   // futuresRenderChart();
+      //   futuresChartUpdate()
+      // };
+      // document.getElementById("spot-asset-type").onchange = () => {
+      //   spotAssetType = document.getElementById("spot-asset-type").value;
+      //   document.getElementById("spot-market-unit").textContent =
+      //     "(" + document.getElementById("spot-asset-type").value + ")";
+      //   document.getElementById("spot-limit-unit").textContent =
+      //     "(" + document.getElementById("spot-asset-type").value + ")";
+      //   // spotRenderChart();
+      //   spotChartUpdate();
+      // };
       // Fetch data initially and then every second
       setTimeout(fetchUserData, 2000);
       fetchFuturesCurrentPrices();
       fetchSpotCurrentPrices();
 
       // intervalId = setInterval(fetchUserData, 500);
-      document.getElementById("spot-asset-type").onchange();
+      // document.getElementById("spot-asset-type").onchange();
 
       // Clear the interval when the user leaves the page
       window.addEventListener("beforeunload", () => {
@@ -3373,6 +3488,78 @@
 
       // setTimeout(futuresRenderChart, 2000);
       // setTimeout(spotRenderChart, 5000);
+    </script>
+    <script>
+      const futuresDropdownSelected = document.getElementById(
+        "futures-dropdownSelected"
+      );
+      const futuresDropdownOptions = document.getElementById(
+        "futures-dropdownOptions"
+      );
+
+      futuresDropdownSelected.addEventListener("click", function () {
+        const isVisible = futuresDropdownOptions.style.display === "block";
+        futuresDropdownOptions.style.display = isVisible ? "none" : "block";
+      });
+
+      function futuresSelectOption(value) {
+        futuresAssetType = value;
+
+        document.getElementById(
+          "futures-dropdownSelected"
+        ).innerHTML = `<div class="dropdown-option" onclick="futuresSelectOption('${futuresAssetType}')">
+                      <span class="money-type">${futuresAssetType}_USDT: </span>
+                      <span class="money-value">${Intl.NumberFormat(
+                        "en-US"
+                      ).format(
+                        futuresCurrentPrices.find(
+                          (item) => item.assetType === futuresAssetType
+                        ).price
+                      )}</span></div>`;
+
+        futuresDropdownOptions.style.display = "none";
+        futuresChartUpdate();
+      }
+
+      const spotDropdownSelected = document.getElementById(
+        "spot-dropdownSelected"
+      );
+      const spotDropdownOptions = document.getElementById(
+        "spot-dropdownOptions"
+      );
+
+      spotDropdownSelected.addEventListener("click", function () {
+        const isVisible = spotDropdownOptions.style.display === "block";
+        spotDropdownOptions.style.display = isVisible ? "none" : "block";
+      });
+
+      function spotSelectOption(value) {
+        spotAssetType = value;
+
+        document.getElementById(
+          "spot-dropdownSelected"
+        ).innerHTML = `<div class="dropdown-option" onclick="spotSelectOption('${spotAssetType}')">
+                      <span class="money-type">${spotAssetType}_USDT: </span>
+                      <span class="money-value">${Intl.NumberFormat(
+                        "en-US"
+                      ).format(
+                        spotCurrentPrices.find(
+                          (item) => item.assetType === spotAssetType
+                        ).price
+                      )}</span></div>`;
+
+        spotDropdownOptions.style.display = "none";
+        spotChartUpdate();
+      }
+
+      document.addEventListener("click", function (event) {
+        if (
+          !futuresDropdownSelected.contains(event.target) &&
+          !futuresDropdownOptions.contains(event.target)
+        ) {
+          futuresDropdownOptions.style.display = "none";
+        }
+      });
     </script>
   </body>
 </html>
