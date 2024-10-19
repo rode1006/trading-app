@@ -216,7 +216,8 @@ app.get("/api/futures_kline", async (req, res) => {
 
     const nowTime = parseInt(new Date() / 1000);
     const startTime = nowTime - intervalValue[interval] * 60 * 50;
-    const url = `https://contract.mexc.com/api/v1/contract/kline/${symbol}?interval=${interval}&start=${startTime}&end=${nowTime}`;
+    // const url = `https://contract.mexc.com/api/v1/contract/kline/${symbol}?interval=${interval}&start=${startTime}&end=${nowTime}`;
+    const url = `https://contract.mexc.com/api/v1/contract/kline/index_price/${symbol}?interval=${interval}&start=${startTime}&end=${nowTime}`;
 
     // console.log(url);
 

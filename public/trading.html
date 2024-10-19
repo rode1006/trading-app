@@ -8,7 +8,55 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
+    <style>
+      .button-container {
+        /* margin-bottom: 20px; */
+      }
+      .chart-container {
+        width: 100%;
+        height: 30vh;
+        /* height: 20vh; */
+      }
+    </style>
     <script>
+      let intervalId;
+
+      const assetTypes = [
+        "BTC",
+        "ETH",
+        "BNB",
+        "NEO",
+        "LTC",
+        "SOL",
+        "XRP",
+        "DOT",
+      ];
+      let futuresAssetType = "BTC";
+      let spotAssetType = "BTC";
+
+      let totalUSDTBalance = 0;
+      let totalValue = 0;
+      let futuresUSDTBalance = 0; // Initialize balance
+      let spotUSDTBalance = 0; // Initialize balance
+
+      let futuresPositionsCount = 0;
+      let futuresClosedPositionsCount = 0;
+      let spotPositionsCount = 0;
+      let spotClosedPositionsCount = 0;
+
+      let closingPosition;
+
+      let spotBalances = [];
+      let futuresCurrentPrices = [];
+      let spotCurrentPrices = [];
+
+      let futuresChart;
+      let spotChart;
+      let chartDelay = 0;
+
+      let futuresInterval = "1h";
+      let spotInterval = "60";
+
       const currencyFormatter = new Intl.NumberFormat("en-US", {
         style: "currency",
         currency: "USD",
@@ -65,13 +113,15 @@
         syncWelcomeMessages();
       });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script> -->
-    <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@latest/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@latest/dist/chartjs-adapter-date-fns.bundle.min.js"></script> -->
+    
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
   </head>
   <body>
     <div class="container">
@@ -1440,7 +1490,8 @@
           <br />
           <!-- <div id="assets-statistics"></div> -->
           <h3>MEXC Futures Asset Price Chart</h3>
-          <canvas
+          <br>
+          <!-- <canvas
             id="futuresChart"
             width="400"
             height="100"
@@ -1503,7 +1554,68 @@
             >
               1M
             </button>
+          </div> -->
+          <div class="chart-container">
+            <div
+              class="tradingview-widget-container"
+              id="futures-tradingview-widget"
+              style="height: 90%; width: 100%"
+            ></div>
           </div>
+          <br>
+          <script type="text/javascript">
+            // function createTradingViewWidget(symbol, interval) {
+            function createFuturesTradingViewWidget(symbol) {
+              // console.log(symbol, interval);
+              const widgetContainer =
+                document.getElementById("futures-tradingview-widget");
+              widgetContainer.innerHTML = "";
+
+              new TradingView.widget({
+                width: "100%",
+                height: "90%",
+                symbol: symbol,
+                // interval: interval,
+                interval: "60",
+                timezone: "exchange",
+                theme: "dark",
+                style: "1",
+                toolbar_bg: "#f1f3f6",
+                enable_publishing: false,
+                backgroundColor: "#16171a",
+                gridColor: "rgba(240, 243, 250, 0.05)",
+                allow_symbol_change: true,
+                container_id: "futures-tradingview-widget",
+                save_image: false,
+                studies: [],
+                studies_overrides: {},
+                overrides: {},
+                hide_side_toolbar: false,
+                details: true,
+                hide_legend: true,
+                calendar: true,
+                news: ["headlines"],
+                auto_scale: true,
+                fontFamily: "Trebuchet MS",
+                fontSize: 12,
+                noTimeScale: false,
+                showLegend: true,
+              });
+            }
+
+            let defaultFuturesSymbol = `MEXC:${futuresAssetType}USDT`;
+            // let defaultInterval = document.getElementById("spot-interval").value;
+            // createTradingViewWidget(defaultSymbol, defaultInterval);
+            createFuturesTradingViewWidget(defaultFuturesSymbol);
+
+            function futuresChartUpdate() {
+              let selectedSymbol = `MEXC:${futuresAssetType}USDT`;
+              // const selectedInterval = document.getElementById("spot-interval").value;
+              // createTradingViewWidget(selectedSymbol, selectedInterval);
+              createFuturesTradingViewWidget(selectedSymbol);
+            }
+          </script>
+
           <div class="order-panel">
             <div>
               Asset Type:<select
@@ -1609,14 +1721,16 @@
           <div id="spot-now-price" style="margin: 10px"></div>
           <br />
           <div id="spot-assets-statistics"></div>
+          <br />
           <h3>MEXC Spot Asset Price Chart</h3>
-          <canvas
+          <br />
+          <!-- <canvas
             id="spotChart"
             width="400"
             height="100"
             style="margin: 20px"
-          ></canvas>
-          <div class="btn-div">
+          ></canvas> -->
+          <!-- <div class="btn-div">
             <button
               class="spot-chart-btn"
               id="btn-1s"
@@ -1673,7 +1787,80 @@
             >
               1M
             </button>
+          </div> -->
+          <!-- <div>
+            <label for="spot-interval">Time Interval:</label>
+            <select id="spot-interval" onchange="spotChartUpdate()">
+              <option value="1">1 Min</option>
+              <option value="5">5 Min</option>
+              <option value="15">15 Min</option>
+              <option value="60" selected>1 Hour</option>
+              <option value="240">4 Hour</option>
+              <option value="D">1 Day</option>
+              <option value="W">1 WEEK</option>
+            </select>
+        </div><br> -->
+
+          <div class="chart-container">
+            <div
+              class="tradingview-widget-container"
+              id="tradingview-widget"
+              style="height: 90%; width: 100%"
+            ></div>
           </div>
+          <script type="text/javascript">
+            // function createTradingViewWidget(symbol, interval) {
+            function createTradingViewWidget(symbol) {
+              // console.log(symbol, interval);
+              const widgetContainer =
+                document.getElementById("tradingview-widget");
+              widgetContainer.innerHTML = "";
+
+              new TradingView.widget({
+                width: "100%",
+                height: "90%",
+                symbol: symbol,
+                // interval: interval,
+                interval: "60",
+                timezone: "exchange",
+                theme: "dark",
+                style: "1",
+                toolbar_bg: "#f1f3f6",
+                enable_publishing: false,
+                backgroundColor: "#16171a",
+                gridColor: "rgba(240, 243, 250, 0.05)",
+                allow_symbol_change: true,
+                container_id: "tradingview-widget",
+                save_image: false,
+                studies: [],
+                studies_overrides: {},
+                overrides: {},
+                hide_side_toolbar: false,
+                details: true,
+                hide_legend: true,
+                calendar: true,
+                news: ["headlines"],
+                auto_scale: true,
+                fontFamily: "Trebuchet MS",
+                fontSize: 12,
+                noTimeScale: false,
+                showLegend: true,
+              });
+            }
+
+            let defaultSymbol = `MEXC:${spotAssetType}USDT`;
+            // let defaultInterval = document.getElementById("spot-interval").value;
+            // createTradingViewWidget(defaultSymbol, defaultInterval);
+            createTradingViewWidget(defaultSymbol);
+
+            function spotChartUpdate() {
+              const selectedSymbol = `MEXC:${spotAssetType}USDT`;
+              // const selectedInterval = document.getElementById("spot-interval").value;
+              // createTradingViewWidget(selectedSymbol, selectedInterval);
+              createTradingViewWidget(selectedSymbol);
+            }
+          </script>
+
           <div class="order-panel">
             <div>
               Asset Type:<select
@@ -1814,43 +2001,6 @@
       </div>
     </div>
     <script>
-      let intervalId;
-
-      const assetTypes = [
-        "BTC",
-        "ETH",
-        "BNB",
-        "NEO",
-        "LTC",
-        "SOL",
-        "XRP",
-        "DOT",
-      ];
-      let futuresAssetType = "BTC";
-      let spotAssetType = "BTC";
-
-      let totalUSDTBalance = 0;
-      let totalValue = 0;
-      let futuresUSDTBalance = 0; // Initialize balance
-      let spotUSDTBalance = 0; // Initialize balance
-
-      let futuresPositionsCount = 0;
-      let futuresClosedPositionsCount = 0;
-      let spotPositionsCount = 0;
-      let spotClosedPositionsCount = 0;
-
-      let closingPosition;
-
-      let spotBalances = [];
-      let futuresCurrentPrices = [];
-      let spotCurrentPrices = [];
-
-      let futuresChart;
-      let spotChart;
-      let chartDelay = 0;
-      let futuresInterval = "1h";
-      let spotInterval = "1h";
-
       let tmp = "";
 
       assetTypes.forEach((assetType, index) => {
@@ -1861,7 +2011,6 @@
       document.getElementById("spot-asset-type").innerHTML = tmp;
 
       async function fetchFuturesCurrentPrices() {
-        // 현재 시장 가격 요청 (선물)
         const futuresPriceResponse = await fetch("/api/getCurrentPrice", {
           method: "POST",
           headers: {
@@ -1901,7 +2050,6 @@
       }
 
       async function fetchSpotCurrentPrices() {
-        // 현재 시장 가격 요청 (스팟)
         const spotPriceResponse = await fetch("/api/getCurrentPrice", {
           method: "POST",
           headers: {
@@ -1918,8 +2066,6 @@
 
         const spotPriceData = await spotPriceResponse.json();
         spotCurrentPrices = spotPriceData.currentPrices;
-
-        // console.log(spotCurrentPrices);
 
         priceText = spotPriceData.currentPrices
           .map(
@@ -1944,9 +2090,6 @@
       async function fetchUserData() {
         setTimeout(fetchUserData, 500);
         try {
-          // chartDelay++;
-
-          // 사용자 잔고 요청
           const balanceResponse = await fetch("/api/getBalance", {
             method: "POST",
             headers: {
@@ -1969,7 +2112,6 @@
             spotBalances.push(0);
           });
 
-          // 포지션 요청
           const positionsResponse = await fetch("/api/getPositions", {
             method: "POST",
             headers: {
@@ -1983,7 +2125,7 @@
           }
 
           const positionsData = await positionsResponse.json();
-          // ...포지션 데이터를 처리하는 기존 코드 참조
+
           processPositionsData(positionsData);
         } catch (error) {
           console.error("Error fetching user data:", error);
@@ -2200,8 +2342,6 @@
             }
           });
           futuresPositionsCount = count;
-          // 기타 처리...
-          // 처리하려는 포지션 정보를 반복하면서 UI 업데이트 등의 작업을 수행
         }
         if (data.closedFuturesPositions) {
           count = data.closedFuturesPositions.length;
@@ -2997,7 +3137,8 @@
 
       document.getElementById("futures-asset-type").onchange = () => {
         futuresAssetType = document.getElementById("futures-asset-type").value;
-        futuresRenderChart();
+        // futuresRenderChart();
+        futuresChartUpdate()
       };
       document.getElementById("spot-asset-type").onchange = () => {
         spotAssetType = document.getElementById("spot-asset-type").value;
@@ -3005,7 +3146,8 @@
           "(" + document.getElementById("spot-asset-type").value + ")";
         document.getElementById("spot-limit-unit").textContent =
           "(" + document.getElementById("spot-asset-type").value + ")";
-        spotRenderChart();
+        // spotRenderChart();
+        spotChartUpdate();
       };
       // Fetch data initially and then every second
       setTimeout(fetchUserData, 2000);
@@ -3020,208 +3162,215 @@
         // clearInterval(intervalId);
       });
 
-      const futuresIntervalString = {
-        "1m": "Min1",
-        "5m": "Min5",
-        "30m": "Min30",
-        "1h": "Min60",
-        "4h": "Hour4",
-        "1d": "Day1",
-        "1W": "Week1",
-        "1M": "Month1",
-      };
-      async function futuresFetchChartData() {
-        const response = await fetch(
-          // "/api/kline?symbol=BTC_USDT&interval=1d"
-          `/api/futures_kline?symbol=${futuresAssetType}_USDT&interval=${futuresIntervalString[futuresInterval]}`
-        );
-        const data = await response.json();
-        return data;
-      }
+      // const futuresIntervalString = {
+      //   "1m": "Min1",
+      //   "5m": "Min5",
+      //   "30m": "Min30",
+      //   "1h": "Min60",
+      //   "4h": "Hour4",
+      //   "1d": "Day1",
+      //   "1W": "Week1",
+      //   "1M": "Month1",
+      // };
 
-      async function futuresRenderChart() {
-        const klineData = await futuresFetchChartData();
+      // async function futuresFetchChartData() {
+      //   const response = await fetch(
+      //     // "/api/kline?symbol=BTC_USDT&interval=1d"
+      //     `/api/futures_kline?symbol=${futuresAssetType}_USDT&interval=${futuresIntervalString[futuresInterval]}`
+      //   );
+      //   const data = await response.json();
+      //   return data;
+      // }
 
-        const candlestickData = klineData.time.map((time, index) => ({
-          x: luxon.DateTime.fromRFC2822(
-            new Date(time * 1000).toUTCString()
-          ).valueOf(),
-          o: klineData.open[index],
-          c: klineData.close[index],
-          h: klineData.high[index],
-          l: klineData.low[index],
-        }));
+      // async function futuresRenderChart() {
+      //   const klineData = await futuresFetchChartData();
+      //   console.log(klineData);
 
-        var lineData = new Array(klineData.length);
+      //   const candlestickData = klineData.time.map((time, index) => ({
+      //     x: luxon.DateTime.fromRFC2822(
+      //       new Date(time * 1000).toUTCString()
+      //     ).valueOf(),
+      //     o: klineData.open[index],
+      //     c: klineData.close[index],
+      //     h: klineData.high[index],
+      //     l: klineData.low[index],
+      //   }));
 
-        candlestickData.forEach((data, index) => {
-          lineData[index] = { x: data.x, y: data.c };
-        });
+      //   var lineData = new Array(klineData.length);
 
-        if (futuresChart) {
-          futuresChart.destroy();
-        }
+      //   candlestickData.forEach((data, index) => {
+      //     lineData[index] = { x: data.x, y: data.c };
+      //   });
 
-        const ctx = document.getElementById("futuresChart").getContext("2d");
+      //   if (futuresChart) {
+      //     futuresChart.destroy();
+      //   }
 
-        futuresChart = new Chart(ctx, {
-          type: "candlestick",
-          data: {
-            datasets: [
-              {
-                label: futuresAssetType + "_USDT: " 
-                + futuresCurrentPrices.filter((item) => item.assetType == futuresAssetType)[0].price.toFixed(2),
-                data: candlestickData,
-              },
-              {
-                label: "Close price",
-                type: "line",
-                data: lineData,
-                hidden: true,
-              },
-            ],
-          },
-          options: {
-            scales: {
-              x: {
-                ticks: {
-                  color: "#999999",
-                },
-                grid: {
-                  color: "#333333",
-                  lineWidth: 1,
-                },
-              },
-              y: {
-                ticks: {
-                  color: "#999999",
-                },
-                beginAtZero: false,
-                grid: {
-                  color: "#333333",
-                  lineWidth: 1,
-                },
-              },
-            },
-            plugins: {
-              legend: {
-                labels: {
-                  color: "#ffffff",
-                  font: {
-                    size: 20,
-                  },
-                },
-              },
-            },
-          },
-        });
-      }
+      //   const ctx = document.getElementById("futuresChart").getContext("2d");
 
-      function changeFuturesInterval(button) {
-        const buttons = document.querySelectorAll(".futures-chart-btn");
-        buttons.forEach((btn) => btn.classList.remove("active"));
-        button.classList.add("active");
-        futuresInterval = button.textContent.trim();
-        futuresRenderChart();
-      }
+      //   futuresChart = new Chart(ctx, {
+      //     type: "candlestick",
+      //     data: {
+      //       datasets: [
+      //         {
+      //           label:
+      //             futuresAssetType +
+      //             "_USDT: " +
+      //             futuresCurrentPrices
+      //               .filter((item) => item.assetType == futuresAssetType)[0]
+      //               .price.toFixed(2),
+      //           data: candlestickData,
+      //         },
+      //         {
+      //           label: "Close price",
+      //           type: "line",
+      //           data: lineData,
+      //           hidden: true,
+      //         },
+      //       ],
+      //     },
+      //     options: {
+      //       scales: {
+      //         x: {
+      //           ticks: {
+      //             color: "#999999",
+      //           },
+      //           grid: {
+      //             color: "#333333",
+      //             lineWidth: 1,
+      //           },
+      //         },
+      //         y: {
+      //           ticks: {
+      //             color: "#999999",
+      //           },
+      //           beginAtZero: false,
+      //           grid: {
+      //             color: "#333333",
+      //             lineWidth: 1,
+      //           },
+      //         },
+      //       },
+      //       plugins: {
+      //         legend: {
+      //           labels: {
+      //             color: "#ffffff",
+      //             font: {
+      //               size: 20,
+      //             },
+      //           },
+      //         },
+      //       },
+      //     },
+      //   });
+      // }
 
-      async function spotFetchChartData() {
-        const response = await fetch(
-          // "/api/kline?symbol=BTC_USDT&interval=1d"
-          `/api/spot_kline?symbol=${spotAssetType}_USDT&interval=${spotInterval}`
-        );
-        const data = await response.json();
-        return data;
-      }
+      // function changeFuturesInterval(button) {
+      //   const buttons = document.querySelectorAll(".futures-chart-btn");
+      //   buttons.forEach((btn) => btn.classList.remove("active"));
+      //   button.classList.add("active");
+      //   futuresInterval = button.textContent.trim();
+      //   futuresRenderChart();
+      // }
 
-      async function spotRenderChart() {
-        const klineData = await spotFetchChartData();
+      // async function spotFetchChartData() {
+      //   const response = await fetch(
+      //     // "/api/kline?symbol=BTC_USDT&interval=1d"
+      //     `/api/spot_kline?symbol=${spotAssetType}_USDT&interval=${spotInterval}`
+      //   );
+      //   const data = await response.json();
+      //   return data;
+      // }
 
-        const candlestickData = klineData.map((item) => ({
-          x: luxon.DateTime.fromRFC2822(
-            new Date(item[0] * 1000).toUTCString()
-          ).valueOf(),
-          o: item[1],
-          c: item[2],
-          h: item[3],
-          l: item[4],
-        }));
+      // async function spotRenderChart() {
+      //   const klineData = await spotFetchChartData();
 
-        var lineData = new Array(klineData.length);
+      //   // console.log(klineData)
+      //   const candlestickData = klineData.map((item) => ({
+      //     x: luxon.DateTime.fromRFC2822(
+      //       new Date(item[0] * 1000).toUTCString()
+      //     ).valueOf(),
+      //     o: item[1],
+      //     c: item[2],
+      //     h: item[3],
+      //     l: item[4],
+      //   }));
 
-        candlestickData.forEach((data, index) => {
-          lineData[index] = { x: data.x, y: data.c };
-        });
+      //   var lineData = new Array(klineData.length);
 
-        if (spotChart) {
-          spotChart.destroy();
-        }
+      //   candlestickData.forEach((data, index) => {
+      //     lineData[index] = { x: data.x, y: data.c };
+      //   });
 
-        const ctx = document.getElementById("spotChart").getContext("2d");
+      //   if (spotChart) {
+      //     spotChart.destroy();
+      //   }
 
-        spotChart = new Chart(ctx, {
-          type: "candlestick",
-          data: {
-            datasets: [
-              {
-                label: spotAssetType + "_USDT: " 
-                + spotCurrentPrices.filter((item) => item.assetType == spotAssetType)[0].price.toFixed(2),
-                data: candlestickData,
-              },
-              {
-                label: "Close price",
-                type: "line",
-                data: lineData,
-                hidden: true,
-              },
-            ],
-          },
-          options: {
-            scales: {
-              x: {
-                ticks: {
-                  color: "#999999",
-                },
-                grid: {
-                  color: "#333333",
-                  lineWidth: 1,
-                },
-              },
-              y: {
-                ticks: {
-                  color: "#999999",
-                },
-                beginAtZero: false,
-                grid: {
-                  color: "#333333",
-                  lineWidth: 1,
-                },
-              },
-            },
-            plugins: {
-              legend: {
-                labels: {
-                  color: "#ffffff",
-                  font: {
-                    size: 20,
-                  },
-                },
-              },
-            },
-          },
-        });
-      }
+      //   const ctx = document.getElementById("spotChart").getContext("2d");
 
-      function changeSpotInterval(button) {
-        const buttons = document.querySelectorAll(".spot-chart-btn");
-        buttons.forEach((btn) => btn.classList.remove("active"));
-        button.classList.add("active");
-        spotInterval = button.textContent.trim();
-        spotRenderChart();
-      }
+      //   spotChart = new Chart(ctx, {
+      //     type: "candlestick",
+      //     data: {
+      //       datasets: [
+      //         {
+      //           label: spotAssetType + "_USDT: "
+      //           + spotCurrentPrices.filter((item) => item.assetType == spotAssetType)[0].price.toFixed(2),
+      //           data: candlestickData,
+      //         },
+      //         {
+      //           label: "Close price",
+      //           type: "line",
+      //           data: lineData,
+      //           hidden: true,
+      //         },
+      //       ],
+      //     },
+      //     options: {
+      //       scales: {
+      //         x: {
+      //           ticks: {
+      //             color: "#999999",
+      //           },
+      //           grid: {
+      //             color: "#333333",
+      //             lineWidth: 1,
+      //           },
+      //         },
+      //         y: {
+      //           ticks: {
+      //             color: "#999999",
+      //           },
+      //           beginAtZero: false,
+      //           grid: {
+      //             color: "#333333",
+      //             lineWidth: 1,
+      //           },
+      //         },
+      //       },
+      //       plugins: {
+      //         legend: {
+      //           labels: {
+      //             color: "#ffffff",
+      //             font: {
+      //               size: 20,
+      //             },
+      //           },
+      //         },
+      //       },
+      //     },
+      //   });
+      // }
 
-      setTimeout(futuresRenderChart, 2000);
-      setTimeout(spotRenderChart, 5000);
+      // function changeSpotInterval(button) {
+      //   const buttons = document.querySelectorAll(".spot-chart-btn");
+      //   buttons.forEach((btn) => btn.classList.remove("active"));
+      //   button.classList.add("active");
+      //   spotInterval = button.textContent.trim();
+      //   spotRenderChart();
+      // }
+
+      // setTimeout(futuresRenderChart, 2000);
+      // setTimeout(spotRenderChart, 5000);
     </script>
   </body>
 </html>

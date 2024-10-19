@@ -62,20 +62,6 @@ body {
   flex-wrap: wrap;
 }
 
-.futures-chart-btn, .spot-chart-btn{
-  padding: 10px 20px;
-  margin: 5px;
-  background-color: rgb(70, 73, 80);
-  border: none;
-  cursor: pointer;
-  transition: background-color .3s;
-}
-
-.futures-chart-btn.active, .spot-chart-btn.active{
-  background-color: rgb(135, 135, 145);
-  color: white;
-}
-
 /* Hide the horizontal scrollbar */
 ::-webkit-scrollbar {
   width: 8px; /* Width of the vertical scrollbar */
@@ -1300,49 +1286,6 @@ button {
   color: #4281ff !important; /* Override inline style */
 }
 
-
-
-.chart {
-  position: relative;
-  overflow: hidden; /* Prevent elements from overflowing */
-
-  background-color: #16171a;
-  padding: 20px;
-  border-radius: 3px;
-  margin-bottom: 30px;
-  height: 1000px;
-  height: 2000px;
-  }
-
-.chart-container {
-  display: none; /* Hide charts initially */
-  height: calc(100% - 32px);
-  width: 100%;
-}
-.active {
-  display: block; /* Show active chart */
-}
-.timeframes {
-  display: flex; /* Flexbox layout for timeframes */
-  justify-content: center; /* Center align items */
-  margin: 10px 0; /* Space around timeframe buttons */
-}
-.timeframe-button {
-  margin: 0 5px; /* Space between buttons */
-  padding: 10px 15px;
-  background-color: #333;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-.timeframe-button:hover {
-  background-color: #555; /* Darker on hover */
-}
-.timeframe-button.active {
-  background-color: #007BFF; /* Highlight active button */
-}
 .modal {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
