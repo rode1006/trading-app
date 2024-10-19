@@ -10,8 +10,7 @@ const app = express();
 const assetTypes = ["BTC", "ETH", "BNB", "NEO", "LTC", "SOL", "XRP", "DOT"];
 // Mexc API URL
 
-const FUTURES_PRICE_API_URL =
-  "https://contract.mexc.com/api/v1/contract/ticker";
+const FUTURES_PRICE_API_URL = "https://contract.mexc.com/api/v1/contract/ticker";
 const SPOT_PRICE_API_URL = "https://www.mexc.com/open/api/v2/market/ticker";
 
 let futuresCurrencyPrices = [];
@@ -151,25 +150,6 @@ function sendPositionPartialClosedEmail(username, position, exitPrice) {
   transporterSendMail(mailOptions);
 }
 //===============================================================================================
-// async function fetchCurrentMarketPrices() {
-// try {
-//   const promises = assetTypes.map(async (assetType) => {
-//     const response = await axios.get(
-//       "https://api.binance.com/api/v3/ticker/price",
-//       {
-//         params: { symbol: assetType + "USDT" },
-//       }
-//     );
-//     return { assetType, price: parseFloat(response.data.price) };
-//   });
-
-//   const results = await Promise.all(promises);
-//   return results;
-// } catch (error) {
-//   console.error("Error fetching prices from Binance:", error);
-//   return null;
-// }
-// }
 async function fetchCurrentMarketPrices(accountType) {
   let response;
   if (accountType == "futures") {
@@ -217,45 +197,6 @@ async function fetchCurrentMarketPrices(accountType) {
   } else {
     console.error("Error fetching data from Mexc API: bad request:", error);
   }
-  // const prices = [];
-
-  // if (accountType == "futures") {
-  //   for (let asset of assetTypes) {
-  //     try {
-  //       const response = await axios.get(`${FUTURES_PRICE_API_URL}?symbol=${asset}_USDT`);
-  //       const price = response.data.data.lastPrice; 
-  //       prices.push({ assetType: asset, price: parseFloat(price) });
-  //     } catch (error) {
-  //       console.error(`Error fetching price for ${asset}:`, error.message);
-  //     }
-  //   }
-  //   if(prices.length > 0){
-  //     futuresCurrencyPrices = prices;
-  //     // console.log('spot - ', prices);
-  //     return prices;
-  //   }else{
-  //     return futuresCurrencyPrices;
-  //   }
-  // } else if (accountType == "spot") {
-  //   for (let asset of assetTypes) {
-  //     try {
-  //       const response = await axios.get(`${SPOT_PRICE_API_URL}?symbol=${asset}_USDT`);
-  //       const price = response.data.data[0].last; 
-  //       prices.push({ assetType: asset, price: parseFloat(price) });
-  //     } catch (error) {
-  //       console.error(`Error fetching price for ${asset}:`, error.message);
-  //     }
-  //   }
-  //   if(prices.length > 0){
-  //     spotCurrencyPrices = prices;
-  //     // console.log('spot - ', prices);
-  //     return prices;
-  //   }else{
-  //     return spotCurrencyPrices;
-  //   }
-  // } else {
-  //   console.error("Error fetching data from Mexc API: bad request:", error);
-  // }
 }
 
 app.get("/api/futures_kline", async (req, res) => {
@@ -842,16 +783,6 @@ app.post("/api/partialClosePosition", authenticateToken, async (req, res) => {
     profitLoss,
   });
 });
-
-// app.post("/api/getClosedPositions", authenticateToken, (req, res) => {
-//   const username = req.user.username;
-//   const users = loadUsers();
-//   const user = users[username];
-
-//   if (!user) return res.status(404).send("User not found");
-
-//   res.json({ closedFuturesPositions: user.closedFuturesPositions });
-// });
 
 app.post("/api/updateValue", authenticateToken, (req, res) => {
   const username = req.user.username;
