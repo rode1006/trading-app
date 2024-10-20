@@ -170,11 +170,11 @@
   },
   "tiger": {
     "password": "$2a$08$V6dQqUGfz7GR8jZ/ZacUfO.b.jS0a6Cnss7WcBrwQLTE.93SVC.cS",
-    "totalValue": 60295.38932129122,
+    "totalValue": 60460.84532129122,
     "totalUSDTBalance": 43051.49632129122,
     "futuresValue": 26963.757321291225,
     "futuresUSDTBalance": 26963.757321291225,
-    "spotValue": 33331.632,
+    "spotValue": 33497.087999999996,
     "spotUSDTBalance": 16087.738999999996,
     "privateKey": "key11",
     "address": "0xb3ad63d24fa85ea509c121d7a502b6127bbe0c54",

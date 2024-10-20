@@ -154,13 +154,6 @@
         syncWelcomeMessages();
       });
     </script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script> -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@latest/dist/chartjs-adapter-date-fns.bundle.min.js"></script> -->
 
     <script
       type="text/javascript"
@@ -1535,70 +1528,7 @@
           <!-- <div id="assets-statistics"></div> -->
           <h3>MEXC Futures Asset Price Chart</h3>
           <br />
-          <!-- <canvas
-            id="futuresChart"
-            width="400"
-            height="100"
-            style="margin: 20px"
-          ></canvas>
-          <div class="btn-div">
-            <button
-              class="futures-chart-btn"
-              id="btn-1s"
-              onclick="changeFuturesInterval(this)"
-            >
-              1m
-            </button>
-            <button
-              class="futures-chart-btn"
-              id="btn-1m"
-              onclick="changeFuturesInterval(this)"
-            >
-              5m
-            </button>
-            <button
-              class="futures-chart-btn"
-              id="btn-5m"
-              onclick="changeFuturesInterval(this)"
-            >
-              30m
-            </button>
-            <button
-              class="futures-chart-btn active"
-              id="btn-15m"
-              onclick="changeFuturesInterval(this)"
-            >
-              1h
-            </button>
-            <button
-              class="futures-chart-btn"
-              id="btn-1H"
-              onclick="changeFuturesInterval(this)"
-            >
-              4h
-            </button>
-            <button
-              class="futures-chart-btn"
-              id="btn-1D"
-              onclick="changeFuturesInterval(this)"
-            >
-              1d
-            </button>
-            <button
-              class="futures-chart-btn"
-              id="btn-1W"
-              onclick="changeFuturesInterval(this)"
-            >
-              1W
-            </button>
-            <button
-              class="futures-chart-btn"
-              id="btn-1M"
-              onclick="changeFuturesInterval(this)"
-            >
-              1M
-            </button>
-          </div> -->
+    
           <div class="chart-container">
             <div
               class="tradingview-widget-container"
@@ -2054,13 +1984,6 @@
     <script>
       let tmp = "";
 
-      // assetTypes.forEach((assetType, index) => {
-      //   tmp += `<option value="${assetType}">${assetType}</option>`;
-      // });
-
-      // document.getElementById("futures-asset-type").innerHTML = tmp;
-      // document.getElementById("spot-asset-type").innerHTML = tmp;
-
       async function fetchFuturesCurrentPrices() {
         const futuresPriceResponse = await fetch("/api/getCurrentPrice", {
           method: "POST",
@@ -2091,12 +2014,6 @@
 
         document.getElementById("futures-now-price").innerHTML = priceText;
 
-        // document.getElementById("futures-current-price").textContent =
-        // Intl.NumberFormat("en-US").format(
-        //   futuresCurrentPrices.find(
-        //     (item) => item.assetType === futuresAssetType
-        //   ).price
-        //   );
         tmp = "";
         assetTypes.forEach((asset, index) => {
           if(asset != futuresAssetType){
@@ -2157,11 +2074,6 @@
 
         document.getElementById("spot-now-price").innerHTML = priceText;
 
-        // document.getElementById("spot-current-price").textContent =
-        //   Intl.NumberFormat("en-US").format(
-        //     spotCurrentPrices.find((item) => item.assetType === spotAssetType)
-        //       .price
-        //   );
         tmp = "";
         assetTypes.forEach((asset, index) => {
           if(asset != spotAssetType){
@@ -2205,11 +2117,6 @@
             setTimeout(fetchUserData, 500);
             throw new Error("Failed to fetch balance");
           }
-
-          // assetTypes.forEach((asset, index) => {
-          //   document.getElementById('futures-asset-type').options[index].textContent = asset + "_USDT: " + new Intl.NumberFormat("en-US").format(futuresCurrentPrices.filter(item => item.assetType == asset)[0].price.toFixed(2));
-          //   document.getElementById('spot-asset-type').options[index].textContent = asset + "_USDT: " + new Intl.NumberFormat("en-US").format(spotCurrentPrices.filter(item => item.assetType == asset)[0].price.toFixed(2));
-          // });
 
           const balanceData = await balanceResponse.json();
           futuresUSDTBalance = balanceData.futuresUSDTBalance;
@@ -2562,10 +2469,6 @@
               spotBalances[assetTypes.indexOf(position.assetType) + 1] +=
                 position.amount;
             }
-            // if (position.positionType == "sell") {
-            //   spotBalances[assetTypes.indexOf(position.assetType) + 1] -=
-            //     position.amount;
-            // }
 
             let currentPrice = spotCurrentPrices.filter(
               (item) => item.assetType == position.assetType
@@ -3252,244 +3155,14 @@
       document.getElementById("limit-sell-button").onclick = () =>
         spotTrading("sell", "limit");
 
-      // document.getElementById("futures-asset-type").onchange = () => {
-      //   futuresAssetType = document.getElementById("futures-asset-type").value;
-      //   // futuresRenderChart();
-      //   futuresChartUpdate()
-      // };
-      // document.getElementById("spot-asset-type").onchange = () => {
-      //   spotAssetType = document.getElementById("spot-asset-type").value;
-      //   document.getElementById("spot-market-unit").textContent =
-      //     "(" + document.getElementById("spot-asset-type").value + ")";
-      //   document.getElementById("spot-limit-unit").textContent =
-      //     "(" + document.getElementById("spot-asset-type").value + ")";
-      //   // spotRenderChart();
-      //   spotChartUpdate();
-      // };
-      // Fetch data initially and then every second
       setTimeout(fetchUserData, 2000);
       fetchFuturesCurrentPrices();
       fetchSpotCurrentPrices();
 
-      // intervalId = setInterval(fetchUserData, 500);
-      // document.getElementById("spot-asset-type").onchange();
-
-      // Clear the interval when the user leaves the page
       window.addEventListener("beforeunload", () => {
         // clearInterval(intervalId);
       });
 
-      // const futuresIntervalString = {
-      //   "1m": "Min1",
-      //   "5m": "Min5",
-      //   "30m": "Min30",
-      //   "1h": "Min60",
-      //   "4h": "Hour4",
-      //   "1d": "Day1",
-      //   "1W": "Week1",
-      //   "1M": "Month1",
-      // };
-
-      // async function futuresFetchChartData() {
-      //   const response = await fetch(
-      //     // "/api/kline?symbol=BTC_USDT&interval=1d"
-      //     `/api/futures_kline?symbol=${futuresAssetType}_USDT&interval=${futuresIntervalString[futuresInterval]}`
-      //   );
-      //   const data = await response.json();
-      //   return data;
-      // }
-
-      // async function futuresRenderChart() {
-      //   const klineData = await futuresFetchChartData();
-      //   console.log(klineData);
-
-      //   const candlestickData = klineData.time.map((time, index) => ({
-      //     x: luxon.DateTime.fromRFC2822(
-      //       new Date(time * 1000).toUTCString()
-      //     ).valueOf(),
-      //     o: klineData.open[index],
-      //     c: klineData.close[index],
-      //     h: klineData.high[index],
-      //     l: klineData.low[index],
-      //   }));
-
-      //   var lineData = new Array(klineData.length);
-
-      //   candlestickData.forEach((data, index) => {
-      //     lineData[index] = { x: data.x, y: data.c };
-      //   });
-
-      //   if (futuresChart) {
-      //     futuresChart.destroy();
-      //   }
-
-      //   const ctx = document.getElementById("futuresChart").getContext("2d");
-
-      //   futuresChart = new Chart(ctx, {
-      //     type: "candlestick",
-      //     data: {
-      //       datasets: [
-      //         {
-      //           label:
-      //             futuresAssetType +
-      //             "_USDT: " +
-      //             futuresCurrentPrices
-      //               .filter((item) => item.assetType == futuresAssetType)[0]
-      //               .price.toFixed(2),
-      //           data: candlestickData,
-      //         },
-      //         {
-      //           label: "Close price",
-      //           type: "line",
-      //           data: lineData,
-      //           hidden: true,
-      //         },
-      //       ],
-      //     },
-      //     options: {
-      //       scales: {
-      //         x: {
-      //           ticks: {
-      //             color: "#999999",
-      //           },
-      //           grid: {
-      //             color: "#333333",
-      //             lineWidth: 1,
-      //           },
-      //         },
-      //         y: {
-      //           ticks: {
-      //             color: "#999999",
-      //           },
-      //           beginAtZero: false,
-      //           grid: {
-      //             color: "#333333",
-      //             lineWidth: 1,
-      //           },
-      //         },
-      //       },
-      //       plugins: {
-      //         legend: {
-      //           labels: {
-      //             color: "#ffffff",
-      //             font: {
-      //               size: 20,
-      //             },
-      //           },
-      //         },
-      //       },
-      //     },
-      //   });
-      // }
-
-      // function changeFuturesInterval(button) {
-      //   const buttons = document.querySelectorAll(".futures-chart-btn");
-      //   buttons.forEach((btn) => btn.classList.remove("active"));
-      //   button.classList.add("active");
-      //   futuresInterval = button.textContent.trim();
-      //   futuresRenderChart();
-      // }
-
-      // async function spotFetchChartData() {
-      //   const response = await fetch(
-      //     // "/api/kline?symbol=BTC_USDT&interval=1d"
-      //     `/api/spot_kline?symbol=${spotAssetType}_USDT&interval=${spotInterval}`
-      //   );
-      //   const data = await response.json();
-      //   return data;
-      // }
-
-      // async function spotRenderChart() {
-      //   const klineData = await spotFetchChartData();
-
-      //   // console.log(klineData)
-      //   const candlestickData = klineData.map((item) => ({
-      //     x: luxon.DateTime.fromRFC2822(
-      //       new Date(item[0] * 1000).toUTCString()
-      //     ).valueOf(),
-      //     o: item[1],
-      //     c: item[2],
-      //     h: item[3],
-      //     l: item[4],
-      //   }));
-
-      //   var lineData = new Array(klineData.length);
-
-      //   candlestickData.forEach((data, index) => {
-      //     lineData[index] = { x: data.x, y: data.c };
-      //   });
-
-      //   if (spotChart) {
-      //     spotChart.destroy();
-      //   }
-
-      //   const ctx = document.getElementById("spotChart").getContext("2d");
-
-      //   spotChart = new Chart(ctx, {
-      //     type: "candlestick",
-      //     data: {
-      //       datasets: [
-      //         {
-      //           label: spotAssetType + "_USDT: "
-      //           + spotCurrentPrices.filter((item) => item.assetType == spotAssetType)[0].price.toFixed(2),
-      //           data: candlestickData,
-      //         },
-      //         {
-      //           label: "Close price",
-      //           type: "line",
-      //           data: lineData,
-      //           hidden: true,
-      //         },
-      //       ],
-      //     },
-      //     options: {
-      //       scales: {
-      //         x: {
-      //           ticks: {
-      //             color: "#999999",
-      //           },
-      //           grid: {
-      //             color: "#333333",
-      //             lineWidth: 1,
-      //           },
-      //         },
-      //         y: {
-      //           ticks: {
-      //             color: "#999999",
-      //           },
-      //           beginAtZero: false,
-      //           grid: {
-      //             color: "#333333",
-      //             lineWidth: 1,
-      //           },
-      //         },
-      //       },
-      //       plugins: {
-      //         legend: {
-      //           labels: {
-      //             color: "#ffffff",
-      //             font: {
-      //               size: 20,
-      //             },
-      //           },
-      //         },
-      //       },
-      //     },
-      //   });
-      // }
-
-      // function changeSpotInterval(button) {
-      //   const buttons = document.querySelectorAll(".spot-chart-btn");
-      //   buttons.forEach((btn) => btn.classList.remove("active"));
-      //   button.classList.add("active");
-      //   spotInterval = button.textContent.trim();
-      //   spotRenderChart();
-      // }
-
-      // setTimeout(futuresRenderChart, 2000);
-      // setTimeout(spotRenderChart, 5000);
-    </script>
-    <script>
       const futuresDropdownSelected = document.getElementById(
         "futures-dropdownSelected"
       );
