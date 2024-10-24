@@ -50,17 +50,11 @@ body {
   /* border-top: none; */
 }
 
-body {
-  font-family: Arial, sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
 
-.btn-div{
-  display: flex;
-  flex-wrap: wrap;
-}
+
+
+
+
 
 /* Hide the horizontal scrollbar */
 ::-webkit-scrollbar {
@@ -87,7 +81,6 @@ body {
 .container {
   display: flex;
   flex-direction: row;
-  width: 100vw;
   height: 100vh;
 }
 
@@ -101,52 +94,6 @@ body {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-}
-
-.chart-container {
-  width: 100%;
-  height: 30vh;
-  /* height: 20vh; */
-}
-
-body {
-  font-family: Arial, sans-serif;
-}
-
-.custom-dropdown {
-  position: relative;
-  width: 250px;
-}
-
-.order-header{
-  display: flex;
-}
-
-.dropdown-selected {
-  padding: 10px;
-  background: #4b4949;
-  border: 1px solid #ffffff;
-  cursor: pointer;
-}
-
-.dropdown-options {
-  display: none;
-  position: absolute;
-  background: rgb(68, 67, 67);
-  border: 1px solid #ccc;
-  z-index: 1;
-  width: 100%;
-  max-height: 200px;
-  overflow-y: auto;
-}
-
-.dropdown-options .dropdown-option {
-  padding: 10px;
-  cursor: pointer;
-}
-
-.dropdown-options .dropdown-option:hover {
-  background: #e0e0e0;
 }
 
 .nav-left{
@@ -310,15 +257,6 @@ body {
   color: #ffffff;
 }
 
-.modal-content-transfer {
-  background-color: #282759;
-  margin: 10% auto;
-  padding: 20px;
-  border-radius: 10px;
-  width: 800px;
-  color: #ffffff;
-}
-
 .close {
   color: #aaaaaa;
   float: right;
@@ -391,13 +329,13 @@ body {
   padding-left: 14px;
   height: 46px !important;
 }
-@font-face {
+/* @font-face {
   font-family: 'Wix Madefor Text Variable';
   src: url('path-to-your-font-file.woff2') format('woff2'),
        url('path-to-your-font-file.woff') format('woff');
   font-weight: normal;
   font-style: normal;
-}
+} */
 
 
 .container1 {
@@ -1332,6 +1270,49 @@ button {
   color: #4281ff !important; /* Override inline style */
 }
 
+
+
+.chart {
+  position: relative;
+  overflow: hidden; /* Prevent elements from overflowing */
+
+  background-color: #16171a;
+  padding: 20px;
+  border-radius: 3px;
+  margin-bottom: 30px;
+  height: 1000px;
+  height: 2000px;
+  }
+
+.chart-container {
+  display: none; /* Hide charts initially */
+  height: calc(100% - 32px);
+  width: 100%;
+}
+.active {
+  display: block; /* Show active chart */
+}
+.timeframes {
+  display: flex; /* Flexbox layout for timeframes */
+  justify-content: center; /* Center align items */
+  margin: 10px 0; /* Space around timeframe buttons */
+}
+.timeframe-button {
+  margin: 0 5px; /* Space between buttons */
+  padding: 10px 15px;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.timeframe-button:hover {
+  background-color: #555; /* Darker on hover */
+}
+.timeframe-button.active {
+  background-color: #007BFF; /* Highlight active button */
+}
 .modal {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
