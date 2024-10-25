@@ -9,8 +9,8 @@ const router = express.Router();
 
 // User Registration
 router.post('/register', async (req, res) => {
-    // console.log(req.body);
     const { username, password } = req.body;
+
     try {
         let user = await User.findOne({ username });
         if (user) {
@@ -28,16 +28,18 @@ router.post('/register', async (req, res) => {
 
         user = new User({
             username,
-            totalValue: 1000000,
-            totalUSDTBalance: 1000000,
+            totalValue: 0,
+            totalUSDTBalance : 0,
+            futuresValue: 0,
+            futuresUSDTBalance: 0,
+            spotValue: 0,
+            spotUSDTBalance: 0,
             password: hashedPassword,
             privateKey: selectedKey.privateKey,
             address: selectedKey.address,
         });
-
         await saveUser(user);
         await deleteKey(selectedKey._id);
-
         res.json({ redirectTo: '/login' });
     } catch (err) {
         console.error(err.message);
@@ -47,8 +49,9 @@ router.post('/register', async (req, res) => {
 
 // User Login
 router.post('/login', async (req, res) => {
-    // console.log(res.body);
+    console.log(req.body);
     const { username, password } = req.body;
+    
     try {
         const user = await User.findOne({ username });
         if (!user || !bcrypt.compareSync(password, user.password)) {
@@ -56,7 +59,8 @@ router.post('/login', async (req, res) => {
         }
 
         const token = jwt.sign({ username }, 'your_jwt_secret', { expiresIn: '1h' });
-        res.json({ token, redirectTo: '/trading' });
+        console.log('token: ', token)
+        res.json({ token, redirectTo: '/trading', ok: true });
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server error');

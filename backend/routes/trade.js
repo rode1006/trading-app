@@ -1,11 +1,10 @@
 const express = require('express');
 const { authenticateToken } = require('../middleware/auth');
 const { getUserPositions, saveUserPositions } = require('../services/positionService');
-const { fetchCurrentMarketPrices } = require('../utils/market');
 const router = express.Router();
 
 router.post('/startTrade', authenticateToken, async (req, res) => {
-    const { assetType, positionType, amount } = req.body;
+    const { positionId } = req.body;
     const username = req.user.username;
     try {
         const positions = await getUserPositions(username);
@@ -13,23 +12,25 @@ router.post('/startTrade', authenticateToken, async (req, res) => {
             return res.status(404).send('User not found');
         }
 
-        const currentMarketPrices = await fetchCurrentMarketPrices();
-        if (!currentMarketPrices) {
-            return res.status(500).send('Error fetching market price');
+        let positionIndex = positions.futuresPositions.findIndex(
+            (pos) => pos.id === positionId
+        );
+        if (positionIndex === -1) {
+            positionIndex = positions.spotPositions.findIndex(
+                (pos) => pos.id === positionId
+            );
+            if (positionIndex === -1) return res.status(404).send("Position not found");
+            positions.spotPositions[positionIndex].orderLimit = 0;
+        } else {
+            positions.futuresPositions[positionIndex].orderLimit = 0;
         }
 
-        const currentMarketPrice = currentMarketPrices.find(item => item.assetType === assetType).price;
-        const positionId = Date.now();
-        const position = {
-            id: positionId,
-            assetType,
-            positionType,
-            amount,
-            entryPrice: currentMarketPrice,
-        };
-
-        positions.spotPositions.push(position);
+        // user.futuresUSDTBalance -= user.futuresPositions[positionIndex].amount;
         await saveUserPositions(username, positions);
+        res.json({
+            futuresPositions: positions.futuresPositions,
+            spotPositions: positions.spotPositions
+        });
 
         res.json({ spotPositions: positions.spotPositions });
     } catch (err) {

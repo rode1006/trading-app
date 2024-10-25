@@ -1,23 +1,53 @@
 const axios = require('axios');
-const assetTypes = ["BTC", "ETH", "BNB", "NEO", "LTC", "SOL", "XRP", "DOT"];
+const assetTypes = ["BTC", "ETH", "BNB", "NEO", "LTC", "SOL", "XRP", "DOT","ADA"];
 
-async function fetchCurrentMarketPrices() {
-    try {
-        const promises = assetTypes.map(async (assetType) => {
-            const response = await axios.get(
-                'https://api.binance.com/api/v3/ticker/price',
-                {
-                    params: { symbol: assetType + 'USDT' },
-                }
-            );
-            return { assetType, price: parseFloat(response.data.price) };
-        });
+async function fetchCurrentMarketPrices(accountType) {
+    let response;
+    let futuresCurrencyPrices = [];
+    let spotCurrencyPrices = [];
+    if (accountType == "futures") {
+        try {
+            response = await axios.get(process.env.FUTURES_PRICE_API_URL);
+            const prices = response.data.data
+                .filter(
+                    (item) =>
+                        assetTypes.includes(item.symbol.split("_")[0]) &&
+                        item.symbol.split("_")[1] == "USDT"
+                )
+                .map((item) => ({
+                    assetType: item.symbol.split("_")[0],
+                    price: parseFloat(item.lastPrice),
+                }));
+            futuresCurrencyPrices = prices;
+            return prices;
+        } catch (error) {
+            console.error("Error fetching data from Mexc API:", error);
+            // return [];
+            return futuresCurrencyPrices;
+        }
+    } else if (accountType == "spot") {
+        try {
+            response = await axios.get(process.env.SPOT_PRICE_API_URL);
+            const prices = response.data.data
+                .filter(
+                    (item) =>
+                        assetTypes.includes(item.symbol.split("_")[0]) &&
+                        item.symbol.split("_")[1] == "USDT"
+                )
+                .map((item) => ({
+                    assetType: item.symbol.split("_")[0],
+                    price: parseFloat(item.last),
+                }));
 
-        const results = await Promise.all(promises);
-        return results;
-    } catch (error) {
-        console.error('Error fetching prices from Binance:', error);
-        return null;
+            spotCurrencyPrices = prices;
+            return prices;
+        } catch (error) {
+            console.error("Error fetching data from Mexc API:", error);
+            // return [];
+            return spotCurrencyPrices;
+        }
+    } else {
+        console.error("Error fetching data from Mexc API: bad request:", error);
     }
 }
 

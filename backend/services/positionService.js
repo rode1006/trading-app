@@ -6,11 +6,13 @@ async function getUserPositions(username) {
         if (!user) {
             throw new Error('User not found');
         }
+       
         return {
             futuresPositions: user.futuresPositions,
             closedFuturesPositions: user.closedFuturesPositions,
             spotPositions: user.spotPositions,
             closedSpotPositions: user.closedSpotPositions,
+            ok: true,
         };
     } catch (err) {
         console.error(err.message);

@@ -4,74 +4,12 @@
   padding: 0;
   box-sizing: border-box;
 }
-
 body {
   margin: 0;
   padding: 0;
   font-family: 'Wix Madefor Text Variable', sans-serif;
   background-color: #0d0e0f;
   color: white;
-}
-
-.nav-bar{
-  padding: 0 20px;
-  justify-content: space-between;
-  width: 100%;
-  display: flex;
-  height: 64px;
-  background-color: #383839;
-  position: absolute;
-  z-index: 100;
-  align-self: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-/* Style the tab */
-.tab {
-  /* overflow: hidden; */
-  /* border: 1px solid #ccc; */
-  background-color: #222222;
-}
-
-/* Style the buttons inside the tab */
-.tab button {
-  background-color: inherit;
-  float: left;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  padding: 14px 16px;
-  transition: 0.3s;
-  font-size: 17px;
-}
-
-/* Change background color of buttons on hover */
-.tab button:hover {
-  background-color: #ddd;
-}
-
-/* Create an active/current tablink class */
-.tab button.active {
-  background-color: #999999;
-}
-
-/* Style the tab content */
-.tabcontent {
-  display: none;
-  padding: 6px 12px;
-  border: 1px solid #ccc;
-  /* border-top: none; */
-}
-
-body {
-  font-family: Arial, sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.btn-div{
-  display: flex;
-  flex-wrap: wrap;
 }
 
 /* Hide the horizontal scrollbar */
@@ -96,10 +34,12 @@ body {
   background: #3a3a7a; /* Lighter shade on hover for visibility */
 }
 
+
+
+
 .container {
   display: flex;
   flex-direction: row;
-  width: 100vw;
   height: 100vh;
 }
 
@@ -113,52 +53,6 @@ body {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-}
-
-.chart-container {
-  width: 100%;
-  height: 30vh;
-  /* height: 20vh; */
-}
-
-body {
-  font-family: Arial, sans-serif;
-}
-
-.custom-dropdown {
-  position: relative;
-  width: 250px;
-}
-
-.order-header{
-  display: flex;
-}
-
-.dropdown-selected {
-  padding: 10px;
-  background: #4b4949;
-  border: 1px solid #ffffff;
-  cursor: pointer;
-}
-
-.dropdown-options {
-  display: none;
-  position: absolute;
-  background: rgb(68, 67, 67);
-  border: 1px solid #ccc;
-  z-index: 1;
-  width: 100%;
-  max-height: 200px;
-  overflow-y: auto;
-}
-
-.dropdown-options .dropdown-option {
-  padding: 10px;
-  cursor: pointer;
-}
-
-.dropdown-options .dropdown-option:hover {
-  background: #e0e0e0;
 }
 
 .nav-left{
@@ -261,27 +155,10 @@ body {
 
 
 
-.money-type{
-  color: #f4a070;
-}
 
-.money-unit{
-  color: #ed70f4;
-}
 
-.money-value{
-  color: #2fda65;
-}
-
-.order-panel{
-  background-color: #333333;
-  font-size: 18px;
-  border: white solid 1px;
-  margin: 10px;
-  padding: 10px;
-}
-
-.trading-panel{
+.open-position{
+  margin-top: 100px;
   background-color: #16171a;
   padding: 20px;
   border-radius: 3px;
@@ -319,15 +196,6 @@ body {
   padding: 20px;
   border-radius: 10px;
   width: 400px;
-  color: #ffffff;
-}
-
-.modal-content-transfer {
-  background-color: #282759;
-  margin: 10% auto;
-  padding: 20px;
-  border-radius: 10px;
-  width: 800px;
   color: #ffffff;
 }
 
@@ -405,8 +273,8 @@ body {
 }
 @font-face {
   font-family: 'Wix Madefor Text Variable';
-  src: url('path-to-your-font-file.woff2') format('woff2'),
-       url('path-to-your-font-file.woff') format('woff');
+  /* src: url('path-to-your-font-file.woff2') format('woff2'),
+       url('path-to-your-font-file.woff') format('woff'); */
   font-weight: normal;
   font-style: normal;
 }
@@ -981,12 +849,6 @@ input[type="number"] {
   text-shadow: 0 0 8px rgba(0, 255, 204, 0.8), 0 0 12px rgba(0, 255, 204, 0.6); /* Cool neon glow */
 }
 
-
-
-
-
-
-
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .main-text {
@@ -1135,11 +997,42 @@ input[type="number"] {
   font-size: 14px; /* Adjust font size as needed */
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @media screen and (max-width: 339px) {
   .deposit-btn {
     display: none;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 .color-button {
   width: 100px;
   height: 50px;
@@ -1180,6 +1073,24 @@ input[type="number"] {
   font-size: 24px;
   font-weight: bold;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 .color-button {
   width: 100px;
@@ -1344,23 +1255,46 @@ button {
   color: #4281ff !important; /* Override inline style */
 }
 
-.modal {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  left: 0;
-  top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-}
-/* Modal Content */
-.modal-content {
-  background-color: #fefefe;
-  margin: 15% auto; /* 15% from the top and centered */
+
+
+.chart {
+  position: relative;
+  overflow: hidden; /* Prevent elements from overflowing */
+
+  background-color: #16171a;
   padding: 20px;
-  border: 1px solid #888;
-  width: 25%; /* Could be more or less, depending on screen size */
+  border-radius: 3px;
+  margin-bottom: 30px;
+  height: 1000px;
+  height: 2000px;
+  }
+
+.chart-container {
+  display: block; /* Hide charts initially */
+  height: calc(100% - 32px);
+  width: 100%;
+}
+.active {
+  display: block; /* Show active chart */
+}
+.timeframes {
+  display: flex; /* Flexbox layout for timeframes */
+  justify-content: center; /* Center align items */
+  margin: 10px 0; /* Space around timeframe buttons */
+}
+.timeframe-button {
+  margin: 0 5px; /* Space between buttons */
+  padding: 10px 15px;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.timeframe-button:hover {
+  background-color: #555; /* Darker on hover */
+}
+.timeframe-button.active {
+  background-color: #007BFF; /* Highlight active button */
 }

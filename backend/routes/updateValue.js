@@ -4,12 +4,11 @@ const { updateValue } = require('../services/updateValueService');
 const router = express.Router();
 
 router.post('/', authenticateToken, async (req, res) => {
-    const { field, value } = req.body;
     const username = req.user.username;
+    const { futuresPositionsAmount, futuresUnrealizedPL, spotValue, totalValue } = req.body;
 
     try {
-        const updatedUser = await updateValue(username, field, value);
-        res.json(updatedUser);
+        res.json(await updateValue(username, futuresPositionsAmount, futuresUnrealizedPL, spotValue, totalValue));
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server error');

@@ -3,6 +3,7 @@ const Key = require('../models/Key');
 async function loadKeys() {
     try {
         const keys = await Key.find();
+        console.log('keys: ', keys)
         return keys;
     } catch (err) {
         console.error(err.message);

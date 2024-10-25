@@ -13,18 +13,6 @@ body {
   color: white;
 }
 
-.nav-bar{
-  padding: 0 20px;
-  justify-content: space-between;
-  width: 100%;
-  display: flex;
-  height: 64px;
-  background-color: #383839;
-  position: absolute;
-  z-index: 100;
-  align-self: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
 /* Style the tab */
 .tab {
   /* overflow: hidden; */
@@ -56,7 +44,7 @@ body {
 
 /* Style the tab content */
 .tabcontent {
-  display: none;
+  display: block;
   padding: 6px 12px;
   border: 1px solid #ccc;
   /* border-top: none; */
@@ -113,52 +101,6 @@ body {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-}
-
-.chart-container {
-  width: 100%;
-  height: 30vh;
-  /* height: 20vh; */
-}
-
-body {
-  font-family: Arial, sans-serif;
-}
-
-.custom-dropdown {
-  position: relative;
-  width: 250px;
-}
-
-.order-header{
-  display: flex;
-}
-
-.dropdown-selected {
-  padding: 10px;
-  background: #4b4949;
-  border: 1px solid #ffffff;
-  cursor: pointer;
-}
-
-.dropdown-options {
-  display: none;
-  position: absolute;
-  background: rgb(68, 67, 67);
-  border: 1px solid #ccc;
-  z-index: 1;
-  width: 100%;
-  max-height: 200px;
-  overflow-y: auto;
-}
-
-.dropdown-options .dropdown-option {
-  padding: 10px;
-  cursor: pointer;
-}
-
-.dropdown-options .dropdown-option:hover {
-  background: #e0e0e0;
 }
 
 .nav-left{
@@ -405,8 +347,8 @@ body {
 }
 @font-face {
   font-family: 'Wix Madefor Text Variable';
-  src: url('path-to-your-font-file.woff2') format('woff2'),
-       url('path-to-your-font-file.woff') format('woff');
+  /* src: url('path-to-your-font-file.woff2') format('woff2'),
+       url('path-to-your-font-file.woff') format('woff'); */
   font-weight: normal;
   font-style: normal;
 }
@@ -631,7 +573,7 @@ select:focus::after {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Shadow for options */
   max-height: 180px; /* Maximum height */
   overflow-y: auto; /* Scroll if needed */
-  opacity: 0; /* Start hidden */
+  opacity: 1; /* Start hidden */
 }
 
 /* Show Dropdown on Click */
@@ -769,7 +711,7 @@ select:focus::after {
   display: flex;
   flex-direction: column; /* Stack items vertically */
   transform: scale(0.7); /* Start smaller */
-  opacity: 0; /* Initially invisible */
+  opacity: 1; /* Initially invisible */
   transition: transform 0.4s ease, opacity 0.4s ease; /* Smooth scale-up and fade-in */
 }
 
@@ -1363,4 +1305,21 @@ button {
   padding: 20px;
   border: 1px solid #888;
   width: 25%; /* Could be more or less, depending on screen size */
+}
+
+/* login form */
+.login-form {
+  margin-top: 20px;
+}
+.login-form label {
+  margin-top: 10px;
+}
+.login-form input {
+  font-size: 20px;
+}
+.login-form-p {
+  margin-top: 10px;
+}
+.login-header {
+  margin-top: 20px;
 }

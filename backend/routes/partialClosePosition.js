@@ -4,12 +4,11 @@ const { partialClosePosition } = require('../services/partialClosePositionServic
 const router = express.Router();
 
 router.post('/', authenticateToken, async (req, res) => {
-    const { positionId, closeAmount } = req.body;
+    const { positionId, percent } = req.body;
     const username = req.user.username;
 
     try {
-        const futuresPositions = await partialClosePosition(username, positionId, closeAmount);
-        res.json({ futuresPositions });
+        res.json(await partialClosePosition(username, positionId, percent));
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server error');

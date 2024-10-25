@@ -1,8 +1,8 @@
-const User = require('../models/User');
+const { getUser, saveUser } = require('../services/userService');
 
 async function getUserBalance(username) {
     try {
-        const user = await User.findOne({ username });
+        const user = await getUser(username);
         if (!user) {
             throw new Error('User not found');
         }
@@ -11,6 +11,7 @@ async function getUserBalance(username) {
             futuresUSDTBalance: user.futuresUSDTBalance,
             spotUSDTBalance: user.spotUSDTBalance,
             address: user.address,
+            ok: true
         };
     } catch (err) {
         console.error(err.message);
@@ -20,14 +21,19 @@ async function getUserBalance(username) {
 
 async function updateUserBalance(username, futuresUSDTBalance, spotUSDTBalance) {
     try {
-        const user = await User.findOne({ username });
+        const user = await getUser(username);
         if (!user) {
             throw new Error('User not found');
         }
-        user.futuresUSDTBalance = futuresUSDTBalance;
-        user.spotUSDTBalance = spotUSDTBalance;
+        user.futuresUSDTBalance = parseFloat(futuresUSDTBalance);
+        user.spotUSDTBalance = parseFloat(spotUSDTBalance);
         user.totalUSDTBalance = futuresUSDTBalance + spotUSDTBalance;
-        await user.save();
+        await saveUser(user);
+        return {
+            futuresUSDTBalance: user.futuresUSDTBalance,
+            spotUSDTBalance: user.spotUSDTBalance,
+            ok: true,
+        };
     } catch (err) {
         console.error(err.message);
     }

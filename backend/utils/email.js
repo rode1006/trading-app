@@ -4,7 +4,7 @@ const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: 'gagenikolov50@gmail.com',
-        pass: 'ijif cbht ohua xzh',
+        pass: 'vwus twmg owyc jhwb',
     },
 });
 
@@ -73,10 +73,21 @@ function sendPositionClosedEmail(username, position, exitPrice) {
     transporterSendMail(mailOptions);
 }
 
+function sendPositionPartialClosedEmail(username, position, exitPrice) {
+    const mailOptions = {
+        from: "gagenikolov50@gmail.com", // Replace with your admin email
+        to: "gagenikolov.z@gmail.com", // Replace with the recipient (admin) email
+        subject: "Position closed",
+        text: ` ${position.id} user ${username} partially closes position, Exit price: ${exitPrice}`,
+    };
+    transporterSendMail(mailOptions);
+}
+
 module.exports = {
     sendWithdrawalEmail,
     sendPositionOpenEmail,
     sendPositionTPEmail,
     sendPositionSLEmail,
     sendPositionClosedEmail,
+    sendPositionPartialClosedEmail
 };

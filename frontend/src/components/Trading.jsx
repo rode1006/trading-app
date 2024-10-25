@@ -1,1442 +1,2909 @@
-import React, { useState, useEffect } from "react";
-import "./trading.css";
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate  } from 'react-router-dom';
+import axios from 'axios';
+// import './futures.css';
+import './trading.css';
+import TradingViewWidget from './TradingViewWidget';
+const TradingApp = () => {
+  const navigate = useNavigate();
 
-const TradingComponent = () => {
-  const [activeTab, setActiveTab] = useState("futures");
-  const [showTransferModal, setShowTransferModal] = useState(false);
-  const [showDepositModal, setShowDepositModal] = useState(false);
-  const [futuresAssetType, setFuturesAssetType] = useState("BTC");
-  const [spotAssetType, setSpotAssetType] = useState("BTC");
-  const [futuresPositions, setFuturesPositions] = useState([]);
-  const [spotPositions, setSpotPositions] = useState([]);
-  const [futuresBalance, setFuturesBalance] = useState(0);
-  const [spotBalance, setSpotBalance] = useState(0);
-  const [futuresCurrentPrice, setFuturesCurrentPrice] = useState(0);
-  const [spotCurrentPrice, setSpotCurrentPrice] = useState(0);
-  const [futuresOpenOrders, setFuturesOpenOrders] = useState([]);
-  const [futuresClosedPositions, setFuturesClosedPositions] = useState([]);
-  const [spotOpenOrders, setSpotOpenOrders] = useState([]);
-  const [spotClosedPositions, setSpotClosedPositions] = useState([]);
-  const [transferUSDTType, setTransferUSDTType] = useState("fromFutures");
-  const [transferUSDTAmount, setTransferUSDTAmount] = useState("");
-  const [closingPosition, setClosingPosition] = useState(null);
-  const [partialClosingPercent, setPartialClosingPercent] = useState(100);
-  const [futuresUSDTBalance, setFuturesUSDTBalance] = useState(0);
-  const [spotUSDTBalance, setSpotUSDTBalance] = useState(0);
-  const [futuresMarketOrder, setFuturesMarketOrder] = useState({
-    amount: "",
-    leverage: "",
-  });
-  const [futuresLimitOrder, setFuturesLimitOrder] = useState({
-    amount: "",
-    leverage: "",
-    limitPrice: "",
-  });
-  const [spotMarketOrder, setSpotMarketOrder] = useState({ amount: "" });
-  const [spotLimitOrder, setSpotLimitOrder] = useState({
-    amount: "",
-    limitPrice: "",
-  });
-  const [selectedAsset, setSelectedAsset] = useState("USDT");
-  const [selectedNetwork, setSelectedNetwork] = useState("ERC-20");
-  const [depositAddress, setDepositAddress] = useState("");
-  const [currentPrices, setCurrentPrices] = useState({});
-  const [balance, setBalance] = useState({ futures: 0, spot: 0 });
+
   const assetTypes = ["BTC", "ETH", "BNB", "NEO", "LTC", "SOL", "XRP", "DOT"];
-  const networkOptions = ["ERC-20", "BSC", "Base", "Arbitrum One"];
-  const [showPartialCloseModal, setShowPartialCloseModal] = useState(false);
-  const [partialClosePercent, setPartialClosePercent] = useState(100);
-  const [closedFuturesPositions, setClosedFuturesPositions] = useState([]);
-  const [closedSpotPositions, setClosedSpotPositions] = useState([]);
-  const [transferAmount, setTransferAmount] = useState("");
-  const [transferType, setTransferType] = useState("fromFutures");
-  const [qrCode, setQrCode] = useState("");
+  // const [futuresAssetType, setFuturesAssetType] = useState("BTC");
+  // const [spotAssetType, setSpotAssetType] = useState("BTC");
+  // const [totalUSDTBalance, setTotalUSDTBalance] = useState(0);
+  // const [selectedNetwork, setSelectedNetwork] = useState("ERC-20");
+  // const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  // const [futuresUSDTBalance, setFuturesUSDTBalance] = useState(0);
+  // const [spotBalances, setSpotBalances] = useState([]);
+  // const [futuresPositionsCount, setFuturesPositionsCount] = useState(0);
+  // const [futuresCurrentPrices, setFuturesCurrentPrices] = useState([]);
+  // const [totalValue, setTotalValue] = useState(0);
+  // const [spotUSDTBalance, setSpotUSDTBalance] = useState(0);
+  // const [spotCurrentPrices, setSpotCurrentPrices] = useState([]);
+  // const [spotPositionsCount, setSpotPositionsCount] = useState(0);
+  // const [futuresClosedPositionsCount, setFuturesClosedPositionsCount] = useState(0);
+  // const [spotClosedPositionsCount, setSpotClosedPositionsCount] = useState(0);
 
-  const fetchBalances = async () => {
-    try {
-      const response = await fetch(
-        "http://localhost:5000/api/balance/getBalance",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-        }
-      );
-      const data = await response.json();
-      setFuturesUSDTBalance(data.futuresUSDTBalance || 0);
-      setSpotUSDTBalance(data.spotUSDTBalance || 0);
-    } catch (error) {
-      console.error("Error fetching balances:", error);
+  // const [availableAmount , setAvailableAmount] = useState(0);
+
+  let futuresAssetType ="BTC";
+  let spotAssetType ="BTC";
+  let totalUSDTBalance = 0;
+  let selectedNetwork ="ERC-20";
+  let isDropdownOpen = false;
+  let futuresUSDTBalance =0;
+  let spotBalances=[];
+  let futuresPositionsCount=0;
+  let futuresCurrentPrices=[];
+  let totalValue=0;
+  let spotUSDTBalance=0;
+  let spotCurrentPrices=[];
+  let spotPositionsCount=0;
+  let futuresClosedPositionsCount=0;
+  let spotClosedPositionsCount=0;
+  
+  let availableAmount =0;
+
+  let closingPosition;
+
+  const [selectedSpotChartSymbol, setSelectedSpotChartSymbol] = useState('MEXC:BTCUSDT')
+  const [selectedFuturesChartSymbol, setSelectedFuturesChartSymbol] = useState('MEXC:BTCUSDT')
+
+  var span1 = document.getElementsByClassName("close")[0];
+  var span2 = document.getElementsByClassName("close")[1];
+  if(span1!=undefined){
+    span1.onClick = function () {
+      partialClosingModal.style.display = "none";
+    };
+  }
+  if(span2!=undefined){
+    span2.onClick = function () {
+      transferUSDTModal.style.display = "none";
+    };
+  }
+
+   // When the user clicks anywhere outside of the modal, close it
+   window.onClick = function (event) {
+    if (event.target == partialClosingModal) {
+      partialClosingModal.style.display = "none";
+    }
+    if (event.target == transferUSDTModal) {
+      transferUSDTModal.style.display = "none";
     }
   };
 
+
+  let partialClosingModal = document.getElementById(
+    "partial-closing-modal"
+  );
+  var transferUSDTModal = document.getElementById("transfer-USDT-modal");
+  const options = [
+    { imgSrc: "img/USDT.png", label: "USDT", balance: "0.00" },
+    { imgSrc: "img/USDC.png", label: "USDC", balance: "0.00" },
+    { imgSrc: "img/BNB.png", label: "BNB", balance: "0.00" },
+  ];
+  const networks = [
+      { imgSrc: "img/ETH3.png", label: "ERC-20" },
+      { imgSrc: "img/bsc.png", label: "BSC" },
+      { imgSrc: "img/base.png", label: "Base" },
+      { imgSrc: "img/arb.png", label: "Arbitrum One" },
+  ];
   useEffect(() => {
-    fetchBalances();
+      checkToken();
+      if (localStorage.getItem("token") == null) {
+        return;
+      }
+      loadUserData();
+      fetchFuturesCurrentPrices();
+      fetchSpotCurrentPrices();
+      hideSpot();
+      setTimeout(fetchUserData, 2000);
   }, []);
+  useEffect(()=>{
+    setTimeout(fetchUserData, 2000);
+  }, [ totalValue, spotBalances, futuresUSDTBalance, futuresPositionsCount,
+    futuresClosedPositionsCount,
+    spotPositionsCount,
+    spotClosedPositionsCount])
 
-  // Function to place market orders in Futures
-  const placeFuturesMarketOrder = async (positionType) => {
-    const { amount, leverage } = futuresMarketOrder;
-    if (!amount || !leverage) {
-      alert("Please enter valid amount and leverage for the market order");
-      return;
-    }
-    try {
-      const response = await fetch(
-        "http://localhost:5000/api/position/openFuturesPosition",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-          body: JSON.stringify({
-            futuresAssetType,
-            positionType,
-            orderType: "market",
-            amount: parseFloat(amount),
-            leverage: parseInt(leverage),
-          }),
-        }
-      );
-      if (response.ok) {
-        alert(`Order of ${positionType} placed successfully in market`);
-        fetchBalances(); // Update balances
-        setFuturesMarketOrder({ amount: "", leverage: "" });
-      } else {
-        alert("Error placing market order");
+  const checkToken = () => {
+      if (localStorage.getItem("token") == null) {
+          // alert("Please login!");
+          navigate('/login')
       }
-    } catch (error) {
-      console.error("Error placing market order:", error);
-    }
   };
-
-  // Function to place limit orders in Futures
-  const placeFuturesLimitOrder = async (positionType) => {
-    const { amount, leverage, limitPrice } = futuresLimitOrder;
-    if (!amount || !leverage || !limitPrice) {
-      alert("Please enter valid amount, leverage, and limit price");
-      return;
-    }
-    try {
-      const response = await fetch(
-        "http://localhost:5000/api/position/openFuturesPosition",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-          body: JSON.stringify({
-            futuresAssetType,
-            positionType,
-            orderType: "limit",
-            amount: parseFloat(amount),
-            leverage: parseInt(leverage),
-            limitPrice: parseFloat(limitPrice),
-          }),
-        }
-      );
-      if (response.ok) {
-        alert(`Limit order of ${positionType} placed successfully`);
-        fetchBalances();
-        setFuturesLimitOrder({ amount: "", leverage: "", limitPrice: "" });
-      } else {
-        alert("Error placing limit order");
-      }
-    } catch (error) {
-      console.error("Error placing limit order:", error);
-    }
-  };
-
-  // Function to place market orders in Spot
-  const placeSpotMarketOrder = async (positionType) => {
-    const { amount } = spotMarketOrder;
-    if (!amount) {
-      alert("Please enter a valid amount for the spot market order");
-      return;
-    }
-    try {
-      const response = await fetch(
-        "http://localhost:5000/api/openSpotPosition",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-          body: JSON.stringify({
-            spotAssetType,
-            positionType,
-            orderType: "market",
-            amount: parseFloat(amount),
-          }),
-        }
-      );
-      if (response.ok) {
-        alert(`Order of ${positionType} placed successfully in Spot market`);
-        fetchBalances();
-        setSpotMarketOrder({ amount: "" });
-      } else {
-        alert("Error placing market order in Spot");
-      }
-    } catch (error) {
-      console.error("Error placing market order in Spot:", error);
-    }
-  };
-
-  // Function to place limit orders in Spot
-  const placeSpotLimitOrder = async (positionType) => {
-    const { amount, limitPrice } = spotLimitOrder;
-    if (!amount || !limitPrice) {
-      alert("Please enter valid amount and limit price for the Spot order");
-      return;
-    }
-    try {
-      const response = await fetch(
-        "http://localhost:5000/api/openSpotPosition",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-          body: JSON.stringify({
-            spotAssetType,
-            positionType,
-            orderType: "limit",
-            amount: parseFloat(amount),
-            limitPrice: parseFloat(limitPrice),
-          }),
-        }
-      );
-      if (response.ok) {
-        alert(`Limit order of ${positionType} placed successfully in Spot`);
-        fetchBalances();
-        setSpotLimitOrder({ amount: "", limitPrice: "" });
-      } else {
-        alert("Error placing limit order in Spot");
-      }
-    } catch (error) {
-      console.error("Error placing limit order in Spot:", error);
-    }
-  };
-
-  useEffect(() => {
-    document.getElementById("defaultOpen").click();
-  }, []);
-
-  const toggleTransferModal = () => {
-    setShowTransferModal(!showTransferModal);
-  };
-
-  const toggleDepositModal = () => {
-    setShowDepositModal(!showDepositModal);
-  };
-
-  // Load initial data
-  useEffect(() => {
-    fetchUserData();
-    fetchMarketData();
-  }, []);
-
-  const fetchUserData = async () => {
-    // Simulated API call to obtain user data
-    try {
-      const response = await fetch(
-        "http://localhost:5000/api/balance/getBalance",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-        }
-      );
-      const data = await response.json();
-      setFuturesBalance(data.futuresUSDTBalance);
-      setSpotBalance(data.spotUSDTBalance);
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-  };
-
-  const fetchMarketData = async () => {
-    // Simulated API call to obtain market price
-    try {
-      const response = await fetch(
-        "http://localhost:5000/api/market/getCurrentPrice",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-      const data = await response.json();
-      const currentPrice =
-        data.currentPrices.find((item) => item.assetType === futuresAssetType)
-          ?.price || 0;
-      setFuturesCurrentPrice(currentPrice);
-
-      const spotPrice =
-        data.currentPrices.find((item) => item.assetType === spotAssetType)
-          ?.price || 0;
-      setSpotCurrentPrice(spotPrice);
-    } catch (error) {
-      console.error("Error fetching market price:", error);
-    }
-  };
-
-  const handleTabChange = (tabName) => {
-    setActiveTab(tabName);
-  };
-
-  // Functions to handle trading operations
-  const handleFuturesTrading = (positionType, orderType) => {
-    // Implementation of futures trading logic
-    alert(`Futures Trading: ${positionType} (${orderType})`);
-  };
-
-  const handleSpotTrading = (positionType, orderType) => {
-    // Implementation of spot trading logic
-    alert(`Spot Trading: ${positionType} (${orderType})`);
-  };
-
-  // Function to obtain positions and orders from backend
-  const fetchPositionsAndOrders = async () => {
-    try {
-      const response = await fetch(
-        "http://localhost:5000/api/position/getPositions",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-        }
-      );
-      const data = await response.json();
-
-      // Update state with positions and orders
-      setFuturesPositions(data.futuresPositions || []);
-      setFuturesOpenOrders(data.futuresOpenOrders || []);
-      setFuturesClosedPositions(data.closedFuturesPositions || []);
-      setSpotPositions(data.spotPositions || []);
-      setSpotOpenOrders(data.spotOpenOrders || []);
-      setSpotClosedPositions(data.closedSpotPositions || []);
-    } catch (error) {
-      console.error("Error fetching positions and orders:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchPositionsAndOrders();
-  }, []);
-
-  // Function to close a futures position
-  const closeFuturesPosition = async (positionId, reason) => {
-    try {
-      const response = await fetch(
-        "http://localhost:5000/api/position/closeFuturesPosition",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-          body: JSON.stringify({ positionId, reason }),
-        }
-      );
-      if (response.ok) {
-        alert("Successfully closed futures position");
-        fetchPositionsAndOrders(); // Update positions after closing
-      } else {
-        alert("Error closing the futures position");
-      }
-    } catch (error) {
-      console.error("Error closing the futures position:", error);
-    }
-  };
-
-  // Function to close a spot position
-  const closeSpotPosition = async (positionId) => {
-    try {
-      const response = await fetch(
-        "http://localhost:5000/api/position/closeSpotPosition",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-          body: JSON.stringify({ positionId }),
-        }
-      );
-      if (response.ok) {
-        alert("Successfully closed spot position");
-        fetchPositionsAndOrders(); // Update positions after closing
-      } else {
-        alert("Error closing the spot position");
-      }
-    } catch (error) {
-      console.error("Error closing the spot position:", error);
-    }
-  };
-
-  // Function to get positions from backend
-  const fetchPositions = async () => {
-    try {
-      const response = await fetch(
-        "http://localhost:5000/api/position/getPositions",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-        }
-      );
-      const data = await response.json();
-      setFuturesPositions(data.futuresPositions || []);
-      setSpotPositions(data.spotPositions || []);
-    } catch (error) {
-      console.error("Error fetching positions:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchPositions();
-  }, []);
-
-  // Function to save Take Profit and Stop Loss
-  const saveTPSL = async (positionId, tp, sl) => {
-    try {
-      const response = await fetch(
-        "http://localhost:5000/api/position/saveTPSL",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-          body: JSON.stringify({ positionId, tp, sl }),
-        }
-      );
-      if (response.ok) {
-        alert("Take Profit and Stop Loss updated");
-        fetchPositions(); // Update positions after saving
-      } else {
-        alert("Error updating TP/SL");
-      }
-    } catch (error) {
-      console.error("Error updating TP/SL:", error);
-    }
-  };
-
-  // Function to transfer USDT between Futures and Spot
-  const transferUSDT = async () => {
-    if (isNaN(transferUSDTAmount) || transferUSDTAmount <= 0) {
-      alert("Please enter a valid amount for the transfer");
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        "http://localhost:5000/api/balance/updateBalance",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-          body: JSON.stringify({
-            type: transferUSDTType,
-            amount: parseFloat(transferUSDTAmount),
-          }),
-        }
-      );
-      if (response.ok) {
-        alert("USDT transfer successful");
-        fetchPositions(); // Update data after the transfer
-        setTransferUSDTAmount("");
-      } else {
-        alert("Error conducting transfer");
-      }
-    } catch (error) {
-      console.error("Error conducting transfer:", error);
-    }
-  };
-
-  // Function to partially close a position
-  const partialClose = async () => {
-    if (
-      isNaN(partialClosingPercent) ||
-      partialClosingPercent <= 0 ||
-      partialClosingPercent > 100
-    ) {
-      alert("Please enter a valid percentage for the partial close");
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        "http://localhost:5000/api/partialClosePosition",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-          body: JSON.stringify({
-            positionId: closingPosition.id,
-            percent: partialClosingPercent,
-          }),
-        }
-      );
-      if (response.ok) {
-        alert(`Partially closed position at ${partialClosingPercent}%`);
-        fetchPositions();
-        setPartialClosingPercent(100);
-        setClosingPosition(null);
-      } else {
-        alert("Error partially closing the position");
-      }
-    } catch (error) {
-      console.error("Error partially closing the position:", error);
-    }
-  };
-
-  const loadUserData = async () => {
-    try {
-      const response = await fetch(
-        "http://localhost:5000/api/balance/getBalance",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-        }
-      );
-      const data = await response.json();
-      setDepositAddress(data.address);
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-  };
-
-  const fetchCurrentPrices = async () => {
-    try {
-      const response = await fetch(
-        "http://localhost:5000/api/market/getCurrentPrice",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const data = await response.json();
-      setCurrentPrices(data.currentPrices);
-    } catch (error) {
-      console.error("Error fetching current prices:", error);
-    }
-  };
-
-  const handleTabClick = (tab) => {
-    setActiveTab(tab);
-  };
-
-  const handleTransferClick = () => {
-    setShowTransferModal(true);
-  };
-
-  const handleDepositClick = () => {
-    setShowDepositModal(true);
-  };
-
-  const handleTransfer = () => {
-    if (transferAmount === "" || isNaN(transferAmount)) {
-      alert("Please enter a valid transfer amount");
-      return;
-    }
-    // Logic for transferring USDT between Futures and Spot accounts
-    alert(`Transferred ${transferAmount} USDT from ${transferType}`);
-    setShowTransferModal(false);
-  };
-
-  const generateQRCode = (address) => {
-    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(
-      address
-    )}&size=150x150`;
-    setQrCode(qrCodeUrl);
-  };
-
-  const closeModals = () => {
-    setShowTransferModal(false);
-    setShowDepositModal(false);
-    setShowPartialCloseModal(false);
-  };
-
-  const handlePartialClose = () => {
-    // Logic to handle the partial closing of positions
-    alert(`Closing ${partialClosePercent}% of the position`);
-    setShowPartialCloseModal(false);
-  };
-
-  const handlePlaceOrder = (orderType, positionType) => {
-    // Logic to handle the order (Futures or Spot)
-    alert(`Placed a ${positionType} ${orderType} order`);
-  };
-
-  const handleAssetChange = (asset) => {
-    setSelectedAsset(asset);
-  };
-
-  const handleNetworkChange = (network) => {
-    setSelectedNetwork(network);
-  };
-
-  const copyAddress = () => {
+  function addValidationEventListener() {
+    // Adding the validation event listeners to input fields
+   
+  }
+  function copyAddress() {
+    const address = document.getElementById("address").innerText;
     navigator.clipboard
-      .writeText(depositAddress)
+      .writeText(address)
       .then(() => {
         alert("Address copied to clipboard");
       })
       .catch((err) => {
         alert("Failed to copy address");
       });
+  }
+  const loadUserData = async () => {
+      // Fetch user data from API
+      
+    try {
+      const response = await axios.post('http://localhost:5000/api/balance/getBalance', {}, {
+            headers:{'Authorization': 'Bearer ' + localStorage.getItem('token')}
+      });
+        const data = await response.data;
+        const availableAmount = parseFloat(data.balance); // Set available balance to variable
+        // setAvailableAmount(availableAmount);
+        availableAmount = availableAmount;
+        document.getElementById('availableAmount').textContent = availableAmount.toFixed(3); // Display formatted balance
+        document.getElementById(
+          "welcome-message-duplicate"
+        ).textContent = data.username;
+        document.getElementById("address").textContent = data.address;
+
+        // Now that the balance is set, add the validation listener
+        addValidationEventListener();
+    
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+    }
   };
 
-  const logout = async () => {
-    await fetch("/logout", { method: "POST" });
-    localStorage.removeItem("token");
-    window.location.href = "/login";
-  };
+  async function fetchFuturesCurrentPrices() {
+    const futuresPriceResponse = await axios.post("http://localhost:5000/api/market/getCurrentPrice", 
+      { accountType: "futures" }, 
+      { headers: {"Content-Type": "application/json" }
+    });
+    
+    const futuresPriceData = await futuresPriceResponse.data;
 
+    if (!futuresPriceData.ok) {
+      throw new Error("Failed to fetch futures prices");
+    }
+    
+    futuresCurrentPrices = futuresPriceData.currentPrices;
+
+    let priceText = futuresPriceData.currentPrices
+      .map(
+        (price) =>
+          `<span class='money-type'>${price.assetType}:</span>
+           <span class='money-value'>${new Intl.NumberFormat("en-US").format(
+            price.price
+          )}</span>&nbsp;&nbsp;&nbsp;&nbsp;`
+      )
+      .join("");
+    document.getElementById("futures-now-price").innerHTML = priceText;
+
+    let tmp = "";
+    assetTypes.forEach((asset, index) => {
+      if (asset != futuresAssetType) {
+        tmp += `<div class="dropdown-option" id = "dropdown-option-${index}">
+                    <span class="money-type">${asset}_USDT: </span>
+                    <span class="money-value">${Intl.NumberFormat(
+          "en-US"
+        ).format(
+          futuresCurrentPrices.find(
+            (item) => item.assetType === asset
+          ).price
+        )}</span></div>`;
+      }
+    });
+
+    document.getElementById("futures-dropdownOptions").innerHTML = tmp;
+    document.getElementById(
+      "futures-dropdownSelected"
+    ).innerHTML = `<span class="money-type">${futuresAssetType}_USDT: </span>
+                    <span class="money-value">${Intl.NumberFormat(
+      "en-US"
+    ).format(
+      futuresCurrentPrices.find(
+        (item) => item.assetType === futuresAssetType
+      ).price
+    )}</span>`;
+    console.log(assetTypes)
+
+    assetTypes.forEach((asset, index)=>{
+      if (asset != futuresAssetType){
+        document.getElementById('dropdown-option-'+index).addEventListener("click", function(){
+          futuresSelectOption(asset)
+        })
+      }
+    })
+    setTimeout(fetchFuturesCurrentPrices, 500);
+  }
+  function createFuturesTradingViewWidget(symbol) {
+    // console.log(symbol, interval);
+    // const widgetContainer = document.getElementById(
+    //   "futures-tradingview-widget"
+    // );
+    // widgetContainer.innerHTML = "";
+
+    // new TradingView.widget({
+    //   width: "100%",
+    //   height: "90%",
+    //   symbol: symbol,
+    //   // interval: interval,
+    //   interval: "60",
+    //   timezone: "Etc/UTC",
+    //   theme: "dark",
+    //   style: "1",
+    //   locate: "en",
+    //   backgroundColor: "#16171a",
+    //   gridColor: "rgba(240, 243, 250, 0.05)",
+    //   allow_symbol_change: false,
+    //   container_id: "futures-tradingview-widget",
+    //   // save_image: false,
+    //   // studies: [],
+    //   // studies_overrides: {},
+    //   // overrides: {},
+    //   hide_side_toolbar: false,
+    //   // details: true,
+    //   hide_legend: true,
+    //   calendar: false,
+    //   // news: ["headlines"],
+    //   // auto_scale: true,
+    //   // fontFamily: "Trebuchet MS",
+    //   // fontSize: 12,
+    //   // noTimeScale: false,
+    //   // showLegend: true,
+    //   hide_volume: true,
+    //   support_host: "https://www.tradingview.com",
+    // });
+  }
+  function futuresChartUpdate() {
+    let selectedSymbol = `MEXC:${futuresAssetType}USDT`;
+    // setSelectedFuturesChartSymbol(selectedSymbol)
+  }
+  function futuresSelectOption(value) {
+    futuresAssetType = value
+    let selectedSymbol = `MEXC:${value}USDT`;
+    setSelectedFuturesChartSymbol(selectedSymbol)
+    // selectedFuturesChartSymbol = selectedSymbol
+    document.getElementById(
+      "futures-dropdownSelected"
+    ).innerHTML = `<div class="dropdown-option">
+                    <span class="money-type">${value}_USDT: </span>
+                    <span class="money-value">${Intl.NumberFormat(
+      "en-US"
+    ).format(
+      futuresCurrentPrices.find(
+        (item) => item.assetType === futuresAssetType
+      ).price
+    )}</span></div>`;
+
+    const futuresDropdownOptions = document.getElementById(
+      "futures-dropdownOptions"
+    );
+
+    futuresDropdownOptions.style.display = "none";
+  }
+  
+  useEffect(()=>{
+    const futuresDropdownSelected = document.getElementById(
+      "futures-dropdownSelected"
+    );
+    const futuresDropdownOptions = document.getElementById(
+      "futures-dropdownOptions"
+    );
+
+    futuresDropdownSelected.addEventListener("click", function () {
+      const isVisible = futuresDropdownOptions.style.display === "block";
+      futuresDropdownOptions.style.display = isVisible ? "none" : "block";
+    });
+
+    const spotDropdownSelected = document.getElementById(
+      "spot-dropdownSelected"
+    );
+    const spotDropdownOptions = document.getElementById(
+      "spot-dropdownOptions"
+    );
+
+    spotDropdownSelected.addEventListener("click", function () {
+      const isVisible = spotDropdownOptions.style.display === "block";
+      spotDropdownOptions.style.display = isVisible ? "none" : "block";
+    });
+
+  }, [])
+
+  useEffect(()=>{
+    if(futuresCurrentPrices.length==0) return;
+    let tmp = "";
+    console.log('futuresCurrentPrices ', futuresCurrentPrices)
+    assetTypes.forEach((asset, index) => {
+      console.log('index =', index, asset)
+      const item =  futuresCurrentPrices.find((item) => item.assetType === asset);
+      console.log('item: ', item)
+      const price = Intl.NumberFormat("en-US").format(item.price);
+
+      if (asset != futuresAssetType) {
+        tmp += `<div id='${'dropdown-option-'+index}' class="custom-dropdown-option">
+                    <span class="money-type">${asset}_USDT: </span>
+                    <span class="money-value">${price}</span></div>`;
+        
+      }
+    });
+    
+    document.getElementById("futures-dropdownOptions").innerHTML = tmp;
+    assetTypes.forEach((asset, index) => {
+      if(document.getElementById("dropdown-option-"+index)!=undefined)
+      document.getElementById("dropdown-option-"+index).addEventListener('click', function() {
+        console.log(index)
+        futuresSelectOption(asset)
+      })
+    });
+    document.getElementById(
+      "futures-dropdownSelected"
+    ).innerHTML = `<span class="money-type">${futuresAssetType}_USDT: </span>
+                    <span class="money-value">${Intl.NumberFormat(
+      "en-US"
+    ).format(
+      futuresCurrentPrices.find(
+        (item) => item.assetType === futuresAssetType
+      ).price
+    )}</span>`;
+    
+    setTimeout(fetchFuturesCurrentPrices, 500);
+
+    
+  }, [futuresCurrentPrices])
+
+  function transferUSDT() {
+    
+    const transferUSDTType =
+      document.getElementById("transfer-USDT-type").value;
+    const transferUSDTAmount = parseFloat(
+      document.getElementById("transfer-USDT-amount").value
+    );
+    if (transferUSDTType == "fromFutures") {
+      if (transferUSDTAmount > futuresUSDTBalance) {
+        alert("Insufficient USDT in the Futures account");
+        return;
+      } else {
+        futuresUSDTBalance -= transferUSDTAmount;
+        spotUSDTBalance += transferUSDTAmount;
+      }
+    }
+    if (transferUSDTType == "fromSpot") {
+      if (transferUSDTAmount > spotUSDTBalance) {
+        alert("Insufficient USDT in the Spot account");
+        return;
+      } else {
+        // console.log(futuresUSDTBalance, spotUSDTBalance);
+        futuresUSDTBalance += transferUSDTAmount;
+        spotUSDTBalance -= transferUSDTAmount;
+        // console.log(futuresUSDTBalance, spotUSDTBalance);
+      }
+    }
+    document.getElementById("transfer-modal-futures-USDT").textContent =
+      futuresUSDTBalance;
+    document.getElementById("transfer-modal-spot-USDT").textContent =
+      spotUSDTBalance;
+    const response = axios.post("http://localhost:5000/api/balance/updateBalance", 
+      {
+        futuresUSDTBalance,
+        spotUSDTBalance,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+          "Content-Type": "application/json",
+        }
+      }
+    );
+    const data = response.data;
+    if (data.ok){
+      alert("Operation completed successfully!");
+    }
+    else{
+      console.error()
+    };
+  }
+  function spotSelectOption(value) {
+    spotAssetType = value
+    let selectedSymbol = `MEXC:${value}USDT`;
+    setSelectedSpotChartSymbol(selectedSymbol)
+    // selectedSpotChartSymbol = selectedSymbol
+    document.getElementById(
+      "spot-dropdownSelected"
+    ).innerHTML = `<div class="dropdown-option" >
+                    <span class="money-type">${value}_USDT: </span>
+                    <span class="money-value">${Intl.NumberFormat(
+      "en-US"
+    ).format(
+      spotCurrentPrices.find(
+        (item) => item.assetType === value
+      ).price
+    )}</span></div>`;
+    const spotDropdownOptions = document.getElementById(
+      "spot-dropdownOptions"
+    );
+    spotDropdownOptions.style.display = "none";
+  }
+  async function fetchSpotCurrentPrices() {
+    const spotPriceResponse = await axios.post("http://localhost:5000/api/market/getCurrentPrice", {
+      accountType: "spot"
+    },
+    {
+      headers: {
+        "Content-Type": "application/json",
+      }
+    });
+    const spotPriceData = await spotPriceResponse.data;
+    if (!spotPriceData.ok) {
+      throw new Error("Failed to fetch spot prices");
+    }
+    // spotCurrentPrices = spotPriceData.currentPrices;
+    console.log('spotPriceData: ', spotPriceData)
+    // setSpotCurrentPrices(spotPriceData.currentPrices);
+    spotCurrentPrices = spotPriceData.currentPrices
+
+    let priceText = spotPriceData.currentPrices
+      .map(
+        (price) =>
+          `<span class='money-type'>${price.assetType}:</span>
+           <span class='money-value'>${new Intl.NumberFormat("en-US").format(
+            price.price
+          )}</span>&nbsp;&nbsp;&nbsp;&nbsp;`
+      )
+      .join("");
+
+    document.getElementById("spot-now-price").innerHTML = priceText;
+    
+    let tmp = "";
+      assetTypes.forEach((asset, index) => {
+        if (asset != spotAssetType) {
+          tmp += `<div class="dropdown-option" id = "dropdown-option-spot-${index}">
+                      <span class="money-type">${asset}_USDT: </span>
+                      <span class="money-value">${Intl.NumberFormat(
+            "en-US"
+          ).format(
+            spotCurrentPrices.find(
+              (item) => item.assetType === asset
+            ).price
+          )}</span></div>`;
+        }
+      });
+
+      document.getElementById("spot-dropdownOptions").innerHTML = tmp;
+      document.getElementById(
+        "spot-dropdownSelected"
+      ).innerHTML = `<span class="money-type">${spotAssetType}_USDT: </span>
+                      <span class="money-value">${Intl.NumberFormat(
+        "en-US"
+      ).format(
+        spotCurrentPrices.find(
+          (item) => item.assetType === spotAssetType
+        ).price
+      )}</span>`;
+
+      assetTypes.forEach((asset, index)=>{
+        if (asset != spotAssetType){
+          document.getElementById('dropdown-option-spot-'+index).addEventListener("click", function(){
+            spotSelectOption(asset)
+          })
+        }
+      })
+      setTimeout(fetchSpotCurrentPrices, 500);
+
+  }
+  function hideSpot(){
+    document.getElementById('spot').style.display = 'none'
+    document.getElementById('defaultOpen').classList.add('active')
+  }
+  useEffect(()=>{
+    if(spotCurrentPrices.length==0) return;
+    let tmp = "";
+    assetTypes.forEach((asset, index) => {
+      if (asset != spotAssetType) {
+        tmp += `<div id = '${'dropdown-option-spot-'+index}' class="custom-dropdown-option">
+                    <span class="money-type">${asset}_USDT: </span>
+                    <span class="money-value">${Intl.NumberFormat(
+          "en-US"
+        ).format(
+          spotCurrentPrices.find(
+            (item) => item.assetType === asset
+          ).price
+        )}</span></div>`;
+      }
+    });
+    
+    document.getElementById("spot-dropdownOptions").innerHTML = tmp;
+    assetTypes.forEach((asset, index) => {
+      if(document.getElementById("dropdown-option-spot-"+index)!=undefined)
+      document.getElementById("dropdown-option-spot-"+index).addEventListener('click', function() {
+        console.log(index)
+        spotSelectOption(asset)
+      })
+    });
+    document.getElementById(
+      "spot-dropdownSelected"
+    ).innerHTML = `<span class="money-type">${spotAssetType}_USDT: </span>
+                    <span class="money-value">${Intl.NumberFormat(
+      "en-US"
+    ).format(
+      spotCurrentPrices.find(
+        (item) => item.assetType === spotAssetType
+      ).price
+    )}</span>`;
+    setTimeout(fetchSpotCurrentPrices, 2000);
+  }, [])
+  async function fetchUserData() {
+    try {
+      const balanceResponse = await axios.post("http://localhost:5000/api/balance/getBalance", {}, {
+          headers: {Authorization: "Bearer " + localStorage.getItem("token")}
+      });
+      const balanceData = await balanceResponse.data;
+      if (!balanceData.ok) {
+        setTimeout(fetchUserData, 500);
+        throw new Error("Failed to fetch balance");
+      }
+      // assetTypes.forEach((asset, index) => {
+      //   document.getElementById('futures-asset-type').options[index].textContent = asset + "_USDT: " + new Intl.NumberFormat("en-US").format(futuresCurrentPrices.filter(item => item.assetType == asset)[0].price.toFixed(2));
+      //   document.getElementById('spot-asset-type').options[index].textContent = asset + "_USDT: " + new Intl.NumberFormat("en-US").format(spotCurrentPrices.filter(item => item.assetType == asset)[0].price.toFixed(2));
+      // });
+      // console.log('balanceData: ', balanceData)
+      // setFuturesUSDTBalance(balanceData.futuresUSDTBalance);
+      futuresUSDTBalance = balanceData.futuresUSDTBalance
+      spotUSDTBalance = balanceData.spotUSDTBalance;
+
+      spotBalances = [];
+      spotBalances.push(spotUSDTBalance);
+      assetTypes.forEach((asset) => {
+        spotBalances.push(0);
+      });
+
+      const positionsResponse = await axios.post("http://localhost:5000/api/position/getPositions", {},
+        {
+          headers: {Authorization: "Bearer " + localStorage.getItem("token")}
+        });
+      const positionsData = await positionsResponse.data;
+      if (!positionsData.ok) {
+        throw new Error("Failed to fetch positions");
+      }
+      processPositionsData(positionsData);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+    setTimeout(fetchUserData, 2000);
+  }
+  function calculateUnrealizedPL(
+    entryPrice,
+    currentPrice,
+    amount,
+    leverage,
+    positionType
+  ) {
+    let profitLoss = 0;
+    const priceDifference = (currentPrice - entryPrice) / entryPrice; // Percentage change
+
+    if (positionType === "Long") {
+      profitLoss = amount * priceDifference; // Long: profit when price goes up
+    } else if (positionType === "Short") {
+      profitLoss = amount * -priceDifference; // Short: profit when price goes down
+    }
+
+    return profitLoss * leverage;
+  }
+
+  function saveTPSL(position) {
+    let tp = parseFloat(document.getElementById("tp" + position.id).value);
+    if (isNaN(tp) || tp == 0) {
+      if (position.positionType == "Long") {
+        tp = 100000000;
+      } else {
+        tp = 0;
+      }
+    }
+    let sl = parseFloat(document.getElementById("sl" + position.id).value);
+    if (isNaN(sl) || sl == 0) {
+      if (position.positionType == "Long") {
+        sl = 0;
+      } else {
+        sl = 100000000;
+      }
+    }
+    const response = axios.post("http://localhost:5000/api/position/saveTPSL",
+      {
+        positionId: position.id,
+        tp: tp,
+        sl: sl,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+          "Content-Type": "application/json",
+        }
+    });
+    const data = response.data;
+    if(data.ok){
+      console.log('Success saving TP & SL')
+    }
+    else
+      console.error("Error saving TP & SL:", data);
+  }
+
+  function closeSpotPosition(position) {
+    if (!position.orderLimit) return;
+    const response = axios.post("http://localhost:5000/api/position/closeSpotPosition", 
+      {
+        positionId: position.id, // Assuming each position has a unique ID
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+          "Content-Type": "application/json",
+        }
+      }
+    );
+    const data = response.data;
+    if (!data.ok) {
+      console.error("Error closing position:", data);
+      alert("Error closing position. Please try again.");
+      throw new Error("Network response was not ok");
+    }
+    else {
+      // updateBalanceDisplay();
+      fetchUserData(); // Refresh user data
+      alert("Limit order of spot trading was closed by user");
+    }
+  }
+  function processPositionsData(data) {
+    const futuresPositionsDiv = document.getElementById(
+      "futures-open-positions"
+    );
+    const futuresOpenOrdersDiv = document.getElementById(
+      "futures-open-orders"
+    );
+    const futuresClosedPositionsDiv = document.getElementById(
+      "futures-closed-positions"
+    );
+
+    const spotPositionsDiv = document.getElementById("spot-open-positions");
+    const spotOpenOrdersDiv = document.getElementById("spot-open-orders");
+    const spotClosedPositionsDiv = document.getElementById(
+      "spot-closed-positions"
+    );
+
+    let count = 0;
+    let futuresUnrealizedPL = 0;
+    let futuresPositionsAmount = 0;
+    // futuresPositions
+    if (data.futuresPositions) {
+      count =
+        data.futuresPositions.length +
+        data.futuresPositions.filter(
+          (position) => position.orderLimit === 1
+        ).length;
+
+      if (count !== futuresPositionsCount) {
+        futuresPositionsDiv.innerHTML = ""; // Clear previous positions
+        futuresOpenOrdersDiv.innerHTML = ""; // Clear previous limit orders
+      }
+
+      data.futuresPositions.forEach((position) => {
+        // futuresBalances[assetTypes.indexOf(position.assetType) + 1] += position.amount;
+        let currentPrice = futuresCurrentPrices.filter(
+          (item) => item["assetType"] == position.assetType)[0].price;
+        let unrealizedPL = calculateUnrealizedPL(
+          position.entryPrice,
+          currentPrice,
+          position.amount,
+          position.leverage,
+          position.positionType
+        );
+        let positionDiv = document.createElement("div");
+
+          if (position.orderLimit == 1) {
+            let startTrading = 0;
+            if (
+              (position.entryPrice < position.limitPrice &&
+                position.limitPrice < currentPrice) ||
+              (position.entryPrice > position.limitPrice &&
+                position.limitPrice > currentPrice)
+            ) {
+              const response = axios.post("http://localhost:5000/api/trade/startTrade",
+                {
+                  positionId: position.id,
+                },
+                {
+                headers: {
+                  Authorization:
+                    "Bearer " + localStorage.getItem("token"),
+                  "Content-Type": "application/json",
+                }
+              })
+              const data =  response.data;
+              if (!data.ok){
+                console.error("Error starting Trade:", data)
+              }
+
+            position.orderLimit = 0;
+          } else {
+            unrealizedPL = 0;
+          }
+        }
+        if ( unrealizedPL < 0 &&
+          Math.abs(unrealizedPL) >= position.amount * 0.8
+        ) {
+          alert('unrealizedPL: ' +unrealizedPL + 'position.amount: '+ position.amount)
+          futuresUnrealizedPL -= position.amount;
+          futuresPositionsAmount += position.amount;
+          closeFuturesPosition(position, 3);
+          return;
+        } else {
+          futuresUnrealizedPL += unrealizedPL;
+          // if (!position.orderLimit)
+          futuresPositionsAmount += position.amount;
+          if (
+            (position.positionType == "Long" &&
+              currentPrice > position.tp) ||
+            (position.positionType == "Short" && currentPrice < position.tp)
+          ) {
+            closeFuturesPosition(position, 1);
+            return;
+          }
+          if (
+            (position.positionType == "Long" &&
+              currentPrice < position.sl) ||
+            (position.positionType == "Short" && currentPrice > position.sl)
+          ) {
+            closeFuturesPosition(position, 2);
+            return;
+          } else {
+            if (count !== futuresPositionsCount) {
+              positionDiv.textContent = `
+                                      ${1 - position.orderLimit}-${position.orderType
+                }-${position.positionType}- ${position.assetType}- 
+                                      Amount: $${position.amount},
+                                      Leverage: ${position.leverage}X, 
+                                      Entry: $${position.entryPrice},
+                                  `;
+              if (position.orderType == "limit")
+                positionDiv.textContent += ` Limit Price: $${position.limitPrice},`;
+
+              let liquidationPrice = 0;
+              if (position.positionType == "Short")
+                liquidationPrice =
+                  (position.entryPrice * (125 + position.leverage / 100)) /
+                  125;
+              if (position.positionType == "Long")
+                liquidationPrice =
+                  (position.entryPrice * (125 - 100 / position.leverage)) /
+                  125;
+
+              positionDiv.textContent += ` Liquidation: $${liquidationPrice.toFixed(
+                2
+              )},`;
+
+              const unPLLabel = document.createElement("label");
+              unPLLabel.textContent = `Unrealized P/L: $${unrealizedPL.toFixed(
+                2
+              )},`;
+              unPLLabel.id = "un" + position.id;
+              positionDiv.appendChild(unPLLabel);
+
+              const tpLabel = document.createElement("label");
+              tpLabel.textContent = "TP: ";
+              positionDiv.appendChild(tpLabel);
+
+              const tpInput = document.createElement("input");
+              tpInput.type = "number";
+              tpInput.id = "tp" + position.id;
+              tpInput.style.width = "80px";
+              if (position.tp > 0 && position.tp < 10000000)
+                tpInput.value = position.tp;
+              positionDiv.appendChild(tpInput);
+
+              const slLabel = document.createElement("label");
+              slLabel.textContent = "SL: ";
+              positionDiv.appendChild(slLabel);
+
+              const slInput = document.createElement("input");
+              slInput.type = "number";
+              slInput.id = "sl" + position.id;
+              slInput.style.width = "80px";
+              if (position.sl > 0 && position.sl < 10000000)
+                slInput.value = position.sl;
+              positionDiv.appendChild(slInput);
+
+              const saveButton = document.createElement("button");
+              saveButton.textContent = "Save";
+              saveButton.onClick = () => saveTPSL(position);
+              positionDiv.appendChild(saveButton);
+              positionDiv.append(" ");
+
+              // Create close button
+              const closeButton = document.createElement("button");
+              closeButton.textContent = "Close";
+              closeButton.onClick = () => {
+                closingPosition = position;
+                partialClosingModal.style.display = "block";
+              };
+              // closeButton.onClick = () => closeFuturesPosition(position, 0);
+              positionDiv.appendChild(closeButton); // Add close button to position div
+
+              if (position.orderType == "market") {
+                if (position.positionType == "Long")
+                  positionDiv.style.backgroundColor = "#232323";
+                if (position.positionType == "Short")
+                  positionDiv.style.backgroundColor = "#464646";
+              }
+              if (position.orderType == "limit") {
+                if (position.orderLimit == 0) {
+                  if (position.positionType == "Long")
+                    positionDiv.style.backgroundColor = "#853467";
+                  if (position.positionType == "Short")
+                    positionDiv.style.backgroundColor = "#925743";
+                } else {
+                  if (position.positionType == "Long")
+                    positionDiv.style.backgroundColor = "#295843";
+                  if (position.positionType == "Short")
+                    positionDiv.style.backgroundColor = "#694456";
+                }
+              }
+
+              if (position.orderLimit) {
+                futuresOpenOrdersDiv.appendChild(positionDiv);
+              } else {
+                futuresPositionsDiv.appendChild(positionDiv);
+              }
+            } else {
+              document.getElementById("un" + position.id).textContent =
+                "Unrealized P/L: " + unrealizedPL.toFixed(2) + ",";
+            }
+          }
+        }
+      });
+      futuresPositionsCount = count;
+      // setFuturesPositionsCount(count)
+    }
+    if (data.closedFuturesPositions) {
+      count = data.closedFuturesPositions.length;
+      if (count !== futuresClosedPositionsCount)
+        futuresClosedPositionsDiv.innerHTML = ""; // Clear previous closed positions
+
+      data.closedFuturesPositions.forEach((position) => {
+        let positionDiv = document.createElement("div");
+
+        if (count !== futuresClosedPositionsCount) {
+          positionDiv.textContent = `
+                                  ${1 - position.orderLimit}-${position.orderType
+            }-${position.positionType}-${position.assetType}- 
+                                  Amount: $${position.amount},
+                                  Leverage: ${position.leverage}X, 
+                                  Entry: $${position.entryPrice},
+                                  Exit: $${position.exitPrice},
+                              `;
+          if (position.orderType == "limit")
+            positionDiv.textContent += ` Limit Price: $${position.limitPrice},`;
+
+          let liquidationPrice = 0;
+          if (position.positionType == "Short")
+            liquidationPrice =
+              (position.entryPrice * (125 + position.leverage / 100)) / 125;
+          if (position.positionType == "Long")
+            liquidationPrice =
+              (position.entryPrice * (125 - 100 / position.leverage)) / 125;
+
+          positionDiv.textContent += ` Liquidation: $${liquidationPrice.toFixed(
+            2
+          )},`;
+
+          if (position.tp != 0 && position.tp != 100000000) {
+            positionDiv.textContent += ` TP: $${position.tp.toFixed(2)},`;
+          }
+
+          if (position.sl != 0 && position.sl != 100000000) {
+            positionDiv.textContent += ` SL: $${position.sl.toFixed(2)},`;
+          }
+
+          positionDiv.textContent += ` realized P/L: $${position.realizedPL.toFixed(
+            2
+          )},`;
+
+          let closedReason = "";
+          switch (position.closedReason) {
+            case 0:
+              closedReason = "by User";
+              break;
+            case 1:
+              closedReason = "by TP";
+              break;
+            case 2:
+              closedReason = "by SL";
+              break;
+            case 3:
+              closedReason = "by Liquidaion";
+              break;
+            case 4:
+              closedReason = "partially";
+              break;
+          }
+
+          positionDiv.textContent += ` closed ${closedReason},`;
+
+          if (position.orderType == "market") {
+            if (position.positionType == "Long")
+              positionDiv.style.backgroundColor = "#232323";
+            if (position.positionType == "Short")
+              positionDiv.style.backgroundColor = "#464646";
+          }
+          if (position.orderType == "limit") {
+            if (position.orderLimit == 0) {
+              if (position.positionType == "Long")
+                positionDiv.style.backgroundColor = "#853467";
+              if (position.positionType == "Short")
+                positionDiv.style.backgroundColor = "#925743";
+            } else {
+              if (position.positionType == "Long")
+                positionDiv.style.backgroundColor = "#295843";
+              if (position.positionType == "Short")
+                positionDiv.style.backgroundColor = "#694456";
+            }
+          }
+
+          futuresClosedPositionsDiv.appendChild(positionDiv);
+        }
+      });
+      futuresClosedPositionsCount = count;
+      // setFuturesClosedPositionsCount(count)
+    }
+
+    if (data.spotPositions) {
+          count =
+            data.spotPositions.length +
+            data.spotPositions.filter(
+              (position) => position.orderLimit == 1
+            ).length;
+          if (count !== spotPositionsCount) {
+            spotPositionsDiv.innerHTML = ""; // Clear previous positions
+            spotOpenOrdersDiv.innerHTML = ""; // Clear previous limit orders
+          }
+          data.spotPositions.forEach((position) => {
+            spotBalances[assetTypes.indexOf(position.assetType) + 1] = 0;
+          });
+          data.spotPositions.forEach((position) => {
+            if(position.positionType=='buy'){
+              spotBalances[assetTypes.indexOf(position.assetType) + 1] += parseFloat(position.amount);
+            }
+            if(position.positionType=='sell'){
+              spotBalances[assetTypes.indexOf(position.assetType) + 1] -= parseFloat(position.amount);
+            }
+          
+        let currentPrice = spotCurrentPrices.filter(
+          (item) => item.assetType == position.assetType
+        )[0].price;
+
+      if (position.orderLimit == 1) {
+        let startTrading = 0;
+        if (
+          (position.entryPrice < position.limitPrice &&
+            position.limitPrice < currentPrice) ||
+          (position.entryPrice > position.limitPrice &&
+            position.limitPrice > currentPrice)
+        ) {
+          const response = axios.post("http://localhost:5000/api/trade/startTrade", 
+            {
+              positionId: position.id,
+            },
+            {
+            headers: {
+              Authorization:
+                "Bearer " + localStorage.getItem("token"),
+              "Content-Type": "application/json",
+            }
+          });
+          const result = response.data;
+          if (!result.ok){
+            console.error("Error starting spot Trading:", result)
+          }  
+          position.orderLimit = 0;
+        }
+      }
+        let positionDiv = document.createElement("div");
+
+        if (count !== spotPositionsCount) {
+          positionDiv.textContent = `
+                                  ${1 - position.orderLimit}-${position.orderType
+            }-${position.positionType}-  
+                                  Amount: ${position.amount} (${position.assetType
+            })-
+                                  Entry Price: ${position.entryPrice}(USDT),
+                              `;
+          if (position.orderType == "limit")
+            positionDiv.textContent += ` Limit Price: $${position.limitPrice},`;
+
+          if (position.orderType == "market") {
+            if (position.positionType == "buy")
+              positionDiv.style.backgroundColor = "#232323";
+            if (position.positionType == "Sell")
+              positionDiv.style.backgroundColor = "#464646";
+          }
+          if (position.orderType == "limit") {
+            if (position.orderLimit == 0) {
+              if (position.positionType == "buy")
+                positionDiv.style.backgroundColor = "#853467";
+              if (position.positionType == "sell")
+                positionDiv.style.backgroundColor = "#925743";
+            } else {
+              if (position.positionType == "buy")
+                positionDiv.style.backgroundColor = "#295843";
+              if (position.positionType == "sell")
+                positionDiv.style.backgroundColor = "#694456";
+            }
+          }
+
+          if (position.orderLimit) {
+            const closeButton = document.createElement("button");
+            closeButton.textContent = "Close";
+            closeButton.onClick = () => {
+              closeSpotPosition(position);
+            };
+            positionDiv.appendChild(closeButton); // Add close button to position div
+
+            spotOpenOrdersDiv.appendChild(positionDiv);
+          } else {
+            spotPositionsDiv.appendChild(positionDiv);
+          }
+        }
+      });
+      spotPositionsCount = count;
+      // setSpotPositionsCount(count)
+    }
+
+    if (data.closedSpotPositions) {
+      count = data.closedSpotPositions.length;
+      if (count !== spotClosedPositionsCount)
+        spotClosedPositionsDiv.innerHTML = ""; // Clear previous closed positions
+
+      data.closedSpotPositions.forEach((position) => {
+        if (position.positionType == "sell" && position.orderLimit == 0) {
+          spotBalances[assetTypes.indexOf(position.assetType) + 1] -=
+            position.amount;
+        }
+        let positionDiv = document.createElement("div");
+
+        if (count !== spotClosedPositionsCount) {
+          positionDiv.textContent = `
+                                  ${1 - position.orderLimit}-${position.orderType
+            }-${position.positionType}- 
+                                  Amount: ${position.amount}(${position.assetType
+            }),
+                                  Entry Price: ${position.entryPrice}(USDT),
+                              `;
+          if (position.orderType == "limit")
+            positionDiv.textContent += ` Limit Price: $${position.limitPrice},`;
+          if (position.orderType == "limit") {
+            if (position.orderLimit == 1) {
+              if (position.positionType == "sell")
+                positionDiv.style.backgroundColor = "#295843";
+              if (position.positionType == "buy")
+                positionDiv.style.backgroundColor = "#694456";
+            }
+          }
+
+          spotClosedPositionsDiv.appendChild(positionDiv);
+        }
+      });
+      spotClosedPositionsCount = count;
+      // setSpotClosedPositionsCount(count)
+    }
+    //---------------futures statistics--------------------------------
+    let statisticsBar = "";
+    statisticsBar +=
+      "<span class='money-type'>Est. Futures Balance (USDT):</span>";
+    statisticsBar +=
+      "<span class='money-value'>" +
+      new Intl.NumberFormat("en-US").format(futuresUSDTBalance.toFixed(2)) +
+      "</span>";
+    statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+    statisticsBar +=
+      "<span class='money-type'>Est. Futures Value (USDT):</span>";
+    statisticsBar +=
+      "<span class='money-value'>" +
+      new Intl.NumberFormat("en-US").format(
+        (
+          futuresUSDTBalance +
+          futuresPositionsAmount +
+          futuresUnrealizedPL
+        ).toFixed(2)
+      ) +
+      "</span>";
+    statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+    statisticsBar +=
+      "<span class='money-type'>Est. Futures Cost (USDT):</span>";
+    statisticsBar +=
+      "<span class='money-value'>" +
+      Intl.NumberFormat("en-US").format(futuresPositionsAmount) +
+      "</span>";
+    statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+    statisticsBar +=
+      "<span class='money-type'>Est. Futures Unrealized PNL (USDT):</span>";
+    statisticsBar +=
+      "<span class='money-value'>" +
+      Intl.NumberFormat("en-US").format(futuresUnrealizedPL.toFixed(2)) +
+      "</span>";
+    document.getElementById("futures-statistics").innerHTML = statisticsBar;
+
+    //----------------spot statistics---------------------------------------
+    statisticsBar = "";
+    statisticsBar +=
+      "<span class='money-type'>Est. Spot Balance (USDT):</span>";
+    statisticsBar +=
+      "<span class='money-value'>" +
+      new Intl.NumberFormat("en-US").format(spotUSDTBalance.toFixed(2)) +
+      "</span>";
+    statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+    statisticsBar +=
+      "<span class='money-type'>Est. Spot Value (USDT):</span>";
+    console.log('spotUSDTBalance = ', spotUSDTBalance)
+    let spotValue = parseFloat(spotUSDTBalance);
+    // console.log(spotBalances);
+    spotBalances.forEach((balance, index) => {
+      if (index > 0) {
+        spotValue += parseFloat(balance) * spotCurrentPrices.filter((item) => item.assetType == assetTypes[index - 1]).price;
+      }
+    });
+    statisticsBar +=
+      "<span class='money-value'>" +
+      new Intl.NumberFormat("en-US").format(spotValue.toFixed(2)) +
+      "</span>";
+
+    document.getElementById("spot-statistics").innerHTML = statisticsBar;
+    //---------------spot asset statistics-----------------------------------
+    statisticsBar = "<span class='money-type'>Est. Balances: </span>";
+    spotBalances.forEach((balance, index) => {
+      if (!index) {
+        statisticsBar +=
+          "<span class='money-value'>" +
+          new Intl.NumberFormat("en-US").format(balance.toFixed(2)) +
+          "</span>";
+        statisticsBar += "<span class='money-unit'> USDT</span>";
+        statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;";
+      } else {
+        if (assetTypes[index - 1] == spotAssetType) {
+          statisticsBar +=
+            "<span class='money-value'>" +
+            new Intl.NumberFormat("en-US").format(balance.toFixed(2)) +
+            "</span>";
+          statisticsBar +=
+            "<span class='money-unit'> " + assetTypes[index - 1] + "</span>";
+          statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;";
+        }
+      }
+      // if (index % 10 == 9) statisticsBar += "<br>";
+    });
+
+    document.getElementById("spot-assets-statistics").innerHTML = statisticsBar;
+
+    //------------------- total statistics --------------------
+    statisticsBar = "";
+    statisticsBar +=
+      "<span class='money-type'>Est. Total Balance (USDT):</span>";
+    statisticsBar +=
+      "<span class='money-value'>" +
+      new Intl.NumberFormat("en-US").format(
+        (futuresUSDTBalance + spotUSDTBalance).toFixed(2)
+      ) +
+      "</span>";
+    statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+    statisticsBar +=
+      "<span class='money-type'>Est. Total Value (USDT):</span>";
+    // setTotalValue(spotUSDTBalance);
+    totalValue = spotUSDTBalance
+    console.log('totalValue = ', totalValue)
+
+    spotBalances.forEach((balance, index) => {
+      if (index > 0) {
+          const newValue =
+            parseFloat(balance) * spotCurrentPrices.filter((item) => item.assetType == assetTypes[index - 1]).price;
+            // setTotalValue(prev=>prev+newValue);
+            totalValue += newValue
+      }
+    });
+    // totalValue += (parseFloat(futuresUSDTBalance) + parseFloat(futuresPositionsAmount) + parseFloat(futuresUnrealizedPL));
+    statisticsBar +=
+      "<span class='money-value'>" +
+      new Intl.NumberFormat("en-US").format((spotUSDTBalance+futuresUSDTBalance+futuresPositionsAmount+futuresUnrealizedPL).toFixed(2)) +
+      "</span>";
+    document.getElementById("total-statistics").innerHTML = statisticsBar;
+
+    //---------------------------------------------------------
+    const response  = axios.post("http://localhost:5000/api/updateValue",
+      {
+        futuresPositionsAmount,
+        futuresUnrealizedPL,
+        spotValue,
+        totalValue,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+          "Content-Type": "application/json",
+        }
+      }
+    )
+    const result = response.data;
+  }
+
+  function partialClose() {
+    let percent = parseFloat(
+      document.getElementById("particalClosingPercent").value
+    );
+    if (percent == 0) {
+      alert("Please select a valid percent");
+    }
+    if (percent == 100) {
+      closeFuturesPosition(closingPosition, 0);
+    } else {
+      const response = axios.post("http://localhost:5000/api/partialClosePosition", 
+        {
+          positionId: closingPosition.id, // Assuming each position has a unique ID
+          percent,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+            "Content-Type": "application/json"
+        }
+      });
+      const data = response.data;
+      if (!response.ok) {
+        console.error("Error closing position:", data);
+        alert("Error closing position. Please try again.");
+        throw new Error("Network response was not ok");
+      }
+      else{
+          // Update futuresUSDTBalance after closing position
+          futuresUSDTBalance += data.profitLoss; // Assuming the server returns the profit/loss
+          // updateBalanceDisplay();
+          fetchUserData(); // Refresh user data
+          alert("Position partially closed by " + percent + "%.");
+          futuresPositionsCount = 0;
+          // setFuturesPositionsCount(0)
+          futuresClosedPositionsCount = 0;
+          // setFuturesClosedPositionsCount(0)
+      }
+    }
+    partialClosingModal.style.display = "none";
+  }
+  // Close position function
+  function closeFuturesPosition(position, reason) {
+    const response = axios.post("http://localhost:5000/api/position/closeFuturesPosition", 
+      {
+        positionId: position.id, // Assuming each position has a unique ID
+        reason,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      }
+    );
+    const data = response.data;
+    if (!data.ok) {
+      console.error("Error closing position:", data);
+      alert("Error closing position. Please try again.");
+      throw new Error("Network response was not ok");
+    }
+    else {
+      // Update futuresUSDTBalance after closing position
+      futuresUSDTBalance += data.profitLoss; // Assuming the server returns the profit/loss
+      // updateBalanceDisplay();
+      fetchUserData(); // Refresh user data
+      switch (reason) {
+        case 0:
+          alert("Position closed manully by user.");
+          break;
+        case 1:
+          alert("Position closed automatically by TP.");
+          break;
+        case 2:
+          alert("Position closed automatically by SL.");
+          break;
+        case 3:
+          alert(
+            "Position closed because you lost all money because of liquidation."
+          );
+          break;
+      }
+    }
+  }
+  function selectTrading(evt, divId) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+      tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+      tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(divId).style.display = "block";
+    evt.currentTarget.className += " active";
+  }
+  function futuresTrading(positionType, orderType) {
+    let betAmount = 0;
+    let leverage = 0;
+    let limitPrice = 0;
+    if (orderType == "market") {
+      betAmount = parseFloat(document.getElementById("bet-amount").value);
+      leverage = parseFloat(document.getElementById("bet-leverage").value);
+    }
+    if (orderType == "limit") {
+      betAmount = parseFloat(document.getElementById("limit-amount").value);
+      leverage = parseFloat(
+        document.getElementById("limit-leverage").value
+      );
+      limitPrice = parseFloat(document.getElementById("limit-price").value);
+      if (isNaN(limitPrice)) {
+        alert("Please enter a valid Limit Price");
+        return;
+      }
+    }
+
+    if (isNaN(betAmount) || betAmount <= 0) {
+      alert("Please enter a valid bet amount.");
+      return;
+    }
+    if (isNaN(leverage) || leverage < 1 || leverage > 300) {
+      alert("Please enter a valid bet amount.");
+      return;
+    }
+
+    const response = axios.post("http://localhost:5000/api/position/openFuturesPosition", 
+      {
+        futuresAssetType,
+        positionType: positionType === "long" ? "Long" : "Short",
+        orderType: orderType,
+        amount: betAmount,
+        leverage: leverage,
+        limitPrice: limitPrice,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+          "Content-Type": "application/json",
+        }
+      }
+    );
+    const data = response.data;  
+    if (!data.ok) {
+      console.error("Error placing bet:", data);
+      alert("Error placing bet. Please try again.");
+      throw new Error("Network response was not ok");
+    }
+    else {
+      alert(`Placed a ${positionType} bet of $${betAmount}`);
+    }
+  }
+  function generateQRCode() {
+    const qrCodeImg = document.getElementById("qr-code");
+    const address = document.getElementById("address").innerText;
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(
+      address
+    )}&size=150x150`;
+    qrCodeImg.src = qrCodeUrl;
+    qrCodeImg.style.display = "block"; // Show the QR code image
+  }
+  function spotTrading(positionType, orderType) {
+    let amount = 0;
+    let limitPrice = 0;
+    if (orderType == "market") {
+      amount = parseFloat(
+        document.getElementById("spot-market-amount").value
+      );
+    }
+    if (orderType == "limit") {
+      amount = parseFloat(
+        document.getElementById("spot-limit-amount").value
+      );
+      limitPrice = parseFloat(
+        document.getElementById("spot-limit-price").value
+      );
+      if (isNaN(limitPrice)) {
+        alert("Please enter a valid Limit Price");
+        return;
+      }
+    }
+
+    if (isNaN(amount) || amount <= 0) {
+      alert("Please enter a valid amount.");
+      return;
+    }
+
+    if (positionType == "buy") {
+      if (
+        spotUSDTBalance <
+        amount *
+        spotCurrentPrices.filter(
+          (item) => item.assetType == spotAssetType
+        )[0].price
+      ) {
+        alert("Insufficient USDT");
+        return;
+      }
+    }
+
+    if (positionType == "sell") {
+      if (amount > spotBalances[assetTypes.indexOf(spotAssetType) + 1]) {
+        alert("Insufficient " + spotAssetType);
+        return;
+      }
+    }
+
+    const response = axios.post("http://localhost:5000/api/openSpotPosition", 
+      {
+        spotAssetType,
+        positionType,
+        orderType,
+        amount,
+        limitPrice,
+      },
+      {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token"),
+        "Content-Type": "application/json",
+      }
+    })
+    const data = response.data;
+    
+    if (!data.ok) {
+      console.error("Error placing bet:", data);
+      alert("Error placing bet. Please try again.");
+      throw new Error("Network response was not ok");
+    }
+    else{
+        //fetchUserData();
+        alert(`${positionType} ${amount} ${spotAssetType}`);
+    }
+  }
+  function validateForm() {
+    const amountInput = document.getElementById("amountInput");
+    const addressInput = document.getElementById("addressInput");
+    const amountValue = amountInput.value.trim();
+    const isValidAmount =
+      !amountValue.startsWith("0") &&
+      !isNaN(parseFloat(amountValue)) &&
+      parseFloat(amountValue) >= 10 &&
+      parseFloat(amountValue) <= availableAmount;
+    const withdrawButton = document.getElementById("withdrawButton");
+    // Check if there are any error messages or if inputs are invalid
+    if ( addressInput.value.length === 42 && isValidAmount )
+    {
+      withdrawButton.disabled = false;
+    } else {
+      withdrawButton.disabled = true;
+    }
+  }
   return (
     <div className="container">
       <div className="main-content">
-        <div className="container">
-          {/* Tab navigation */}
-          <div className="tab-navigation">
-            <button
-              className={`tablinks ${activeTab === "futures" ? "active" : ""}`}
-              onClick={() => handleTabClick("futures")}
-            >
-              Futures Trading
-            </button>
-            <button
-              className={`tablinks ${activeTab === "spot" ? "active" : ""}`}
-              onClick={() => handleTabClick("spot")}
-            >
-              Spot Trading
-            </button>
-          </div>
-
-          {/* Tab content */}
-          {activeTab === "futures" && (
-            <div className="trading-panel">
-              <h3>Futures Trading Panel</h3>
-              <div>
-                <span>Asset Type:</span>
-                <select
-                  value={selectedAsset}
-                  onChange={(e) => setSelectedAsset(e.target.value)}
-                >
-                  {assetTypes.map((asset) => (
-                    <option key={asset} value={asset}>
-                      {asset}
-                    </option>
-                  ))}
-                </select>
-                <span>Current Price:</span>
-                <span>{currentPrices[selectedAsset] || "Loading..."}</span>
-              </div>
-
-              {/* Statistics */}
-              <div className="statistics">
-                <span>Est. Futures Balance: {balance.futures} USDT</span>
-                <span>
-                  Est. Futures Value:{" "}
-                  {(
-                    balance.futures +
-                    futuresPositions.reduce((sum, pos) => sum + pos.amount, 0)
-                  ).toFixed(2)}{" "}
-                  USDT
-                </span>
-              </div>
-
-              {/* Open Positions */}
-              <h3>Open Positions</h3>
-              <div className="positions-list">
-                {futuresPositions.length ? (
-                  futuresPositions.map((position, index) => (
-                    <div key={index} className="position-item">
-                      <span>
-                        {position.assetType} - {position.amount} USDT
-                      </span>
-                      <button onClick={() => setShowPartialCloseModal(true)}>
-                        Partial Close
-                      </button>
-                    </div>
-                  ))
-                ) : (
-                  <div>No open positions</div>
-                )}
-              </div>
-
-              {/* Closed Positions */}
-              <h3>Closed Positions</h3>
-              <div className="positions-list">
-                {closedFuturesPositions.length ? (
-                  closedFuturesPositions.map((position, index) => (
-                    <div key={index} className="position-item closed">
-                      <span>
-                        {position.assetType} - Closed at {position.exitPrice}{" "}
-                        USDT
-                      </span>
-                    </div>
-                  ))
-                ) : (
-                  <div>No closed positions</div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {activeTab === "spot" && (
-            <div className="trading-panel">
-              <h3>Spot Trading Panel</h3>
-              <div>
-                <span>Asset Type:</span>
-                <select
-                  value={selectedAsset}
-                  onChange={(e) => setSelectedAsset(e.target.value)}
-                >
-                  {assetTypes.map((asset) => (
-                    <option key={asset} value={asset}>
-                      {asset}
-                    </option>
-                  ))}
-                </select>
-                <span>Current Price:</span>
-                <span>{currentPrices[selectedAsset] || "Loading..."}</span>
-              </div>
-
-              {/* Statistics */}
-              <div className="statistics">
-                <span>Est. Spot Balance: {balance.spot} USDT</span>
-                <span>
-                  Est. Spot Value:{" "}
-                  {(
-                    balance.spot +
-                    spotPositions.reduce((sum, pos) => sum + pos.amount, 0)
-                  ).toFixed(2)}{" "}
-                  USDT
-                </span>
-              </div>
-
-              {/* Open Positions */}
-              <h3>Open Positions</h3>
-              <div className="positions-list">
-                {spotPositions.length ? (
-                  spotPositions.map((position, index) => (
-                    <div key={index} className="position-item">
-                      <span>
-                        {position.assetType} - {position.amount} USDT
-                      </span>
-                    </div>
-                  ))
-                ) : (
-                  <div>No open positions</div>
-                )}
-              </div>
-
-              {/* Closed Positions */}
-              <h3>Closed Positions</h3>
-              <div className="positions-list">
-                {closedSpotPositions.length ? (
-                  closedSpotPositions.map((position, index) => (
-                    <div key={index} className="position-item closed">
-                      <span>
-                        {position.assetType} - Closed at {position.exitPrice}{" "}
-                        USDT
-                      </span>
-                    </div>
-                  ))
-                ) : (
-                  <div>No closed positions</div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Modals for transfer and deposit */}
-          {showTransferModal && (
-            <div className="modal">
-              <div className="modal-content">
-                <span className="close" onClick={closeModals}>
-                  ×
-                </span>
-                <h2>USDT Transfer</h2>
-                <div>
-                  <label>Mode:</label>
-                  <select
-                    value={transferType}
-                    onChange={(e) => setTransferType(e.target.value)}
-                  >
-                    <option value="fromFutures">Futures - Spot</option>
-                    <option value="fromSpot">Spot - Futures</option>
-                  </select>
-                </div>
-                <div>
-                  <label>Amount:</label>
-                  <input
-                    type="number"
-                    value={transferAmount}
-                    onChange={(e) => setTransferAmount(e.target.value)}
-                  />
-                  <span>(USDT)</span>
-                </div>
-                <button onClick={handleTransfer}>Transfer</button>
-              </div>
-            </div>
-          )}
-
-          {showDepositModal && (
-            <div className="modal">
-              <div className="modal-content">
-                <span className="close" onClick={closeModals}>
-                  ×
-                </span>
-                <h2>Deposit</h2>
-                <div>
-                  <img src={qrCode} alt="QR Code" />
-                  <p>Deposit Address: {depositAddress}</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {showPartialCloseModal && (
-            <div className="modal">
-              <div className="modal-content">
-                <span className="close" onClick={closeModals}>
-                  ×
-                </span>
-                <h2>Partial Close</h2>
-                <div>
-                  <label>Percent:</label>
-                  <input
-                    type="number"
-                    value={partialClosePercent}
-                    onChange={(e) => setPartialClosePercent(e.target.value)}
-                  />
-                  <span>%</span>
-                </div>
-                <button onClick={handlePartialClose}>Confirm</button>
-              </div>
-            </div>
-          )}
-        </div>
-        {/* Navigation */}
-        <div className="navigation">
-          <div className="nav-left">
+        {/* <!-- Navigation --> */}
+        <div style={{ 
+            padding: '0 20px',
+            justifyContent: 'space-between',
+            width: '100%',
+            display: 'flex',
+            height: '64px',
+            backgroundColor: '#383839',
+            position: 'absolute',
+            zIndex: 100,
+            alignSelf: 'center',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+        }}>
+          {/* <!--left--> */}
+          <div className="nav-left" style={{flexDirection: 'row',  display: 'flex'}}>
             <div className="tab">
-              <button
-                className={`tablinks ${
-                  activeTab === "futures" ? "active" : ""
-                }`}
-                onClick={(e) => handleTabChange(e, "futures")}
-                id="defaultOpen"
-              >
+              <button className="tablinks" onClick={(event)=>selectTrading(event, 'futures')} id="defaultOpen">
                 Futures Trading
               </button>
-              <button
-                className={`tablinks ${activeTab === "spot" ? "active" : ""}`}
-                onClick={(e) => handleTabChange(e, "spot")}
-              >
+              <button className="tablinks" onClick={(event)=>selectTrading(event, 'spot')}>
                 Spot Trading
               </button>
             </div>
           </div>
-          <div className="nav-right">
-            <button className="deposit-btn" onClick={toggleTransferModal}>
-              <i className="fas fa-arrow-right-arrow-left" /> Transfer
-            </button>
-            <button className="deposit-btn" onClick={toggleDepositModal}>
-              <i className="fas fa-wallet" /> Deposit
-            </button>
 
-            {/* Buttons for Transfer and Deposit */}
-      <div className="nav-buttons">
-        <button className="deposit-btn" onClick={handleTransferClick}>
-          <i className="fas fa-arrow-right-arrow-left"></i> Transfer
-        </button>
-        <button className="deposit-btn" onClick={handleDepositClick}>
-          <i className="fas fa-wallet"></i> Deposit
-        </button>
-      </div>
+          {/* <!--right--> */}
+          <div className="nav-right" style={{flexDirection: 'row', display: 'flex'}}>
+          <button 
+            style={{ height: '60px', width: '120px', marginRight: '10px' }} 
+            className="deposit-btn" 
+            id="transfer-USDT-btn"
+            onClick={()=>{transferUSDTModal.style.display = "block";
+              document.getElementById(
+                "transfer-modal-futures-USDT"
+              ).textContent = futuresUSDTBalance;
+              document.getElementById(
+                "transfer-modal-spot-USDT"
+              ).textContent = spotUSDTBalance;
+              
+            }}
+          >
+            <i style={{ marginRight: '10px' }} className="fas fa-arrow-right-arrow-left"></i>
+            Transfer
+          </button>
 
-      
+          <button 
+            style={{ height: '60px' }} 
+            className="deposit-btn" 
+            id="deposit-btn"
+            onClick={()=> {
+              document.getElementById('popup-modal').setAttribute('style', 'display: block');
+              setTimeout(generateQRCode, 500);
+          }}
+          >
+            <i style={{ marginRight: '10px' }} className="fas fa-wallet"></i>
+            Deposit
+          </button>
 
-      {/* Logout Button */}
-      <button className="logout-btn" onClick={logout}>
-        Logout
-      </button>
-      
-          </div>
-        </div>
+            {/* <!-- Modal Structure --> */}
+            <div id="popup-modal" className="popup-modal">
+              <div className="popup-modal-content">
+                <div id="user-info">
+                  <div className="zaclose">
+                    <img src="img/close.png" id="popup-close-btn" className="closee" 
+                      onClick={()=>{
+                        document.getElementById('popup-modal').setAttribute('style', 'display: none')
+                      }}
+                    />
+                    <h2 style={{ fontSize: '20px' }}>Transfer Crypto</h2>
+                  </div>
+                  <div className="deposit-header"></div>
+                  <div className="toggle-buttons-custom">
+                    <button id="deposit-toggle-custom" style={{ 
+                        fontSize: '14px', 
+                        borderRadius: '10px', 
+                        paddingTop: '11px' 
+                      }} className="toggle-button-custom active"
+                      onClick={()=>{
+                        document
+                        .getElementById("deposit-content-custom")
+                        .classList.add("active");
+                        document
+                          .getElementById("withdraw-content-custom")
+                          .classList.remove("active");
+                        this.classList.add("active");
+                        document
+                          .getElementById("withdraw-toggle-custom")
+                          .classList.remove("active");
+                      }}
+                    >
+                      Deposit
+                    </button>
+                    <button id="withdraw-toggle-custom" 
+                      style={{
+                        fontSize: '14px',
+                        borderRadius: '10px',
+                        paddingTop: '11px'
+                      }} 
+                      className="toggle-button-custom"
+                      onClick={()=>{
+                        document
+                        .getElementById("withdraw-content-custom")
+                        .classList.add("active");
+                        document
+                          .getElementById("deposit-content-custom")
+                          .classList.remove("active");
+                        this.classList.add("active");
+                        document
+                          .getElementById("deposit-toggle-custom")
+                          .classList.remove("active");
+                        }
+                      }
+                    >
+                      Withdraw
+                    </button>
+                  </div>
+                  {/* <!-- DEPOSIT --> */}
+                  <div id="deposit-content-custom" className="content-section-custom active">
+                    <div id="network-selectors">
+                      {/* <!--Asset Dropdown--> */}
+                      <div className="custom-dropdown" style={{flex: 1, fontWeight: 550, fontSize: '15px'}}>
+                        <label className="choose">Choose Asset</label>
+                        <div className="custom-dropdown-selected" 
+                          style={{ 
+                            marginBottom: '5px', 
+                            marginTop: '5px', 
+                            width: '100%', 
+                            display: 'flex', 
+                            justifyContent: 'space-between', 
+                            alignItems: 'center', 
+                            backgroundColor: '#26235a', 
+                            padding: '10px', 
+                            borderRadius: '8px' 
+                          }} 
+                          id="network-selector2"
+                          onClick={()=>{
+                            document
+                            .querySelectorAll(".custom-dropdown")
+                            .forEach((dropdown) => {
+                              const selected = dropdown.querySelector(
+                                ".custom-dropdown-selected"
+                              );
+                              const options = dropdown.querySelector(
+                                ".custom-dropdown-options"
+                              );
 
-      {/* Trading Content */}
-      {activeTab === "futures" && (
-        <div id="futures" className="tabcontent">
-          <h3>Futures Trading</h3>
-          <div className="statistics">
-            <p>Est. Balance (USDT): {futuresBalance.toFixed(2)}</p>
-            <p>Current Price: {futuresCurrentPrice.toFixed(2)} USDT</p>
-          </div>
-          <div className="order-panel">
-            <div>
-              <label>Asset Type:</label>
-              <select
-                value={futuresAssetType}
-                onChange={(e) => setFuturesAssetType(e.target.value)}
+                              selected.addEventListener("click", () => {
+                                dropdown.classList.toggle("open");
+                              });
+
+                              options
+                                .querySelectorAll(".custom-dropdown-option")
+                                .forEach((option) => {
+                                  option.addEventListener("click", () => {
+                                    selected.querySelector(
+                                      ".custom-dropdown-selected-text"
+                                    ).textContent = option.textContent;
+                                    dropdown.classList.remove("open");
+                                  });
+                                });
+
+                              // Close dropdown when clicking outside
+                              window.addEventListener("click", (event) => {
+                                if (!dropdown.contains(event.target)) {
+                                  dropdown.classList.remove("open");
+                                }
+                              });
+                            });
+                          }}
+                        >
+                          <span className="custom-dropdown-selected-text">USDT</span>
+                          <span className="custom-dropdown-arrow"><img width="14px" src="img/arrow-right.png" /></span>
+                        </div>
+                        <div className="custom-dropdown-options">
+                          <hr className="separator2" />
+                          <div className="custom-dropdown-option">
+                            <img src="img/ETH.png" style={{ 
+                                width: '24px', 
+                                marginLeft: '10px' 
+                              }}  
+                            />
+                            <span style={{marginLeft: '10px'}}>ETH</span>
+                          </div>
+                          <div className="custom-dropdown-option">
+                            <img src="img/brett.png" style={{
+                                  width: '25px',
+                                  height: '25px',
+                                  marginLeft: '10px'
+                             }} 
+                             />
+                            <span style={{marginLeft: '10px'}}>BRETT</span>
+                          </div>
+                          <div className="custom-dropdown-option">
+                            <img src="img/people.png" style={{width: '22px', marginLeft: '10px'}} />
+                            <span style={{marginLeft: '10px'}}>PEOPLE</span>
+                          </div>
+                          <div className="custom-dropdown-option">
+                            <img src="img/USDT.png" style= {{width: '22px', marginLeft: '10px'}} />
+                            <span style={{marginLeft: '10px'}}>USDT</span>
+                          </div>
+                          <div className="custom-dropdown-option">
+                            <img src="img/USDC.png" style={{width: '22px', marginLeft: '10px'}} />
+                            <span style= {{marginLeft: '10px'}}>USDC</span>
+                          </div>
+                          <div className="custom-dropdown-option">
+                            <img src="img/BNB.png" style={{width: '22px', marginLeft: '10px'}} />
+                            <span style= {{marginLeft: '10px'}}>BNB</span>
+                          </div>
+                        </div>
+                      </div>
+                      {/* <!--Network Dropdown--> */}
+                      <div className="custom-dropdown" style={{flex: 1,  fontWeight: 550, fontSize: '15px'}}>
+                        <label className="choose">Choose Network</label>
+                        <div className="custom-dropdown-selected" 
+                          style={{
+                            marginBottom: '5px',
+                            marginTop: '5px',
+                            width: '100%',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            backgroundColor: '#26235a',
+                            padding: '10px',
+                            borderRadius: '8px'
+                          }}
+                          id="network-selector2"
+                          onClick={()=>{
+                            document
+                            .querySelectorAll(".custom-dropdown")
+                            .forEach((dropdown) => {
+                              const selected = dropdown.querySelector(
+                                ".custom-dropdown-selected"
+                              );
+                              const options = dropdown.querySelector(
+                                ".custom-dropdown-options"
+                              );
+
+                              selected.addEventListener("click", () => {
+                                dropdown.classList.toggle("open");
+                              });
+
+                              options
+                                .querySelectorAll(".custom-dropdown-option")
+                                .forEach((option) => {
+                                  option.addEventListener("click", () => {
+                                    selected.querySelector(
+                                      ".custom-dropdown-selected-text"
+                                    ).textContent = option.textContent;
+                                    dropdown.classList.remove("open");
+                                  });
+                                });
+
+                              // Close dropdown when clicking outside
+                              window.addEventListener("click", (event) => {
+                                if (!dropdown.contains(event.target)) {
+                                  dropdown.classList.remove("open");
+                                }
+                              });
+                            });
+                          }}
+                        >
+                          <span className="custom-dropdown-selected-text">ERC-20</span>
+                          <span className="custom-dropdown-arrow"><img width="14px" src="img/arrow-right.png" /></span>
+                        </div>
+                        <div className="custom-dropdown-options">
+                          <hr className="separator2" />
+                          <div className="custom-dropdown-option">
+                            <img src="img/ETH3.png" 
+                              style={{
+                                width: '15px',
+                                height: '24px',
+                                marginLeft: '15px'
+                              }}  
+                            />
+                            <span style={{marginLeft: '10px'}}>ERC-20</span>
+                          </div>
+                          <div className="custom-dropdown-option">
+                            <img src="img/bsc.png" 
+                              style={{
+                                width: '25px',
+                                height: '25px',
+                                marginLeft: '10px'
+                              }}  
+                            />
+                            <span style={{marginLeft: '10px'}}>BSC</span>
+                          </div>
+                          <div className="custom-dropdown-option">
+                            <img src="img/base.png" style={{width: '22px', marginLeft: '10px'}} />
+                            <span style={{marginLeft: '10px'}}>Base</span>
+                          </div>
+                          <div className="custom-dropdown-option">
+                            <img src="img/arb.png" style={{width: '22px', marginLeft: '10px'}} />
+                            <span style={{marginLeft: '10px'}}>Arbitrum One</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="qr-add" style={{marginBottom: '15px'}}>
+                      {/* <!-- QR Code Image --> */}
+                      <div id="qr-code-container">
+                        <img id="qr-code" style={{ display: 'none' }} />
+                      </div>
+                      <div id="address-container">
+                        <div style={{ overflow: 'hidden' }}>
+                          <label className="choose">Deposit Address</label>
+                          <div id="address"></div>
+                        </div>
+                        <img 
+                            src="img/copy.png" 
+                            style={{ width: '21px', marginTop: '15px' }} 
+                            id="copy-icon" 
+                            onClick={copyAddress} 
+                        />
+                      </div>
+                    </div>
+                    <div id="warningContainer" className="warning-container-darkblue">
+                      <p className="warning-text">
+                        <img src="img/warning2.png" className="warning-icon" />
+                        Minimum Deposit: $1.5 ∼ 1.5 USDT
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* <!-- WITHDRAW --> */}
+                  <div id="withdraw-content-custom" className="content-section-custom" style={{fontWeight: 'bold'}}>
+                    <div id="network-selectors">
+                      {/* <!--Asset Dropdown--> */}
+                      <div className="custom-dropdown" style={{flex: 1}}>
+                        <label className="choose">Choose Asset</label>
+                        <div 
+                          className="custom-dropdown-selected" 
+                          style={{ 
+                              margin: '5px 0', 
+                              width: '100%', 
+                              display: 'flex', 
+                              justifyContent: 'space-between', 
+                              alignItems: 'center', 
+                              backgroundColor: '#26235a', 
+                              padding: '10px', 
+                              borderRadius: '8px' 
+                          }} 
+                          id="network-selector1"
+                          onClick={()=>{
+                            document
+                            .querySelectorAll(".custom-dropdown")
+                            .forEach((dropdown) => {
+                              const selected = dropdown.querySelector(
+                                ".custom-dropdown-selected"
+                              );
+                              const options = dropdown.querySelector(
+                                ".custom-dropdown-options"
+                              );
+
+                              selected.addEventListener("click", () => {
+                                dropdown.classList.toggle("open");
+                              });
+
+                              options
+                                .querySelectorAll(".custom-dropdown-option")
+                                .forEach((option) => {
+                                  option.addEventListener("click", () => {
+                                    selected.querySelector(
+                                      ".custom-dropdown-selected-text"
+                                    ).textContent = option.textContent;
+                                    dropdown.classList.remove("open");
+                                  });
+                                });
+
+                              // Close dropdown when clicking outside
+                              window.addEventListener("click", (event) => {
+                                if (!dropdown.contains(event.target)) {
+                                  dropdown.classList.remove("open");
+                                }
+                              });
+                            });
+                          }}
+                        >
+                          <span className="custom-dropdown-selected-text" style={{fontSize: '15px'}}>USDT</span>
+                          <span className="custom-dropdown-arrow"><img width="14px" src="img/arrow-right.png" /></span>
+                        </div>
+                        <div className="custom-dropdown-options">
+                          <hr className="separator2" />
+                          <div 
+                            className="custom-dropdown-option" 
+                            style={{ 
+                                fontSize: '14px', 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                justifyContent: 'space-between', 
+                                padding: '10px' 
+                            }} 
+                          >
+                            <div style={{display: 'flex', alignItems: 'center'}}>
+                              <img src="img/ETH.png" style={{ width: '24px', height: '24px' }}/>
+                              <span style={{marginLeft: '10px'}}>ETH</span>
+                            </div>
+                            <span 
+                              style={{
+                                fontSize: '14px',
+                                fontWeight: 'bold',
+                                color: '#929292'
+                              }}
+                            >0.00</span>
+                          </div>
+                          <div className="custom-dropdown-option" 
+                            style={{
+                              fontSize: '14px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '10px'
+                            }}
+                          >
+                            <div style= {{display: 'flex',  alignitems: "center"}}>
+                              <img src="img/brett.png" style={{width: '24px', height: '24px'}}/>
+                              <span style={{marginLeft: '10px'}}>BRETT</span>
+                            </div>
+                            <span 
+                              style={{
+                                  fontSize: '14px',
+                                  fontWeight: 'bold',
+                                  display: 'flex',
+                                  color: '#afafaf'
+                              }}
+                            >
+                                0.00
+                            </span>
+                          </div>
+                          <div className="custom-dropdown-option"  
+                            style={{
+                              fontSize: '14px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '10px'
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                              <img 
+                                  src="img/people.png" 
+                                  alt="People Icon" 
+                                  style={{ width: '24px', height: '24px' }} 
+                              />
+                              <span style={{ marginLeft: '10px' }}>PEOPLE</span>
+                            </div>
+                            <span style={{
+                              fontSize: '14px',
+                              fontWeight: 'bold',
+                              display: 'flex',
+                              color: '#afafaf'
+                            }}>
+                              0.00
+                            </span>
+                          </div>
+
+                          {options.map((option, index) => (
+                            <div 
+                                key={index}
+                                className="custom-dropdown-option" 
+                                style={{
+                                    fontSize: '14px',
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    padding: '10px'
+                                }}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <img 
+                                        src={option.imgSrc} 
+                                        alt={`${option.label} icon`} 
+                                        style={{ width: '24px', height: '24px' }} 
+                                    />
+                                    <span style={{ marginLeft: '10px' }}>{option.label}</span>
+                                </div>
+                                <span 
+                                    style={{
+                                        fontSize: '14px',
+                                        fontWeight: 'bold',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        color: '#afafaf'
+                                    }}
+                                >
+                                    {option.balance}
+                                </span>
+                            </div>
+                        ))}
+                        </div>
+                      </div>
+                      {/* <!--Network Dropdown--> */}
+                      <div className="custom-dropdown" style={{ flex: 1, fontSize: '15px' }}>
+                        <label className="choose">Choose Network</label>
+                        <div 
+                            className="custom-dropdown-selected" 
+                            style={{
+                                margin: '5px 0',
+                                width: '100%',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                backgroundColor: '#26235a',
+                                padding: '10px',
+                                borderRadius: '8px',
+                            }} 
+                            onClick={()=>{
+                              document
+                              .querySelectorAll(".custom-dropdown")
+                              .forEach((dropdown) => {
+                                const selected = dropdown.querySelector(
+                                  ".custom-dropdown-selected"
+                                );
+                                const options = dropdown.querySelector(
+                                  ".custom-dropdown-options"
+                                );
+  
+                                selected.addEventListener("click", () => {
+                                  dropdown.classList.toggle("open");
+                                });
+  
+                                options
+                                  .querySelectorAll(".custom-dropdown-option")
+                                  .forEach((option) => {
+                                    option.addEventListener("click", () => {
+                                      selected.querySelector(
+                                        ".custom-dropdown-selected-text"
+                                      ).textContent = option.textContent;
+                                      dropdown.classList.remove("open");
+                                    });
+                                  });
+  
+                                // Close dropdown when clicking outside
+                                window.addEventListener("click", (event) => {
+                                  if (!dropdown.contains(event.target)) {
+                                    dropdown.classList.remove("open");
+                                  }
+                                });
+                              });
+                            }}
+                            id="network-selector2"
+                        >
+                            <span className="custom-dropdown-selected-text">{selectedNetwork}</span>
+                            <span className="custom-dropdown-arrow">
+                                <img width="14px" src="img/arrow-right.png" alt="Arrow icon" />
+                            </span>
+                        </div>
+                        {isDropdownOpen && (
+                          <div className="custom-dropdown-options">
+                              <hr className="separator2" />
+                              {networks.map((network, index) => (
+                                  <div 
+                                      key={index} 
+                                      className="custom-dropdown-option" 
+                                      style={{ display: 'flex', alignItems: 'center', padding: '5px 0' }}
+                                  >
+                                      <img 
+                                          src={network.imgSrc} 
+                                          alt={`${network.label} icon`} 
+                                          style={{ width: '24px', height: '24px', marginLeft: '10px' }} 
+                                      />
+                                      <span style={{ marginLeft: '10px' }}>{network.label}</span>
+                                  </div>
+                              ))}
+                          </div>
+                        )}
+                    </div>
+                    </div>
+
+                    <span id="welcome-message" style={{ pointerEvents: 'none', color: 'transparent' }}>Login</span>
+                    <div className="amount-sectionz">
+                      <div className="razss">
+                        <label style={{margin: 0}} className="choose">Withdraw Address</label>
+                        <div id="error-message2" className="error-message2"></div>
+                      </div>
+                      <div className="input-wrapperz">
+                      <input 
+                        type="text" 
+                        id="addressInput" 
+                        className="inputz"
+                        style={{ height: '20px', fontSize: '13px', fontWeight: 'bold' }} 
+                        placeholder="0xc4.." 
+                        onChange={(event)=>{
+                          if(event.target.value !==42){
+                            document.getElementById("error-message2").textContent = "Invalid address";
+                          }
+                          else{
+                            const errorMessage2 = document.getElementById("error-message2");
+                            errorMessage2.textContent = "";
+                          }
+                          validateForm();
+                        }}
+                      />
+                      </div>
+                    </div>
+                    <div className="amount-sectionz">
+                      <div className="razss">
+                        <label style={{margin: 0}} className="choose">Amount</label>
+                        <div id="error-message" className="error-message"></div>
+                      </div>
+
+                      <div className="input-wrapperz">
+                        <input id="amountInput" style={{
+                              height: '20px',
+                              fontSize: '14px',
+                              fontWeight: 'bold'
+                         }} placeholder="10" className="inputz" type="number" 
+                         onChange={(event)=>{
+                          const amountValue = event.target.value;
+                          const inputAmount = parseFloat(amountValue); // Parse user input to float
+                          const errorMessage = document.getElementById("error-message");
+                          // Clear any previous error message
+                          errorMessage.textContent = "";
+
+                          if (amountValue.startsWith("0")) {
+                            errorMessage.textContent =
+                              "Minimum withdrawal amount is 10";
+                          } else if (isNaN(inputAmount)) {
+                            return; // Skip validation if input is not a number
+                          } else if (inputAmount < 10) {
+                            errorMessage.textContent =
+                              "Minimum withdrawal amount is 10";
+                          } else if (inputAmount > availableAmount) {
+                            errorMessage.textContent = "Insufficient amount";
+                          }
+
+                          validateForm();
+                         }}
+                         />
+                      </div>
+                    </div>
+
+                    <div className="availablez">
+                      Available
+                      <span style={{fontWeight: 'bold'}} id="availableAmount" className="available-valuez">0.000</span>
+                    </div>
+                    <div className="memo-sectionz">
+                      <label className="choose">MEMO (Optional)</label>
+                      <input type="text" style={{fontSize: '12px', color: '#dcd9ff'}} className="inputz" />
+                    </div>
+                    <div className="network-feez">
+                      <span style={{color: '#dcd9ff', fontSize: '14px'}}>Network Fee</span>
+                      <span style={{fontSize: '14px'}} className="fee-valuez">&lt; 0.01 USDT</span>
+                    </div>
+                    <button className="withdraw-button33" id="withdrawButton"
+                      onClick={async()=>{
+                        const address =
+                          document.getElementById("addressInput").value;
+                        const amount =
+                          document.getElementById("amountInput").value;
+                        const username =
+                          document.getElementById(
+                            "welcome-message"
+                          ).textContent;
+
+                          try {
+                            const response = await axios.post(
+                              "http://localhost:5000/api/withdrawal/withdrawRequest",
+                              { address, amount, username},
+                              {
+                                headers:{Authorization: "Bearer " + localStorage.getItem("token")}
+                              }
+                            );
+                            const data = response.data;
+                            if (data.ok) {
+                              alert("Withdrawal request sent successfully!");
+                            } else {
+                              alert("Failed to send the withdrawal request.");
+                            }
+                          } catch (error) {
+                            console.error(
+                              "Error sending withdrawal request:",
+                              error
+                            );
+                            alert("An error occurred.");
+                          }
+                      }}
+                    >
+                      Withdraw
+                    </button>
+                    
+                  </div>
+
+                </div>
+              </div>
+            </div>
+            
+            <a
+              id="user-icon2"
+              style={{
+                cursor: 'pointer',
+                borderRadius: '20px',
+                padding: '0 10px',
+                height: '45px',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+              onMouseEnter = {()=>{document.getElementById("main-menu2").style.display = "block";}}
+              onMouseLeave = {()=>{setTimeout(function () {
+                if (
+                  !document.getElementById("main-menu2").matches(":hover")
+                ) {
+                  document.getElementById("main-menu2").style.display =
+                    "none";
+                }
+              }, 100);}}
+            >
+              <span>Wallets</span>
+            </a>
+
+            <div id="icon2" onClick={(event)=>{ event.stopPropagation();}}>
+              {/* <!-- Main dropdown content --> */}
+              <div
+                id="main-menu2"
+                className="dropdown-content2"
+                style={{
+                  marginRight: '20px',
+                  width: '250px',
+                  padding: '20px',
+                  borderRadius: '10px',
+                  zIndex: 10,
+                  boxShadow: '0 4px 8px rgba(0.3, 0.3, 0.3, 0.3)',
+                }}
+                onMouseLeave = {(event)=>{ event.target.setAttribute('style','display = none')}}
+                onMouseEnter = {(event)=>{event.target.setAttribute('style','display = block') }}
               >
-                <option value="BTC">BTC</option>
-                <option value="ETH">ETH</option>
-                <option value="BNB">BNB</option>
-                {/* Add more options as needed */}
-              </select>
+                {/* <!-- Center the profile picture and welcome message --> */}
+                <div className="balance-info">
+                  <span className="balance-text"><img style={{width: '20px'}} src="img/USDT.png" /></span>
+                </div>
+                <hr
+                  className="separator3"
+                  style={{
+                    width: '70%',
+                    margin: '18px auto',
+                    border: 0,
+                    height: '1.8px',
+                    background: 'linear-gradient(to right, #ff8c00, #ff0080)',
+                    boxShadow: '0 0 5px rgba(0, 0, 0, 0.3)',
+                  }}
+                />
+                {/* <!-- Main menu items --> */}
+                <a
+                  href="#"
+                  id="activity-link"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    textDecoration: 'none',
+                    marginBottom: '8px',
+                  }}
+                >
+                  <img
+                    src="img/activity.png"
+                    alt="Activity Icon"  // Adding alt for accessibility
+                    style={{
+                      width: '22px',
+                      height: '22px',
+                      marginRight: '20px',
+                      marginLeft: '5px',
+                    }}
+                  />
+                  <p style={{ margin: 0, fontSize: '16px' }}>Spot</p>
+                </a>
+
+                <a
+                  href="#"
+                  id="privacy-security-link"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    textDecoration: 'none',
+                    marginBottom: '8px',
+                  }}
+                >
+                  <img
+                    src="img/lock.png"
+                    alt="Lock Icon"  // Adding alt for accessibility
+                    style={{
+                      width: '20px',
+                      height: '20px',
+                      marginRight: '20px',
+                      marginLeft: '4px',
+                    }}
+                  />
+                  <p style={{ margin: 0, fontSize: '16px' }}>Futures</p>
+                </a>
+
+                <a
+                  href="#"
+                  id="support-link"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    textDecoration: 'none',
+                    marginBottom: '8px',
+                  }}
+                >
+                  <img
+                    src="img/contact.png"
+                    alt="Contact Icon"  // Adding alt for accessibility
+                    style={{
+                      width: '20px',
+                      height: '20px',
+                      marginRight: '20px',
+                      marginLeft: '4px',
+                    }}
+                  />
+                  <p style={{ margin: 0, fontSize: '16px' }}>Copy Trade</p>
+                </a>
+              </div>
             </div>
+            <a
+              id="user-icon"
+              style={{
+                cursor: 'pointer',
+                borderRadius: '20px',
+                padding: '0 10px',
+                height: '45px',
+                fontWeight: 'bold',
+                backgroundImage: 'linear-gradient(rgb(29, 28, 73), rgb(50, 49, 121))',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+              onMouseEnter = {()=>{document.getElementById("main-menu").style.display = "block";}}
+              onMouseLeave = {()=>{setTimeout(function () {
+                if (
+                  !document.getElementById("main-menu").matches(":hover")
+                ) {
+                  document.getElementById("main-menu").style.display =
+                    "none";
+                }
+              }, 100);}}
+            >
+              <img
+                className="pfp"
+                src="img/pfp.png"
+                style={{ pointerEvents: 'none' }}
+              />
+              <div
+                className="icon"
+                style={{
+                  width: '25px',
+                  height: '20px',
+                  margin: '4px 20px 0 10px',
+                  pointerEvents: 'none',
+                }}
+              >
+                <span
+                  id="welcome-message-duplicate"
+                  style={{ pointerEvents: 'none', color: '#dcdcdc' }}
+                >
+                  Login
+                </span>
+              </div>
+              <img
+                src="img/arrow-down.png"
+                style={{
+                  width: '16px',
+                  height: '16px',
+                  marginLeft: '10px',
+                  pointerEvents: 'none',
+                }}
+              />
+            </a>
+            <div id="icon3" onClick = {(event)=>{event.stopPropagation()}}>
+              {/* <!-- Main dropdown content --> */}
+                <div
+                  id="main-menu"
+                  className="dropdown-content"
+                  style={{
+                    marginRight: '20px',
+                    width: '250px',
+                    padding: '20px',
+                    borderRadius: '10px',
+                    zIndex: 10,
+                    boxShadow: '0 4px 8px rgba(0.3, 0.3, 0.3, 0.3)',
+                  }}
+                  onMouseLeave = {()=>{ document.getElementById("main-menu").style.display = "none";}}
+                  onMouseEnter = {()=>{ this.style.display = "block";}}
+                  
+                >
+                {/* <!-- Center the profile picture and welcome message --> */}
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    marginBottom: '5px',
+                  }}
+                >
+                  <img
+                    src="img/pfp.png"
+                    className="pfp-large"
+                    style={{
+                      width: '100px',
+                      height: '100px',
+                      borderRadius: '50%',
+                    }}
+                  />
+                </div>
 
-            {/* <div>
-              <label>Bet Amount:</label>
-              <input type="number" id="bet-amount" min="1" max="100" />
-              <label>Leverage:</label>
-              <input type="number" id="bet-leverage" min="1" max="300" />
-              <button onClick={() => handleFuturesTrading("long", "market")}>
-                Long
-              </button>
-              <button onClick={() => handleFuturesTrading("short", "market")}>
-                Short
-              </button>
-            </div> */}
-            {/* Futures market and limit order section */}
-      <div className="futures-order-section">
-        <h3>Futures Orders</h3>
-        <div className="market-order">
-          <h4>Market Order</h4>
-          <input
-            type="number"
-            placeholder="Amount (USDT)"
-            value={futuresMarketOrder.amount}
-            onChange={(e) =>
-              setFuturesMarketOrder({
-                ...futuresMarketOrder,
-                amount: e.target.value,
-              })
-            }
-          />
-          <input
-            type="number"
-            placeholder="Leverage"
-            value={futuresMarketOrder.leverage}
-            onChange={(e) =>
-              setFuturesMarketOrder({
-                ...futuresMarketOrder,
-                leverage: e.target.value,
-              })
-            }
-          />
-          <button onClick={() => placeFuturesMarketOrder("long")}>
-            Buy (Long)
-          </button>
-          <button onClick={() => placeFuturesMarketOrder("short")}>
-            Sell (Short)
-          </button>
-        </div>
+                <hr
+                  className="separator3"
+                  style={{
+                    width: '70%',
+                    margin: '18px auto',
+                    border: '0',
+                    height: '1.8px',
+                    background: 'linear-gradient(to right, #ff8c00, #ff0080)',
+                    boxShadow: '0 0 5px rgba(0, 0, 0, 0.3)',
+                  }}
+                />
 
-        <div className="limit-order">
-          <h4>Limit Order</h4>
-          <input
-            type="number"
-            placeholder="Amount (USDT)"
-            value={futuresLimitOrder.amount}
-            onChange={(e) =>
-              setFuturesLimitOrder({
-                ...futuresLimitOrder,
-                amount: e.target.value,
-              })
-            }
-          />
-          <input
-            type="number"
-            placeholder="Leverage"
-            value={futuresLimitOrder.leverage}
-            onChange={(e) =>
-              setFuturesLimitOrder({
-                ...futuresLimitOrder,
-                leverage: e.target.value,
-              })
-            }
-          />
-          <input
-            type="number"
-            placeholder="Limit Price (USDT)"
-            value={futuresLimitOrder.limitPrice}
-            onChange={(e) =>
-              setFuturesLimitOrder({
-                ...futuresLimitOrder,
-                limitPrice: e.target.value,
-              })
-            }
-          />
-          <button onClick={() => placeFuturesLimitOrder("long")}>
-            Buy (Long)
-          </button>
-          <button onClick={() => placeFuturesLimitOrder("short")}>
-            Sell (Short)
-          </button>
-        </div>
-      </div>
+                {/* Main menu items */}
+                <a
+                  href="#"
+                  id="activity-link"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    textDecoration: 'none',
+                    marginBottom: '8px',
+                  }}
+                >
+                  <img
+                    src="img/activity.png"
+                    style={{
+                      width: '22px',
+                      height: '22px',
+                      marginRight: '20px',
+                      marginLeft: '5px',
+                    }}
+                  />
+                  <p style={{ margin: 0, fontSize: '16px' }}>Activity</p>
+                </a>
 
+                <a
+                  href="#"
+                  id="privacy-security-link"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    textDecoration: 'none',
+                    marginBottom: '8px',
+                  }}
+                >
+                  <img
+                    src="img/lock.png"
+                    style={{
+                      width: '20px',
+                      height: '20px',
+                      marginRight: '20px',
+                      marginLeft: '4px',
+                    }}
+                    alt="Privacy and Security Icon"
+                  />
+                  <p style={{ margin: 0, fontSize: '16px' }}>Privacy & security</p>
+                </a>
+
+                <a
+                  href="#"
+                  id="support-link"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    textDecoration: 'none',
+                    marginBottom: '8px',
+                  }}
+                >
+                  <img
+                    src="img/contact.png"
+                    style={{
+                      width: '20px',
+                      height: '20px',
+                      marginRight: '20px',
+                      marginLeft: '4px',
+                    }}
+                    alt="Contact Icon"
+                  />
+                  <p style={{ margin: 0, fontSize: '16px' }}>Contact</p>
+                </a>
+
+                <a
+                  href="/login"
+                  id="headerlogout-btn"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    textDecoration: 'none',
+                  }}
+                  onClick = { async (event)=> {
+                    axios.post("/logout", { method: "POST" });
+                    localStorage.removeItem("token");
+                    navigate('/login')
+                    // window.location.href = "/login"; // Redirect to the login page
+                  }}
+                >
+                  <img
+                    src="img/logout.png"
+                    style={{
+                      width: '25px',
+                      height: '25px',
+                      marginRight: '20px',
+                    }}
+                    alt="Logout Icon"
+                  />
+                  <p style={{ margin: 0, fontSize: '16px' }}>Login / Logout</p>
+                </a>
+              </div>
+            </div>
           </div>
-
-          {/* Open Futures Positions Section */}
-      <div className="positions-section">
-        <h3>Open Futures Positions</h3>
-        <div className="positions-list">
-          {futuresPositions.map((position) => (
-            <div key={position.id} className="position-item">
-              <p>
-                {position.positionType} - {position.assetType} - Amount:{" "}
-                {position.amount} USDT
-              </p>
-              <button onClick={() => closeFuturesPosition(position.id, 0)}>
-                Close Position
-              </button>
-            </div>
-          ))}
         </div>
-      </div>
-
-      {/* Futures Section */}
-      <div className="futures-section">
-        <h3>Futures Positions</h3>
-        {futuresPositions.map((position) => (
-          <div key={position.id} className="position-item">
-            <p>
-              {position.positionType} - {position.assetType} - Amount:{" "}
-              {position.amount} USDT
-            </p>
-            <div className="tpsl-section">
-              <label>TP:</label>
-              <input
-                type="number"
-                value={position.tp}
-                onChange={(e) => (position.tp = e.target.value)}
-              />
-              <label>SL:</label>
-              <input
-                type="number"
-                value={position.sl}
-                onChange={(e) => (position.sl = e.target.value)}
-              />
+        <div id="total-statistics" style={{marginTop: '80px'}}></div>
+        <div id="futures" className="tabcontent trading-panel">
+          <div id="futures-statistics"></div>
+          <div id="futures-now-price" style={{margin: '10px'}}></div>
+          <br />
+          {/* <!-- <div id="assets-statistics"></div> --> */}
+          <h3>MEXC Futures Asset Price Chart</h3>
+          <br />
+          {/* <!-- <canvas
+              id="futuresChart"
+              width="400"
+              height="100"
+              style="margin: 20px"
+            ></canvas>
+            <div className="btn-div">
               <button
-                onClick={() => saveTPSL(position.id, position.tp, position.sl)}
+                className="futures-chart-btn"
+                id="btn-1s"
+                onClick="changeFuturesInterval(this)"
               >
-                Save TP/SL
+                1m
               </button>
-            </div>
-            <button onClick={() => setClosingPosition(position)}>
-              Partial Close
-            </button>
-          </div>
-        ))}
-      </div>
-
-      {/* Open Futures Orders Section */}
-      <div className="orders-section">
-        <h3>Open Futures Orders</h3>
-        <div className="orders-list">
-          {futuresOpenOrders.map((order) => (
-            <div key={order.id} className="order-item">
-              <p>
-                {order.orderType} - {order.assetType} - Amount: {order.amount}{" "}
-                USDT
-              </p>
-              <button onClick={() => closeFuturesPosition(order.id, 0)}>
-                Close Order
+              <button
+                className="futures-chart-btn"
+                id="btn-1m"
+                onClick="changeFuturesInterval(this)"
+              >
+                5m
               </button>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Closed Futures Positions Section */}
-      <div className="closed-positions-section">
-        <h3>Closed Futures Positions</h3>
-        <div className="closed-positions-list">
-          {futuresClosedPositions.map((position) => (
-            <div key={position.id} className="closed-position-item">
-              <p>
-                {position.positionType} - {position.assetType} - Realized:{" "}
-                {position.realizedPL} USDT
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-        </div>
-      )}
-
-      {activeTab === "spot" && (
-        <div id="spot" className="tabcontent">
-          <h3>Spot Trading</h3>
-          <div className="statistics">
-            <p>Est. Balance (USDT): {spotBalance.toFixed(2)}</p>
-            <p>Current Price: {spotCurrentPrice.toFixed(2)} USDT</p>
+              <button
+                className="futures-chart-btn"
+                id="btn-5m"
+                onClick="changeFuturesInterval(this)"
+              >
+                30m
+              </button>
+              <button
+                className="futures-chart-btn active"
+                id="btn-15m"
+                onClick="changeFuturesInterval(this)"
+              >
+                1h
+              </button>
+              <button
+                className="futures-chart-btn"
+                id="btn-1H"
+                onClick="changeFuturesInterval(this)"
+              >
+                4h
+              </button>
+              <button
+                className="futures-chart-btn"
+                id="btn-1D"
+                onClick="changeFuturesInterval(this)"
+              >
+                1d
+              </button>
+              <button
+                className="futures-chart-btn"
+                id="btn-1W"
+                onClick="changeFuturesInterval(this)"
+              >
+                1W
+              </button>
+              <button
+                className="futures-chart-btn"
+                id="btn-1M"
+                onClick="changeFuturesInterval(this)"
+              >
+                1M
+              </button>
+            </div> --> */}
+          <div className="chart-container">
+            {/* <div className="tradingview-widget-container" id="futures-tradingview-widget" style={{height: '90%', width: '100%'}}>
+            
+            </div> */}
+            {/* <div className = "tradingview-widget-container" id="futures-tradingview-widget" > */}
+              <TradingViewWidget symbol={selectedFuturesChartSymbol} key={selectedFuturesChartSymbol} id="futures-tradingview-widget" ></TradingViewWidget>
+            {/* </div> */}
           </div>
+          <br />
+
           <div className="order-panel">
             <div>
-              <label>Asset Type:</label>
-              <select
-                value={spotAssetType}
-                onChange={(e) => setSpotAssetType(e.target.value)}
-              >
-                <option value="BTC">BTC</option>
-                <option value="ETH">ETH</option>
-                <option value="BNB">BNB</option>
-                {/* Add more options as needed */}
-              </select>
+              Select an Asset Type:
+              {/* <!-- <select
+                  id="futures-asset-type"
+                  style="width: 160px"
+                ></select>&nbsp;&nbsp;&nbsp;
+                <span className="money-type">Current Price:</span>
+                <span id="futures-current-price" className="money-value"
+                  >Loading...</span
+                >
+                <span className="money-unit">USDT</span> --> */}
+
+              <div className="custom-dropdown">
+                <div className="custom-dropdown-selected" id="futures-dropdownSelected" 
+                  // onClick={()=>{
+                  //   alert(document.getElementById("futures-dropdownOptions").style.display)
+                  //   const isVisible = (document.getElementById("futures-dropdownOptions").style.display === "block");
+                  //   alert(isVisible)
+                  //   document.getElementById("futures-dropdownOptions").style.display = isVisible ? "none" : "block";
+                  // }}
+                >
+                </div>
+                <div className="custom-dropdown-options" id="futures-dropdownOptions" >
+
+                </div>
+              </div>
             </div>
 
-            {/* <div>
-              <label>Amount:</label>
-              <input type="number" id="spot-market-amount" min="1" max="100" />
-              <button onClick={() => handleSpotTrading("buy", "market")}>
-                Buy
+            <div>
+              <label style={{ color: 'rgb(255, 0, 0)', fontSize: '24px' }}>Market Order: </label>&nbsp;&nbsp;
+              <label>Bet Amount:</label>
+              <input 
+                type="number" 
+                id="bet-amount" 
+                min="1" 
+                max="100" 
+                style={{ width: '80px', fontSize: '20px' }} 
+              /><span className="money-unit">(USDT)</span>&nbsp;&nbsp;
+              <label>Leverage:</label>
+              <input 
+                type="number" 
+                id="bet-leverage" 
+                min="1" 
+                max="300" 
+                defaultValue="1" 
+                style={{ width: '50px', fontSize: '20px' }} 
+              />&nbsp;&nbsp;
+              <button 
+                id="long-button" 
+                className="playbutttton" 
+                style={{ marginTop: '15px' }}
+                onClick={()=>futuresTrading("long", "market")}
+              >
+                Long
+              </button>&nbsp;&nbsp;
+              <button 
+                id="short-button" 
+                className="playbutttton" 
+                style={{ marginTop: '15px' }}
+                onClick={()=>futuresTrading("short", "market")}
+              >
+                Short
+              </button>&nbsp;&nbsp;
+            </div>
+            <div>
+              <label style={{ color: 'rgb(255, 0, 0)', fontSize: '24px' }}>Limit Order: </label>&nbsp;&nbsp;
+              <label>Bet Amount:</label>
+              <input 
+                type="number" 
+                id="limit-amount" 
+                min="1" 
+                max="100" 
+                style={{ width: '80px', fontSize: '20px' }} 
+              />
+              <span className="money-unit">(USDT)</span>&nbsp;&nbsp;
+              <label>Leverage:</label>
+              <input 
+                type="number" 
+                id="limit-leverage" 
+                min="1" 
+                max="300" 
+                defaultValue="1" 
+                style={{ width: '50px', fontSize: '20px' }} 
+              />&nbsp;&nbsp;
+              <label>Limit Price:</label>
+              <input 
+                type="number" 
+                id="limit-price" 
+                style={{ width: '100px', fontSize: '20px' }} 
+              />
+              <span className="money-unit">(USDT)</span>&nbsp;&nbsp;
+              <button 
+                id="limit-long-button" 
+                className="playbutttton" 
+                style={{ marginTop: '15px' }}
+                onClick={()=>{
+                  futuresTrading("long", "limit");
+                }}
+              >
+                Long
+              </button>&nbsp;&nbsp;
+              <button 
+                id="limit-short-button" 
+                className="playbutttton" 
+                style={{ marginTop: '15px' }}
+                onClick={()=>{
+                  futuresTrading("short", "limit");
+                }}
+              >
+                Short
+              </button>&nbsp;&nbsp;
+            </div>
+          </div>
+          <h3 style={{ color: '#ff8c00' }}>Open Positions</h3>
+          <div id="futures-open-positions"></div>
+          <h3 style={{ color: '#ff8c00' }}>Open Orders</h3>
+          <div id="futures-open-orders"></div>
+          <h3 style={{ color: '#ff8c00' }}>Closed Positions</h3>
+          <div id="futures-closed-positions"></div>
+        </div>
+
+        <div id="spot" className="tabcontent trading-panel">
+          <div id="spot-statistics"></div>
+          <div id="spot-now-price" style={{margin: '10px'}}></div>
+          <br />
+          <h3>MEXC Spot Asset Price Chart</h3>
+          <br />
+          {/* <!-- <canvas
+              id="spotChart"
+              width="400"
+              height="100"
+              style="margin: 20px"
+            ></canvas> -->
+          <!-- <div className="btn-div">
+              <button
+                className="spot-chart-btn"
+                id="btn-1s"
+                onClick="changeSpotInterval(this)"
+              >
+                1m
               </button>
-              <button onClick={() => handleSpotTrading("sell", "market")}>
+              <button
+                className="spot-chart-btn"
+                id="btn-1m"
+                onClick="changeSpotInterval(this)"
+              >
+                5m
+              </button>
+              <button
+                className="spot-chart-btn"
+                id="btn-5m"
+                onClick="changeSpotInterval(this)"
+              >
+                30m
+              </button>
+              <button
+                className="spot-chart-btn active"
+                id="btn-15m"
+                onClick="changeSpotInterval(this)"
+              >
+                1h
+              </button>
+              <button
+                className="spot-chart-btn"
+                id="btn-1H"
+                onClick="changeSpotInterval(this)"
+              >
+                4h
+              </button>
+              <button
+                className="spot-chart-btn"
+                id="btn-1D"
+                onClick="changeSpotInterval(this)"
+              >
+                1d
+              </button>
+              <button
+                className="spot-chart-btn"
+                id="btn-1W"
+                onClick="changeSpotInterval(this)"
+              >
+                1W
+              </button>
+              <button
+                className="spot-chart-btn"
+                id="btn-1M"
+                onClick="changeSpotInterval(this)"
+              >
+                1M
+              </button>
+            </div> --> */}
+
+          <div className="chart-container">
+            <TradingViewWidget symbol={selectedSpotChartSymbol} key={selectedSpotChartSymbol} id ="tradingview-widget" ></TradingViewWidget>
+          </div>
+          
+          <div className="order-panel">
+            <div className="spot-order-div">
+              <div style={{margin: '10px'}}>Select an Asset Type:</div>
+
+              <div className="custom-dropdown">
+                <div className="custom-dropdown-selected" id="spot-dropdownSelected"
+                  // onClick={()=>{
+                  //   const isVisible = document.getElementById("spot-dropdownOptions").style.display === "block";
+                  //   document.getElementById("spot-dropdownOptions").style.display = isVisible ? "none" : "block";
+                  // }}
+                > 
+                </div>
+                <div className="custom-dropdown-options" id="spot-dropdownOptions"></div>
+              </div>
+              <div style={{margin: '10px'}} id="spot-assets-statistics"></div>
+            </div>
+
+
+            <div>
+              <label style={{color: 'rgb(255, 0, 0)', fontSize: '24px'}}>Market: </label>&nbsp;&nbsp;
+              <label>Amount:</label>
+              <input type="number" id="spot-market-amount" min="1" max="100" style={{width: '80px', fontSize: '20px'}} /><span
+                className="money-unit" id="spot-market-unit"></span>&nbsp;&nbsp;
+              <button id="market-buy-button" className="playbutttton" style={{marginTop: '15px'}}
+                onClick={()=>spotTrading("buy", "market")}
+              >
+                Buy</button>&nbsp;&nbsp;
+              <button id="market-sell-button" className="playbutttton" style={{marginTop: '15px'}}
+                onClick={()=>spotTrading("sell", "market")}
+              >
                 Sell
               </button>
-            </div> */}
-
-            {/* Spot market and limit order section */}
-      <div className="spot-order-section">
-        <h3>Spot Orders</h3>
-        <div className="market-order">
-          <h4>Market Order</h4>
-          <input
-            type="number"
-            placeholder="Amount"
-            value={spotMarketOrder.amount}
-            onChange={(e) =>
-              setSpotMarketOrder({ ...spotMarketOrder, amount: e.target.value })
-            }
-          />
-          <button onClick={() => placeSpotMarketOrder("buy")}>Buy</button>
-          <button onClick={() => placeSpotMarketOrder("sell")}>Sell</button>
-        </div>
-
-        <div className="limit-order">
-          <h4>Limit Order</h4>
-          <input
-            type="number"
-            placeholder="Amount"
-            value={spotLimitOrder.amount}
-            onChange={(e) =>
-              setSpotLimitOrder({ ...spotLimitOrder, amount: e.target.value })
-            }
-          />
-          <input
-            type="number"
-            placeholder="Limit Price (USDT)"
-            value={spotLimitOrder.limitPrice}
-            onChange={(e) =>
-              setSpotLimitOrder({
-                ...spotLimitOrder,
-                limitPrice: e.target.value,
-              })
-            }
-          />
-          <button onClick={() => placeSpotLimitOrder("buy")}>Buy</button>
-          <button onClick={() => placeSpotLimitOrder("sell")}>Sell</button>
-        </div>
-      </div>
-
-          </div>
-
-          {/* Open Spot Positions Section */}
-      <div className="positions-section">
-        <h3>Open Spot Positions</h3>
-        <div className="positions-list">
-          {spotPositions.map((position) => (
-            <div key={position.id} className="position-item">
-              <p>
-                {position.positionType} - {position.assetType} - Amount:{" "}
-                {position.amount}
-              </p>
-              <button onClick={() => closeSpotPosition(position.id)}>
-                Close Position
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Open Spot Orders Section */}
-      <div className="orders-section">
-        <h3>Open Spot Orders</h3>
-        <div className="orders-list">
-          {spotOpenOrders.map((order) => (
-            <div key={order.id} className="order-item">
-              <p>
-                {order.orderType} - {order.assetType} - Amount: {order.amount}
-              </p>
-              <button onClick={() => closeSpotPosition(order.id)}>
-                Close Order
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Closed Spot Positions Section */}
-      <div className="closed-positions-section">
-        <h3>Closed Spot Positions</h3>
-        <div className="closed-positions-list">
-          {spotClosedPositions.map((position) => (
-            <div key={position.id} className="closed-position-item">
-              <p>
-                {position.positionType} - {position.assetType} - Realized:{" "}
-                {position.realizedPL}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-      
-        </div>
-      )}
-        
-      </div>
-
-    {/* Transfer Modal */}
-    {/* {showTransferModal && (
-        <div className="modal">
-          <div className="modal-content">
-            <span className="close" onClick={closeModals}>
-              ×
-            </span>
-            <h2>USDT Transfer</h2>
-            <div>
-              <label>Mode:</label>
-              <select name="transferType">
-                <option value="fromFutures">Futures -&gt; Spot</option>
-                <option value="fromSpot">Spot -&gt; Futures</option>
-              </select>
             </div>
             <div>
+              <label style={{ color: 'rgb(255, 0, 0)', fontSize: '24px' }}>Limit: </label>&nbsp;&nbsp;
               <label>Amount:</label>
-              <input type="number" min="1" max="100" />
-              <span>(USDT)</span>
-            </div>
-            <button onClick={closeModals}>Transfer</button>
-          </div>
-        </div>
-      )} */}
-
-      {/* Deposit Modal */}
-      {showDepositModal && (
-        <div className="modal">
-          <div className="modal-content">
-            <span className="close" onClick={closeModals}>
-              ×
-            </span>
-            <h2>Deposit Crypto</h2>
-            <div className="custom-dropdown">
-              <label>Choose Asset</label>
-              <div
-                className="custom-dropdown-selected"
-                onClick={() => handleAssetChange(selectedAsset)}
+              <input 
+                type="number"
+                id="spot-limit-amount"
+                min="1"
+                max="100"
+                style={{ width: '80px', fontSize: '20px' }}
+              />
+              <span className="money-unit" id="spot-limit-unit"></span>&nbsp;&nbsp;
+              <label>Price:</label>
+              <input 
+                type="number"
+                id="spot-limit-price"
+                min="1"
+                max="100"
+                style={{ width: '80px', fontSize: '20px' }}
+              />
+              <span className="money-unit">(USDT)</span>&nbsp;&nbsp;
+              <button 
+                id="limit-buy-button" 
+                className="playbutttton" 
+                style={{ marginTop: '15px' }}
+                onClick={()=>spotTrading("buy", "limit")}
               >
-                {selectedAsset}
-              </div>
-              {/* Dropdown menu options */}
-            </div>
-
-            <div className="custom-dropdown">
-              <label>Choose Network</label>
-              <div
-                className="custom-dropdown-selected"
-                onClick={() => handleNetworkChange(selectedNetwork)}
+                Buy
+              </button>&nbsp;&nbsp;
+              <button 
+                id="limit-sell-button" 
+                className="playbutttton" 
+                style={{ marginTop: '15px' }}
+                onClick={()=>spotTrading("sell", "limit")}
               >
-                {selectedNetwork}
-              </div>
-              {/* Dropdown menu options */}
-            </div>
-
-            <div>
-              <label>Deposit Address</label>
-              <div>{depositAddress}</div>
-              <button onClick={copyAddress}>Copy</button>
+                Sell
+              </button>
             </div>
           </div>
+          <h3 style={{ color: '#ff8c00' }}>Open Positions</h3>
+          <div id="spot-open-positions"></div>
+          <h3 style={{ color: '#ff8c00' }}>Open Orders</h3>
+          <div id="spot-open-orders"></div>
+          <h3 style={{ color: '#ff8c00' }}>Closed Positions</h3>
+          <div id="spot-closed-positions"></div>
         </div>
-      )}
-
-      {/* Transfer Modal */}
-      {showTransferModal && (
-          <div className="modal">
-            <div className="modal-content">
-              <span className="close" onClick={toggleTransferModal}>
-                ×
-              </span>
-              <h2>USDT Transfer</h2>
-              <div>
-                <label>Mode:</label>
-                <select name="transferType" id="transfer-USDT-type">
-                  <option value="fromFutures">Futures - Spot</option>
-                  <option value="fromSpot">Spot - Futures</option>
-                </select>
-              </div>
-              <div>
-                <label>Amount:</label>
-                <input type="number" id="transfer-USDT-amount" />
-              </div>
-              <button onClick={toggleTransferModal}>Transfer</button>
-
-
-              {/* USDT Transfer Section */}
-      <div className="transfer-section">
-        <h3>USDT Transfer</h3>
-        <select
-          value={transferUSDTType}
-          onChange={(e) => setTransferUSDTType(e.target.value)}
-        >
-          <option value="fromFutures">From Futures to Spot</option>
-          <option value="fromSpot">From Spot to Futures</option>
-        </select>
-        <input
-          type="number"
-          value={transferUSDTAmount}
-          onChange={(e) => setTransferUSDTAmount(e.target.value)}
-          placeholder="USDT Amount"
-        />
-        <button onClick={transferUSDT}>Transfer</button>
       </div>
-      
-            </div>
-
-          </div>
-        )}
-
-        {/* Deposit Modal */}
-        {/* {showDepositModal && (
-          <div className="modal">
-            <div className="modal-content">
-              <span className="close" onClick={toggleDepositModal}>
-                ×
-              </span>
-              <h2>Deposit Crypto</h2> */}
-              {/* Add logic and content for the deposit modal here */}
-            {/* </div>
-          </div>
-        )} */}
-
-      {/* Partial Close Modal */}
-      {closingPosition && (
-        <div className="modal">
-          <div className="modal-content">
-            <span className="close" onClick={() => setClosingPosition(null)}>
-              ×
-            </span>
-            <h2>Partial Close</h2>
+    
+      <div id="partial-closing-modal" className="modal">
+        {/* <!-- Modal content --> */}
+        <div className="modal-content">
+          <span className="close">&times;</span>
+          <h2 style={{ color: '#16171a' }}>Partial Closing</h2>
+          <br />
+          <p style={{ color: '#16171a', fontSize: '20px' }}>
             <input
+              id="particalClosingPercent"
               type="number"
-              value={partialClosingPercent}
-              onChange={(e) => setPartialClosingPercent(e.target.value)}
               min="1"
               max="100"
+              defaultValue="100"
             />
-            <button onClick={partialClose}>Confirm Partial Close</button>
-          </div>
+            %&nbsp;&nbsp;
+            <button onClick={()=>partialClose()}>Confirm</button>
+          </p>
         </div>
-      )}
+      </div>
 
-      {/* Statistics and balances section */}
-      {/* <div className="statistics-section">
-        <h3>Statistics</h3>
-        <p>Futures Balance: {futuresUSDTBalance} USDT</p>
-        <p>Spot Balance: {spotUSDTBalance} USDT</p>
-      </div> */}
-
-      {/* <div className="tab">
-        <button
-          className={`tablinks ${activeTab === "futures" ? "active" : ""}`}
-          onClick={() => handleTabChange("futures")}
-        >
-          Futures Trading
-        </button>
-        <button
-          className={`tablinks ${activeTab === "spot" ? "active" : ""}`}
-          onClick={() => handleTabChange("spot")}
-        >
-          Spot Trading
-        </button>
-      </div> */}
-
-
-      
-
-      
-
-      
-
-      
-
-      
-
-      
-      {/* Tab navigation */}
-      {/* <div className="tab-navigation">
-        <button
-          className={`tablinks ${activeTab === "futures" ? "active" : ""}`}
-          onClick={() => handleTabClick("futures")}
-        >
-          Futures Trading
-        </button>
-        <button
-          className={`tablinks ${activeTab === "spot" ? "active" : ""}`}
-          onClick={() => handleTabClick("spot")}
-        >
-          Spot Trading
-        </button>
-      </div> */}
-
-      {/* Tab content */}
-      {/* {activeTab === "futures" && (
-        <div className="trading-panel">
-          <h3>Futures Trading Panel</h3> */}
-          {/* Specific content for Futures tab */}
-        {/* </div>
-      )} */}
-
-      {/* {activeTab === "spot" && (
-        <div className="trading-panel">
-          <h3>Spot Trading Panel</h3> */}
-          {/* Specific content for Spot tab */}
-        {/* </div>
-      )} */}
-
-      
+      <div id="transfer-USDT-modal" className="modal">
+        {/* <!-- Modal content --> */}
+        <div className="modal-content-transfer">
+          <span className="close" onClick={()=>{document.getElementById("transfer-USDT-modal").style.display='none'}} >&times;</span>
+          <h2>USDT Transfer</h2>
+          <br />
+          <p>
+            <span className="money-type">Est. Futures Balance(USDT)</span>
+            <span className="money-value" id="transfer-modal-futures-USDT"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+            <span className="money-type">Est. Spot Balance(USDT)</span>
+            <span className="money-value" id="transfer-modal-spot-USDT"></span>
+          </p>
+          <br />
+          <p style={{fontSize: '20px'}}>
+            <span>Mode:</span>
+            <select name="transferType" id="transfer-USDT-type">
+              <option value="fromFutures" selected>Futures - Spot</option>
+              <option value="fromSpot" selected>Spot - Futures</option>
+            </select>
+            <span>Amount:</span>
+            <input type="number" min="1" max="100" id="transfer-USDT-amount" style={{fontSize: '20px', margin: '10px'}} />
+            <span className="money-unit">(USDT)</span>
+            <button id="transfer-USDT-btn" onClick={()=>transferUSDT()}>
+              Transfer
+            </button>
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default TradingComponent;
+export default TradingApp;

@@ -1,11 +1,11 @@
 {
-  "name": "Demo",
+  "name": "project1",
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
-    "dev": "concurrently \"npm run start --prefix backend\" \"npm run start --prefix frontend\""
+    "dev": "nodemon server.js"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +20,10 @@
     "express": "^4.21.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.7.1",
-    "nodemailer": "^6.9.15"
+    "nodemailer": "^6.9.15",
+    "project1": "file:"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
   }
 }
