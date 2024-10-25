@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate  } from 'react-router-dom';
 import axios from 'axios';
-import './futures.css';
+// import './futures.css';
 import './trading.css';
 import TradingViewWidget from './TradingViewWidget';
 const TradingApp = () => {
@@ -167,7 +167,7 @@ const TradingApp = () => {
 
     let tmp = "";
     assetTypes.forEach((asset, index) => {
-      if (asset != futuresAssetType && futuresCurrentPrices) {
+      if ((asset != futuresAssetType) && futuresCurrentPrices) {
         tmp += `<div class="dropdown-option" id = "dropdown-option-${index}">
                     <span class="money-type">${asset}_USDT: </span>
                     <span class="money-value">${Intl.NumberFormat(
@@ -404,7 +404,7 @@ const TradingApp = () => {
     
     let tmp = "";
       assetTypes.forEach((asset, index) => {
-        if (asset != spotAssetType) {
+        if ((asset != spotAssetType) && (spotCurrentPrices)) {
           tmp += `<div class="dropdown-option" id = "dropdown-option-spot-${index}">
                       <span class="money-type">${asset}_USDT: </span>
                       <span class="money-value">${Intl.NumberFormat(
@@ -2465,8 +2465,8 @@ const TradingApp = () => {
           <br />
 
           <div className="order-panel">
-            <div>
-              Select an Asset Type:
+            <div className='order-header'>
+              <div className='asset-label'>Select an Asset Type:</div> 
               <div className="custom-dropdown">
                 <div className="custom-dropdown-selected" id="futures-dropdownSelected" 
                   onClick={()=>{
@@ -2478,7 +2478,6 @@ const TradingApp = () => {
                 >
                 </div>
                 <div className="custom-dropdown-options" id="futures-dropdownOptions" >
-
                 </div>
               </div>
             </div>
@@ -2588,9 +2587,8 @@ const TradingApp = () => {
           </div>
           
           <div className="order-panel">
-            <div className="spot-order-div">
-              <div style={{margin: '10px'}}>Select an Asset Type:</div>
-
+            <div className="order-header">
+              <div className='asset-label'>Select an Asset Type:</div>
               <div className="custom-dropdown">
                 <div className="custom-dropdown-selected" id="spot-dropdownSelected"
                   onClick={()=>{
@@ -2601,10 +2599,8 @@ const TradingApp = () => {
                 </div>
                 <div className="custom-dropdown-options" id="spot-dropdownOptions"></div>
               </div>
-              <div style={{margin: '10px'}} id="spot-assets-statistics"></div>
+              <div style={{margin: '15px'}} id="spot-assets-statistics"></div>
             </div>
-
-
             <div>
               <label style={{color: 'rgb(255, 0, 0)', fontSize: '24px'}}>Market: </label>&nbsp;&nbsp;
               <label>Amount:</label>

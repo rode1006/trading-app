@@ -157,6 +157,7 @@ body {
   width: 200px;
   padding: 16px 24px;
 }
+
 .dropdown-content2 {
   display: none; /* Hidden by default */
   position: absolute;
@@ -527,11 +528,16 @@ select:focus::after {
 
 /* Dropdown Selected Box */
 .custom-dropdown-selected {
-  height: 50px;
-  color: #fff; /* White text */
-  cursor: pointer; /* Pointer cursor */
-  display: flex; /* Align text and arrow */
-  align-items: center; /* Center items vertically */}
+  margin: 5px 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #26235a;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
 
 /* Font Awesome Arrow Styling */
 .custom-dropdown-arrow {
@@ -558,6 +564,7 @@ select:focus::after {
   max-height: 180px; /* Maximum height */
   overflow-y: auto; /* Scroll if needed */
   opacity: 100; /* Start hidden */
+  cursor: pointer;
 }
 
 /* Show Dropdown on Click */
@@ -1332,4 +1339,53 @@ button {
   padding: 20px;
   border: 1px solid #888;
   width: 25%; /* Could be more or less, depending on screen size */
+}
+
+.order-header{
+  display: flex;
+}
+
+.asset-label{
+  margin: 15px;
+}
+
+.dropdown-selected {
+  padding: 10px;
+  background: #4b4949;
+  border: 1px solid #ffffff;
+  cursor: pointer;
+}
+.dropdown-options {
+  display: none;
+  position: absolute;
+  background: rgb(68, 67, 67);
+  border: 1px solid #ccc;
+  z-index: 1;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.dropdown-options .dropdown-option {
+  padding: 10px;
+  cursor: pointer;
+}
+.dropdown-selected {
+  padding: 10px;
+  background: #4b4949;
+  border: 1px solid #ffffff;
+  cursor: pointer;
+}
+.dropdown-options {
+  display: none;
+  position: absolute;
+  background: rgb(68, 67, 67);
+  border: 1px solid #ccc;
+  z-index: 1;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.dropdown-options .dropdown-option {
+  padding: 10px;
+  cursor: pointer;
 }
