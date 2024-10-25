@@ -4,7 +4,6 @@
   padding: 0;
   box-sizing: border-box;
 }
-
 body {
   margin: 0;
   padding: 0;
@@ -12,49 +11,6 @@ body {
   background-color: #0d0e0f;
   color: white;
 }
-
-/* Style the tab */
-.tab {
-  /* overflow: hidden; */
-  /* border: 1px solid #ccc; */
-  background-color: #222222;
-}
-
-/* Style the buttons inside the tab */
-.tab button {
-  background-color: inherit;
-  float: left;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  padding: 14px 16px;
-  transition: 0.3s;
-  font-size: 17px;
-}
-
-/* Change background color of buttons on hover */
-.tab button:hover {
-  background-color: #ddd;
-}
-
-/* Create an active/current tablink class */
-.tab button.active {
-  background-color: #999999;
-}
-
-/* Style the tab content */
-.tabcontent {
-  display: none;
-  padding: 6px 12px;
-  border: 1px solid #ccc;
-  /* border-top: none; */
-}
-
-
-
-
-
-
 
 /* Hide the horizontal scrollbar */
 ::-webkit-scrollbar {
@@ -77,6 +33,9 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #3a3a7a; /* Lighter shade on hover for visibility */
 }
+
+
+
 
 .container {
   display: flex;
@@ -196,27 +155,10 @@ body {
 
 
 
-.money-type{
-  color: #f4a070;
-}
 
-.money-unit{
-  color: #ed70f4;
-}
 
-.money-value{
-  color: #2fda65;
-}
-
-.order-panel{
-  background-color: #333333;
-  font-size: 18px;
-  border: white solid 1px;
-  margin: 10px;
-  padding: 10px;
-}
-
-.trading-panel{
+.open-position{
+  margin-top: 100px;
   background-color: #16171a;
   padding: 20px;
   border-radius: 3px;
@@ -329,13 +271,13 @@ body {
   padding-left: 14px;
   height: 46px !important;
 }
-/* @font-face {
+@font-face {
   font-family: 'Wix Madefor Text Variable';
-  src: url('path-to-your-font-file.woff2') format('woff2'),
-       url('path-to-your-font-file.woff') format('woff');
+  /* src: url('path-to-your-font-file.woff2') format('woff2'),
+       url('path-to-your-font-file.woff') format('woff'); */
   font-weight: normal;
   font-style: normal;
-} */
+}
 
 
 .container1 {
@@ -527,11 +469,15 @@ select:focus::after {
 
 /* Dropdown Selected Box */
 .custom-dropdown-selected {
-  height: 50px;
-  color: #fff; /* White text */
-  cursor: pointer; /* Pointer cursor */
-  display: flex; /* Align text and arrow */
-  align-items: center; /* Center items vertically */}
+  margin: 5px 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #26235a;
+  padding: 10px;
+  border-radius: 8px;
+}
 
 /* Font Awesome Arrow Styling */
 .custom-dropdown-arrow {
@@ -557,7 +503,7 @@ select:focus::after {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Shadow for options */
   max-height: 180px; /* Maximum height */
   overflow-y: auto; /* Scroll if needed */
-  opacity: 100; /* Start hidden */
+  opacity: 0; /* Start hidden */
 }
 
 /* Show Dropdown on Click */
@@ -590,7 +536,9 @@ select:focus::after {
   color: #fff; /* White text on hover */
 }
 
-
+.dropdown-option{
+  cursor: pointer;
+}
 
 /* General Container */
 .toggle-container-custom {
@@ -907,12 +855,6 @@ input[type="number"] {
   text-shadow: 0 0 8px rgba(0, 255, 204, 0.8), 0 0 12px rgba(0, 255, 204, 0.6); /* Cool neon glow */
 }
 
-
-
-
-
-
-
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .main-text {
@@ -1061,11 +1003,42 @@ input[type="number"] {
   font-size: 14px; /* Adjust font size as needed */
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @media screen and (max-width: 339px) {
   .deposit-btn {
     display: none;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 .color-button {
   width: 100px;
   height: 50px;
@@ -1106,6 +1079,24 @@ input[type="number"] {
   font-size: 24px;
   font-weight: bold;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 .color-button {
   width: 100px;
@@ -1285,8 +1276,8 @@ button {
   }
 
 .chart-container {
-  display: none; /* Hide charts initially */
-  height: calc(100% - 32px);
+  display: block; /* Hide charts initially */
+  height: calc(100% - 50px);
   width: 100%;
 }
 .active {
@@ -1313,23 +1304,43 @@ button {
 .timeframe-button.active {
   background-color: #007BFF; /* Highlight active button */
 }
-.modal {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  left: 0;
-  top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+.dropdown-selected {
+  padding: 10px;
+  background: #4b4949;
+  border: 1px solid #ffffff;
+  cursor: pointer;
 }
-/* Modal Content */
-.modal-content {
-  background-color: #fefefe;
-  margin: 15% auto; /* 15% from the top and centered */
-  padding: 20px;
-  border: 1px solid #888;
-  width: 25%; /* Could be more or less, depending on screen size */
+.dropdown-options {
+  display: none;
+  position: absolute;
+  background: rgb(68, 67, 67);
+  border: 1px solid #ccc;
+  z-index: 1;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.dropdown-options .dropdown-option {
+  padding: 10px;
+  cursor: pointer;
+}
+.dropdown-selected {
+  padding: 10px;
+  background: #4b4949;
+  border: 1px solid #ffffff;
+  cursor: pointer;
+}
+.dropdown-options {
+  display: none;
+  position: absolute;
+  background: rgb(68, 67, 67);
+  border: 1px solid #ccc;
+  z-index: 1;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.dropdown-options .dropdown-option {
+  padding: 10px;
+  cursor: pointer;
 }

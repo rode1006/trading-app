@@ -49,7 +49,7 @@ router.post('/register', async (req, res) => {
 
 // User Login
 router.post('/login', async (req, res) => {
-    console.log(req.body);
+    // console.log(req.body);
     const { username, password } = req.body;
     
     try {

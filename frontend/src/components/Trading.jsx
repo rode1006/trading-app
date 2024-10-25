@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate  } from 'react-router-dom';
 import axios from 'axios';
-// import './futures.css';
+import './futures.css';
 import './trading.css';
 import TradingViewWidget from './TradingViewWidget';
 const TradingApp = () => {
@@ -9,23 +9,6 @@ const TradingApp = () => {
 
 
   const assetTypes = ["BTC", "ETH", "BNB", "NEO", "LTC", "SOL", "XRP", "DOT"];
-  // const [futuresAssetType, setFuturesAssetType] = useState("BTC");
-  // const [spotAssetType, setSpotAssetType] = useState("BTC");
-  // const [totalUSDTBalance, setTotalUSDTBalance] = useState(0);
-  // const [selectedNetwork, setSelectedNetwork] = useState("ERC-20");
-  // const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  // const [futuresUSDTBalance, setFuturesUSDTBalance] = useState(0);
-  // const [spotBalances, setSpotBalances] = useState([]);
-  // const [futuresPositionsCount, setFuturesPositionsCount] = useState(0);
-  // const [futuresCurrentPrices, setFuturesCurrentPrices] = useState([]);
-  // const [totalValue, setTotalValue] = useState(0);
-  // const [spotUSDTBalance, setSpotUSDTBalance] = useState(0);
-  // const [spotCurrentPrices, setSpotCurrentPrices] = useState([]);
-  // const [spotPositionsCount, setSpotPositionsCount] = useState(0);
-  // const [futuresClosedPositionsCount, setFuturesClosedPositionsCount] = useState(0);
-  // const [spotClosedPositionsCount, setSpotClosedPositionsCount] = useState(0);
-
-  // const [availableAmount , setAvailableAmount] = useState(0);
 
   let futuresAssetType ="BTC";
   let spotAssetType ="BTC";
@@ -46,38 +29,12 @@ const TradingApp = () => {
   let availableAmount =0;
 
   let closingPosition;
-
+  let partialClosingModal;
+  let transferUSDTModal;
   const [selectedSpotChartSymbol, setSelectedSpotChartSymbol] = useState('MEXC:BTCUSDT')
   const [selectedFuturesChartSymbol, setSelectedFuturesChartSymbol] = useState('MEXC:BTCUSDT')
 
-  var span1 = document.getElementsByClassName("close")[0];
-  var span2 = document.getElementsByClassName("close")[1];
-  if(span1!=undefined){
-    span1.onClick = function () {
-      partialClosingModal.style.display = "none";
-    };
-  }
-  if(span2!=undefined){
-    span2.onClick = function () {
-      transferUSDTModal.style.display = "none";
-    };
-  }
-
-   // When the user clicks anywhere outside of the modal, close it
-   window.onClick = function (event) {
-    if (event.target == partialClosingModal) {
-      partialClosingModal.style.display = "none";
-    }
-    if (event.target == transferUSDTModal) {
-      transferUSDTModal.style.display = "none";
-    }
-  };
-
-
-  let partialClosingModal = document.getElementById(
-    "partial-closing-modal"
-  );
-  var transferUSDTModal = document.getElementById("transfer-USDT-modal");
+  
   const options = [
     { imgSrc: "img/USDT.png", label: "USDT", balance: "0.00" },
     { imgSrc: "img/USDC.png", label: "USDC", balance: "0.00" },
@@ -106,6 +63,37 @@ const TradingApp = () => {
     futuresClosedPositionsCount,
     spotPositionsCount,
     spotClosedPositionsCount])
+  
+  useEffect(()=>{
+    var span1 = document.getElementsByClassName("close")[0];
+    var span2 = document.getElementsByClassName("close")[1];
+    if(span1!=undefined){
+      span1.onClick = function () {
+        partialClosingModal.style.display = "none";
+      };
+    }
+    if(span2!=undefined){
+      span2.onClick = function () {
+        transferUSDTModal.style.display = "none";
+      };
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onClick = function (event) {
+      if (event.target == partialClosingModal) {
+        partialClosingModal.style.display = "none";
+      }
+      if (event.target == transferUSDTModal) {
+        transferUSDTModal.style.display = "none";
+      }
+    };
+
+
+    partialClosingModal = document.getElementById(
+      "partial-closing-modal"
+    );
+    transferUSDTModal = document.getElementById("transfer-USDT-modal");
+  }, []);
 
   const checkToken = () => {
       if (localStorage.getItem("token") == null) {
@@ -138,11 +126,10 @@ const TradingApp = () => {
         const data = await response.data;
         const availableAmount = parseFloat(data.balance); // Set available balance to variable
         // setAvailableAmount(availableAmount);
-        availableAmount = availableAmount;
+        // availableAmount = availableAmount;
         document.getElementById('availableAmount').textContent = availableAmount.toFixed(3); // Display formatted balance
-        document.getElementById(
-          "welcome-message-duplicate"
-        ).textContent = data.username;
+        document.getElementById("welcome-message-duplicate").textContent = data.username;
+        document.getElementById("welcome-message").textContent = data.username;
         document.getElementById("address").textContent = data.address;
 
         // Now that the balance is set, add the validation listener
@@ -180,7 +167,7 @@ const TradingApp = () => {
 
     let tmp = "";
     assetTypes.forEach((asset, index) => {
-      if (asset != futuresAssetType) {
+      if (asset != futuresAssetType && futuresCurrentPrices) {
         tmp += `<div class="dropdown-option" id = "dropdown-option-${index}">
                     <span class="money-type">${asset}_USDT: </span>
                     <span class="money-value">${Intl.NumberFormat(
@@ -204,7 +191,7 @@ const TradingApp = () => {
         (item) => item.assetType === futuresAssetType
       ).price
     )}</span>`;
-    console.log(assetTypes)
+    // console.log(assetTypes)
 
     assetTypes.forEach((asset, index)=>{
       if (asset != futuresAssetType){
@@ -215,48 +202,9 @@ const TradingApp = () => {
     })
     setTimeout(fetchFuturesCurrentPrices, 500);
   }
-  function createFuturesTradingViewWidget(symbol) {
-    // console.log(symbol, interval);
-    // const widgetContainer = document.getElementById(
-    //   "futures-tradingview-widget"
-    // );
-    // widgetContainer.innerHTML = "";
-
-    // new TradingView.widget({
-    //   width: "100%",
-    //   height: "90%",
-    //   symbol: symbol,
-    //   // interval: interval,
-    //   interval: "60",
-    //   timezone: "Etc/UTC",
-    //   theme: "dark",
-    //   style: "1",
-    //   locate: "en",
-    //   backgroundColor: "#16171a",
-    //   gridColor: "rgba(240, 243, 250, 0.05)",
-    //   allow_symbol_change: false,
-    //   container_id: "futures-tradingview-widget",
-    //   // save_image: false,
-    //   // studies: [],
-    //   // studies_overrides: {},
-    //   // overrides: {},
-    //   hide_side_toolbar: false,
-    //   // details: true,
-    //   hide_legend: true,
-    //   calendar: false,
-    //   // news: ["headlines"],
-    //   // auto_scale: true,
-    //   // fontFamily: "Trebuchet MS",
-    //   // fontSize: 12,
-    //   // noTimeScale: false,
-    //   // showLegend: true,
-    //   hide_volume: true,
-    //   support_host: "https://www.tradingview.com",
-    // });
-  }
   function futuresChartUpdate() {
     let selectedSymbol = `MEXC:${futuresAssetType}USDT`;
-    // setSelectedFuturesChartSymbol(selectedSymbol)
+    setSelectedFuturesChartSymbol(selectedSymbol)
   }
   function futuresSelectOption(value) {
     futuresAssetType = value
@@ -312,11 +260,11 @@ const TradingApp = () => {
   useEffect(()=>{
     if(futuresCurrentPrices.length==0) return;
     let tmp = "";
-    console.log('futuresCurrentPrices ', futuresCurrentPrices)
+    // console.log('futuresCurrentPrices ', futuresCurrentPrices)
     assetTypes.forEach((asset, index) => {
-      console.log('index =', index, asset)
+      // console.log('index =', index, asset)
       const item =  futuresCurrentPrices.find((item) => item.assetType === asset);
-      console.log('item: ', item)
+      // console.log('item: ', item)
       const price = Intl.NumberFormat("en-US").format(item.price);
 
       if (asset != futuresAssetType) {
@@ -331,7 +279,7 @@ const TradingApp = () => {
     assetTypes.forEach((asset, index) => {
       if(document.getElementById("dropdown-option-"+index)!=undefined)
       document.getElementById("dropdown-option-"+index).addEventListener('click', function() {
-        console.log(index)
+        // console.log(index)
         futuresSelectOption(asset)
       })
     });
@@ -395,6 +343,7 @@ const TradingApp = () => {
       }
     );
     const data = response.data;
+    // console.log(data)
     if (data.ok){
       alert("Operation completed successfully!");
     }
@@ -437,7 +386,7 @@ const TradingApp = () => {
       throw new Error("Failed to fetch spot prices");
     }
     // spotCurrentPrices = spotPriceData.currentPrices;
-    console.log('spotPriceData: ', spotPriceData)
+    // console.log('spotPriceData: ', spotPriceData)
     // setSpotCurrentPrices(spotPriceData.currentPrices);
     spotCurrentPrices = spotPriceData.currentPrices
 
@@ -515,7 +464,7 @@ const TradingApp = () => {
     assetTypes.forEach((asset, index) => {
       if(document.getElementById("dropdown-option-spot-"+index)!=undefined)
       document.getElementById("dropdown-option-spot-"+index).addEventListener('click', function() {
-        console.log(index)
+        // console.log(index)
         spotSelectOption(asset)
       })
     });
@@ -1140,14 +1089,15 @@ const TradingApp = () => {
     statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
     statisticsBar +=
       "<span class='money-type'>Est. Spot Value (USDT):</span>";
-    console.log('spotUSDTBalance = ', spotUSDTBalance)
+    // console.log('spotUSDTBalance = ', spotUSDTBalance)
     let spotValue = parseFloat(spotUSDTBalance);
     // console.log(spotBalances);
     spotBalances.forEach((balance, index) => {
-      if (index > 0) {
-        spotValue += parseFloat(balance) * spotCurrentPrices.filter((item) => item.assetType == assetTypes[index - 1]).price;
+      if (index > 0 && spotCurrentPrices !== null) {
+        spotValue += parseFloat(balance) * spotCurrentPrices.filter((item) => item.assetType == assetTypes[index - 1])[0].price;
       }
     });
+    // console.log('spotValue = ', spotValue)
     statisticsBar +=
       "<span class='money-value'>" +
       new Intl.NumberFormat("en-US").format(spotValue.toFixed(2)) +
@@ -1195,21 +1145,22 @@ const TradingApp = () => {
       "<span class='money-type'>Est. Total Value (USDT):</span>";
     // setTotalValue(spotUSDTBalance);
     totalValue = spotUSDTBalance
-    console.log('totalValue = ', totalValue)
+    // console.log('totalValue = ', totalValue)
 
     spotBalances.forEach((balance, index) => {
-      if (index > 0) {
+      if (index > 0 && spotCurrentPrices) {
           const newValue =
             parseFloat(balance) * spotCurrentPrices.filter((item) => item.assetType == assetTypes[index - 1]).price;
             // setTotalValue(prev=>prev+newValue);
-            totalValue += newValue
+            totalValue += isNaN(newValue)? 0 : newValue;
       }
     });
     // totalValue += (parseFloat(futuresUSDTBalance) + parseFloat(futuresPositionsAmount) + parseFloat(futuresUnrealizedPL));
+    let sum = spotUSDTBalance+futuresUSDTBalance + futuresPositionsAmount+futuresUnrealizedPL
+    let res = new Intl.NumberFormat("en-US").format(sum.toFixed(2))
     statisticsBar +=
-      "<span class='money-value'>" +
-      new Intl.NumberFormat("en-US").format((spotUSDTBalance+futuresUSDTBalance+futuresPositionsAmount+futuresUnrealizedPL).toFixed(2)) +
-      "</span>";
+      `<span class='money-value'>`+ res+
+      `</span>`;
     document.getElementById("total-statistics").innerHTML = statisticsBar;
 
     //---------------------------------------------------------
@@ -1563,15 +1514,19 @@ const TradingApp = () => {
                       }} className="toggle-button-custom active"
                       onClick={()=>{
                         document
+                          .getElementById("withdraw-toggle-custom")
+                          .classList.remove("active");
+                        document
+                          .getElementById("deposit-toggle-custom")
+                          .classList.add("active");
+                        document
                         .getElementById("deposit-content-custom")
                         .classList.add("active");
                         document
                           .getElementById("withdraw-content-custom")
                           .classList.remove("active");
                         this.classList.add("active");
-                        document
-                          .getElementById("withdraw-toggle-custom")
-                          .classList.remove("active");
+                        
                       }}
                     >
                       Deposit
@@ -1585,15 +1540,19 @@ const TradingApp = () => {
                       className="toggle-button-custom"
                       onClick={()=>{
                         document
+                          .getElementById("deposit-toggle-custom")
+                          .classList.remove("active");
+                        document
+                        .getElementById("withdraw-toggle-custom")
+                        .classList.add("active");
+                        document
                         .getElementById("withdraw-content-custom")
                         .classList.add("active");
                         document
                           .getElementById("deposit-content-custom")
                           .classList.remove("active");
                         this.classList.add("active");
-                        document
-                          .getElementById("deposit-toggle-custom")
-                          .classList.remove("active");
+                        
                         }
                       }
                     >
@@ -2029,7 +1988,7 @@ const TradingApp = () => {
                                 <img width="14px" src="img/arrow-right.png" alt="Arrow icon" />
                             </span>
                         </div>
-                        {isDropdownOpen && (
+                        { (
                           <div className="custom-dropdown-options">
                               <hr className="separator2" />
                               {networks.map((network, index) => (
@@ -2466,7 +2425,6 @@ const TradingApp = () => {
                 </a>
 
                 <a
-                  href="/login"
                   id="headerlogout-btn"
                   style={{
                     display: 'flex',
@@ -2474,10 +2432,8 @@ const TradingApp = () => {
                     textDecoration: 'none',
                   }}
                   onClick = { async (event)=> {
-                    axios.post("/logout", { method: "POST" });
                     localStorage.removeItem("token");
                     navigate('/login')
-                    // window.location.href = "/login"; // Redirect to the login page
                   }}
                 >
                   <img
@@ -2496,108 +2452,29 @@ const TradingApp = () => {
           </div>
         </div>
         <div id="total-statistics" style={{marginTop: '80px'}}></div>
-        <div id="futures" className="tabcontent trading-panel">
+        <div id="futures" className="tabcontent trading-panel active">
           <div id="futures-statistics"></div>
           <div id="futures-now-price" style={{margin: '10px'}}></div>
           <br />
           {/* <!-- <div id="assets-statistics"></div> --> */}
           <h3>MEXC Futures Asset Price Chart</h3>
           <br />
-          {/* <!-- <canvas
-              id="futuresChart"
-              width="400"
-              height="100"
-              style="margin: 20px"
-            ></canvas>
-            <div className="btn-div">
-              <button
-                className="futures-chart-btn"
-                id="btn-1s"
-                onClick="changeFuturesInterval(this)"
-              >
-                1m
-              </button>
-              <button
-                className="futures-chart-btn"
-                id="btn-1m"
-                onClick="changeFuturesInterval(this)"
-              >
-                5m
-              </button>
-              <button
-                className="futures-chart-btn"
-                id="btn-5m"
-                onClick="changeFuturesInterval(this)"
-              >
-                30m
-              </button>
-              <button
-                className="futures-chart-btn active"
-                id="btn-15m"
-                onClick="changeFuturesInterval(this)"
-              >
-                1h
-              </button>
-              <button
-                className="futures-chart-btn"
-                id="btn-1H"
-                onClick="changeFuturesInterval(this)"
-              >
-                4h
-              </button>
-              <button
-                className="futures-chart-btn"
-                id="btn-1D"
-                onClick="changeFuturesInterval(this)"
-              >
-                1d
-              </button>
-              <button
-                className="futures-chart-btn"
-                id="btn-1W"
-                onClick="changeFuturesInterval(this)"
-              >
-                1W
-              </button>
-              <button
-                className="futures-chart-btn"
-                id="btn-1M"
-                onClick="changeFuturesInterval(this)"
-              >
-                1M
-              </button>
-            </div> --> */}
           <div className="chart-container">
-            {/* <div className="tradingview-widget-container" id="futures-tradingview-widget" style={{height: '90%', width: '100%'}}>
-            
-            </div> */}
-            {/* <div className = "tradingview-widget-container" id="futures-tradingview-widget" > */}
-              <TradingViewWidget symbol={selectedFuturesChartSymbol} key={selectedFuturesChartSymbol} id="futures-tradingview-widget" ></TradingViewWidget>
-            {/* </div> */}
+            <TradingViewWidget symbol={selectedFuturesChartSymbol} key={selectedFuturesChartSymbol} id="futures-tradingview-widget" ></TradingViewWidget>
           </div>
           <br />
 
           <div className="order-panel">
             <div>
               Select an Asset Type:
-              {/* <!-- <select
-                  id="futures-asset-type"
-                  style="width: 160px"
-                ></select>&nbsp;&nbsp;&nbsp;
-                <span className="money-type">Current Price:</span>
-                <span id="futures-current-price" className="money-value"
-                  >Loading...</span
-                >
-                <span className="money-unit">USDT</span> --> */}
-
               <div className="custom-dropdown">
                 <div className="custom-dropdown-selected" id="futures-dropdownSelected" 
-                  // onClick={()=>{
-                  //   alert(document.getElementById("futures-dropdownOptions").style.display)
-                  //   const isVisible = (document.getElementById("futures-dropdownOptions").style.display === "block");
-                  //   alert(isVisible)
-                  //   document.getElementById("futures-dropdownOptions").style.display = isVisible ? "none" : "block";
-                  // }}
+                  onClick={()=>{
+                    // alert(document.getElementById("futures-dropdownOptions").style.display)
+                    const isVisible = (document.getElementById("futures-dropdownOptions").style.display === "block");
+                    // alert(isVisible)
+                    document.getElementById("futures-dropdownOptions").style.display = isVisible ? "none" : "block";
+                  }}
                 >
                 </div>
                 <div className="custom-dropdown-options" id="futures-dropdownOptions" >
@@ -2705,71 +2582,7 @@ const TradingApp = () => {
           <br />
           <h3>MEXC Spot Asset Price Chart</h3>
           <br />
-          {/* <!-- <canvas
-              id="spotChart"
-              width="400"
-              height="100"
-              style="margin: 20px"
-            ></canvas> -->
-          <!-- <div className="btn-div">
-              <button
-                className="spot-chart-btn"
-                id="btn-1s"
-                onClick="changeSpotInterval(this)"
-              >
-                1m
-              </button>
-              <button
-                className="spot-chart-btn"
-                id="btn-1m"
-                onClick="changeSpotInterval(this)"
-              >
-                5m
-              </button>
-              <button
-                className="spot-chart-btn"
-                id="btn-5m"
-                onClick="changeSpotInterval(this)"
-              >
-                30m
-              </button>
-              <button
-                className="spot-chart-btn active"
-                id="btn-15m"
-                onClick="changeSpotInterval(this)"
-              >
-                1h
-              </button>
-              <button
-                className="spot-chart-btn"
-                id="btn-1H"
-                onClick="changeSpotInterval(this)"
-              >
-                4h
-              </button>
-              <button
-                className="spot-chart-btn"
-                id="btn-1D"
-                onClick="changeSpotInterval(this)"
-              >
-                1d
-              </button>
-              <button
-                className="spot-chart-btn"
-                id="btn-1W"
-                onClick="changeSpotInterval(this)"
-              >
-                1W
-              </button>
-              <button
-                className="spot-chart-btn"
-                id="btn-1M"
-                onClick="changeSpotInterval(this)"
-              >
-                1M
-              </button>
-            </div> --> */}
-
+          
           <div className="chart-container">
             <TradingViewWidget symbol={selectedSpotChartSymbol} key={selectedSpotChartSymbol} id ="tradingview-widget" ></TradingViewWidget>
           </div>
@@ -2780,10 +2593,10 @@ const TradingApp = () => {
 
               <div className="custom-dropdown">
                 <div className="custom-dropdown-selected" id="spot-dropdownSelected"
-                  // onClick={()=>{
-                  //   const isVisible = document.getElementById("spot-dropdownOptions").style.display === "block";
-                  //   document.getElementById("spot-dropdownOptions").style.display = isVisible ? "none" : "block";
-                  // }}
+                  onClick={()=>{
+                    const isVisible = document.getElementById("spot-dropdownOptions").style.display === "block";
+                    document.getElementById("spot-dropdownOptions").style.display = isVisible ? "none" : "block";
+                  }}
                 > 
                 </div>
                 <div className="custom-dropdown-options" id="spot-dropdownOptions"></div>
@@ -2889,9 +2702,9 @@ const TradingApp = () => {
           <br />
           <p style={{fontSize: '20px'}}>
             <span>Mode:</span>
-            <select name="transferType" id="transfer-USDT-type">
-              <option value="fromFutures" selected>Futures - Spot</option>
-              <option value="fromSpot" selected>Spot - Futures</option>
+            <select name="transferType" id="transfer-USDT-type" defaultValue={"fromFutures"}>
+              <option value="fromFutures">Futures - Spot</option>
+              <option value="fromSpot">Spot - Futures</option>
             </select>
             <span>Amount:</span>
             <input type="number" min="1" max="100" id="transfer-USDT-amount" style={{fontSize: '20px', margin: '10px'}} />
