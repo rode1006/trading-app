@@ -196,13 +196,13 @@ router.post('/closeSpotPosition', authenticateToken, async (req, res) => {
 
 
         // Log the closed position with realized P/L
-        if (!user.closedSpotPositions) {
-            user.closedSpotPositions = [];
-        }
-        user.closedSpotPositions.push({
-            ...closedPosition,
-            exitPrice: currentMarketPrice
-        });
+        // if (!user.closedSpotPositions) {
+        //     user.closedSpotPositions = [];
+        // }
+        // user.closedSpotPositions.push({
+        //     ...closedPosition,
+        //     exitPrice: currentMarketPrice
+        // });
 
         sendPositionClosedEmail(username, closedPosition, currentMarketPrice);
 

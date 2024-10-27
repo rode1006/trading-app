@@ -4,7 +4,6 @@
   padding: 0;
   box-sizing: border-box;
 }
-
 body {
   margin: 0;
   padding: 0;
@@ -117,7 +116,6 @@ body {
   width: 200px;
   padding: 16px 24px;
 }
-
 .dropdown-content2 {
   display: none; /* Hidden by default */
   position: absolute;
@@ -273,14 +271,13 @@ body {
   padding-left: 14px;
   height: 46px !important;
 }
-
-/* @font-face {
+@font-face {
   font-family: 'Wix Madefor Text Variable';
-  src: url('path-to-your-font-file.woff2') format('woff2'),
-       url('path-to-your-font-file.woff') format('woff');
+  /* src: url('path-to-your-font-file.woff2') format('woff2'),
+       url('path-to-your-font-file.woff') format('woff'); */
   font-weight: normal;
   font-style: normal;
-} */
+}
 
 
 .container1 {
@@ -472,15 +469,11 @@ select:focus::after {
 
 /* Dropdown Selected Box */
 .custom-dropdown-selected {
-  margin: 5px 0;
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #26235a;
-  padding: 10px;
-  border-radius: 8px;
-}
+  height: 50px;
+  color: #fff; /* White text */
+  cursor: pointer; /* Pointer cursor */
+  display: flex; /* Align text and arrow */
+  align-items: center; /* Center items vertically */}
 
 /* Font Awesome Arrow Styling */
 .custom-dropdown-arrow {
@@ -539,9 +532,7 @@ select:focus::after {
   color: #fff; /* White text on hover */
 }
 
-.dropdown-option{
-  cursor: pointer;
-}
+
 
 /* General Container */
 .toggle-container-custom {
@@ -1264,6 +1255,25 @@ button {
   color: #4281ff !important; /* Override inline style */
 }
 
+
+
+.chart {
+  position: relative;
+  overflow: hidden; /* Prevent elements from overflowing */
+
+  background-color: #16171a;
+  padding: 20px;
+  border-radius: 3px;
+  margin-bottom: 30px;
+  height: 1000px;
+  height: 2000px;
+  }
+
+.chart-container {
+  display: block; /* Hide charts initially */
+  height: calc(100% - 32px);
+  width: 100%;
+}
 .active {
   display: block; /* Show active chart */
 }
@@ -1287,4 +1297,24 @@ button {
 }
 .timeframe-button.active {
   background-color: #007BFF; /* Highlight active button */
+}
+.dropdown-selected {
+  padding: 10px;
+  background: #4b4949;
+  border: 1px solid #ffffff;
+  cursor: pointer;
+}
+.dropdown-options {
+  display: none;
+  position: absolute;
+  background: rgb(68, 67, 67);
+  border: 1px solid #ccc;
+  z-index: 1;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.dropdown-options .dropdown-option {
+  padding: 10px;
+  cursor: pointer;
 }

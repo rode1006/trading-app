@@ -63,19 +63,22 @@ router.post('/', authenticateToken, async (req, res) => {
             user.spotPositions = [];
         }
 
-        if (!user.closedSpotPositions) {
-            user.closedSpotPositions = [];
-        }
+        // if (!user.closedSpotPositions) {
+        //     user.closedSpotPositions = [];
+        // }
 
-        if (position.positionType == 'buy') {
-            user.spotPositions.push(position);
-            sendPositionOpenEmail(username, position);
-        }
+        // if (position.positionType == 'buy') {
+        //     user.spotPositions.push(position);
+        //     sendPositionOpenEmail(username, position);
+        // }
 
-        if (position.positionType == 'sell') {
-            user.closedSpotPositions.push(position);
-            sendPositionClosedEmail(username, position, currentMarketPrice);
-        }
+        // if (position.positionType == 'sell') {
+        //     user.closedSpotPositions.push(position);
+        //     sendPositionClosedEmail(username, position, currentMarketPrice);
+        // }
+
+        user.spotPositions.push(position);
+        sendPositionClosedEmail(username, position, currentMarketPrice);
 
         saveUser(user);
 

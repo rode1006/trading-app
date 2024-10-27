@@ -27,7 +27,10 @@ async function updateUserBalance(username, futuresUSDTBalance, spotUSDTBalance) 
         }
         user.futuresUSDTBalance = parseFloat(futuresUSDTBalance);
         user.spotUSDTBalance = parseFloat(spotUSDTBalance);
-        user.totalUSDTBalance = futuresUSDTBalance + spotUSDTBalance;
+        user.totalUSDTBalance = parseFloat(futuresUSDTBalance) + parseFloat(spotUSDTBalance);
+        console.log(user.futuresUSDTBalance)
+        console.log(user.spotUSDTBalance)
+        console.log(user.totalUSDTBalance)
         await saveUser(user);
         return {
             futuresUSDTBalance: user.futuresUSDTBalance,

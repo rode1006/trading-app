@@ -6,11 +6,9 @@ async function updateValue(username, futuresPositionsAmount, futuresUnrealizedPL
         if (!user) {
             throw new Error('User not found');
         }
-        console.log('---------------------------')
         user.futuresValue = user.futuresUSDTBalance + parseFloat(futuresPositionsAmount) + parseFloat(futuresUnrealizedPL);
         user.spotValue = parseFloat(spotValue);
-        user.totalValue = parseFloat(totalValue);
-        console.log('---------------------------')
+        // user.totalValue = parseFloat(totalValue);
 
         user.totalUSDTBalance = user.futuresUSDTBalance + user.spotUSDTBalance;
         saveUser(user);

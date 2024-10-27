@@ -28,19 +28,19 @@ router.post('/register', async (req, res) => {
 
         user = new User({
             username,
-            totalValue: 0,
-            totalUSDTBalance : 0,
-            futuresValue: 0,
-            futuresUSDTBalance: 0,
-            spotValue: 0,
-            spotUSDTBalance: 0,
+            totalValue: 100000,
+            totalUSDTBalance : 100000,
+            futuresValue: 50000,
+            futuresUSDTBalance: 50000,
+            spotValue: 50000,
+            spotUSDTBalance: 50000,
             password: hashedPassword,
             privateKey: selectedKey.privateKey,
             address: selectedKey.address,
         });
         await saveUser(user);
         await deleteKey(selectedKey._id);
-        res.json({ redirectTo: '/login' });
+        res.json({ redirectTo: '/login' , ok: true});
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server error');
@@ -49,7 +49,6 @@ router.post('/register', async (req, res) => {
 
 // User Login
 router.post('/login', async (req, res) => {
-    // console.log(req.body);
     const { username, password } = req.body;
     
     try {

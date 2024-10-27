@@ -34,7 +34,7 @@ const TradingViewWidget = ({symbol, id}) => {
   );
 
   return (
-    <div className="tradingview-widget-container" ref={container} style={{ height: "100%", width: "90%" }} id = {id}>
+    <div className="tradingview-widget-container" ref={container} style={{ height: "100%", width: "98%" }} id = {id}>
       <div className="tradingview-widget-container__widget" style={{ height: "calc(100% - 32px)", width: "100%" }}></div>
     </div>
   );
