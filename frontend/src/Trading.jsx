@@ -33,6 +33,7 @@ const TradingApp = () => {
   let spotUSDTBalance = 0;
   let spotCurrentPrices = [];
   let availableAmount = 0;
+  let btnDelay = true;
 
   const options = [
     { imgSrc: "img/USDT.png", label: "USDT", balance: "0.00" },
@@ -57,6 +58,8 @@ const TradingApp = () => {
 
   useEffect(() => {
     async function fetchFuturesCurrentPrices() {
+      btnDelay = false;
+
       const futuresPriceResponse = await axios.post(
         "/api/market/getCurrentPrice",
         { accountType: "futures" },
@@ -130,11 +133,14 @@ const TradingApp = () => {
       document
         .getElementById("futures-dropdownSelected")
         .addEventListener("click", function () {
-          const isVisible =
-            document.getElementById("futures-dropdownOptions").style.display ===
-            "block";
-          document.getElementById("futures-dropdownOptions").style.display =
-            isVisible ? "none" : "block";
+          if(!btnDelay){
+            const isVisible =
+              document.getElementById("futures-dropdownOptions").style.display ===
+              "block";
+            document.getElementById("futures-dropdownOptions").style.display =
+              isVisible ? "none" : "block";
+            btnDelay = true;
+          }
         });
       // console.log(assetTypes)
 
@@ -925,8 +931,8 @@ const TradingApp = () => {
       });
     }
 
-    const intervalId1 = setInterval(fetchFuturesCurrentPrices, 1000);
-    const intervalId2 = setInterval(fetchSpotCurrentPrices, 2000);
+    const intervalId1 = setInterval(fetchFuturesCurrentPrices, 500);
+    const intervalId2 = setInterval(fetchSpotCurrentPrices, 500);
     const intervalId3 = setInterval(fetchUserData, 1000);
 
     return () => {
