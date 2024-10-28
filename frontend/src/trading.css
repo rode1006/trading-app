@@ -538,8 +538,9 @@ select:focus::after {
 /* Custom Dropdown Container */
 .custom-dropdown {
   position: relative; /* Position options absolutely within container */
-  width: 200px; /* Width of the dropdown */
+  width: 320px; /* Width of the dropdown */
   cursor: pointer;
+  margin-left: 10px;
 }
 
 /* Dropdown Selected Box */
@@ -547,11 +548,15 @@ select:focus::after {
   margin: 5px 0;
   width: 100%;
   display: flex;
-  justify-content: space-between;
+  /* justify-content: space-between; */
   align-items: center;
   background-color: #26235a;
-  padding: 10px;
+  /* padding: 10px; */
   border-radius: 8px;
+}
+.custom-dropdown-selected span{
+  font-size: 22px;
+  font-weight: bold;
 }
 
 /* Font Awesome Arrow Styling */
@@ -568,7 +573,7 @@ select:focus::after {
 
 /* Dropdown Options Container */
 .custom-dropdown-options {
-  width: 100%;
+  width: 270px;
   padding: 0 4px;
   display: none; /* Hide by default */
   position: absolute; /* Position below selected box */
@@ -1317,6 +1322,7 @@ button {
 
 .order-header{
   display: flex;
+  align-items: center;
 }
 
 .asset-label{
@@ -1362,4 +1368,18 @@ button {
 .dropdown-options .dropdown-option {
   padding: 10px;
   cursor: pointer;
+}
+
+.custom-dropdown-options .dropdown-option {
+  padding: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  margin-bottom: -10px;
+}
+
+.crypto-icon-small{
+  margin-top: 8px;
+  margin-right: 10px;
+  margin-left: 10px;
 }

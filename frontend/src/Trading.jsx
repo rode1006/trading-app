@@ -21,21 +21,6 @@ const TradingApp = () => {
   const [selectedFuturesChartSymbol, setSelectedFuturesChartSymbol] =
     useState("MEXC:BTCUSDT");
 
-  // const [totalUSDTBalance, setTotalUSDTBalance] = useState(0);
-  // const [selectedNetwork, setSelectedNetwork] = useState("ERC-20");
-  // const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  // const [futuresUSDTBalance, setFuturesUSDTBalance] = useState(0);
-  // const [spotBalances, setSpotBalances] = useState([]);
-  // const [futuresPositionsCount, setFuturesPositionsCount] = useState(0);
-  // const [futuresCurrentPrices, setFuturesCurrentPrices] = useState([]);
-  // const [totalValue, setTotalValue] = useState(0);
-  // const [spotUSDTBalance, setSpotUSDTBalance] = useState(0);
-  // const [spotCurrentPrices, setSpotCurrentPrices] = useState([]);
-  // const [spotPositionsCount, setSpotPositionsCount] = useState(0);
-  // const [futuresClosedPositionsCount, setFuturesClosedPositionsCount] = useState(0);
-  // const [spotClosedPositionsCount, setSpotClosedPositionsCount] = useState(0);
-  // const [availableAmount , setAvailableAmount] = useState(0);
-
   let selectedNetwork = "ERC-20";
   let futuresUSDTBalance = 0;
   let spotBalances = [];
@@ -102,7 +87,8 @@ const TradingApp = () => {
       assetTypes.forEach((asset, index) => {
         if (asset != futuresAssetType) {
           tmp += `<div class="dropdown-option" id = "dropdown-option-${index}">
-                      <span class="money-type">${asset}_USDT: </span>
+                      <span class="crypto-icon-small"><img src="icon/${asset}.png"></span>
+                      <span class="money-type">${asset}_USDT:&nbsp; </span>
                       <span class="money-value">${Intl.NumberFormat(
                         "en-US"
                       ).format(
@@ -116,7 +102,8 @@ const TradingApp = () => {
       document.getElementById("futures-dropdownOptions").innerHTML = tmp;
       document.getElementById(
         "futures-dropdownSelected"
-      ).innerHTML = `<span class="money-type">${futuresAssetType}_USDT: </span>
+      ).innerHTML = `<span class="crypto-icon-small"><img src="icon/${futuresAssetType}.png" style="width:48px;height:48px;"></span>
+                      <span class="money-type">${futuresAssetType}_USDT:&nbsp;&nbsp;</span>
                       <span class="money-value">${Intl.NumberFormat(
                         "en-US"
                       ).format(
@@ -154,7 +141,8 @@ const TradingApp = () => {
       document.getElementById(
         "futures-dropdownSelected"
       ).innerHTML = `<div class="dropdown-option">
-                      <span class="money-type">${futuresAssetType}_USDT: </span>
+                      <span class="crypto-icon-small"><img src="icon/${futuresAssetType}.png" style="width:48px;height:48px;"></span>
+                      <span class="money-type">${futuresAssetType}_USDT:&nbsp; </span>
                       <span class="money-value">${Intl.NumberFormat(
                         "en-US"
                       ).format(
@@ -863,7 +851,8 @@ const TradingApp = () => {
       assetTypes.forEach((asset, index) => {
         if (asset != spotAssetType) {
           tmp += `<div class="dropdown-option" id = "dropdown-option-spot-${index}">
-                        <span class="money-type">${asset}_USDT: </span>
+                        <span class="crypto-icon-small"><img src="icon/${asset}.png"></span>
+                        <span class="money-type">${asset}_USDT:&nbsp; </span>
                         <span class="money-value">${Intl.NumberFormat(
                           "en-US"
                         ).format(
@@ -877,7 +866,8 @@ const TradingApp = () => {
       document.getElementById("spot-dropdownOptions").innerHTML = tmp;
       document.getElementById(
         "spot-dropdownSelected"
-      ).innerHTML = `<span class="money-type">${spotAssetType}_USDT: </span>
+      ).innerHTML = `<span class="crypto-icon-small"><img src="icon/${spotAssetType}.png" style="width:48px;height:48px;"></span>
+                      <span class="money-type">${spotAssetType}_USDT:&nbsp; </span>
                         <span class="money-value">${Intl.NumberFormat(
                           "en-US"
                         ).format(
@@ -1061,7 +1051,8 @@ const TradingApp = () => {
     document.getElementById(
       "spot-dropdownSelected"
     ).innerHTML = `<div class="dropdown-option" >
-                    <span class="money-type">${value}_USDT: </span>
+                    <span class="crypto-icon-small"><img src="icon/${value}.png"></span>
+                    <span class="money-type">${value}_USDT:&nbsp; </span>
                     <span class="money-value">${Intl.NumberFormat(
                       "en-US"
                     ).format(
