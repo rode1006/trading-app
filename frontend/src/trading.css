@@ -201,7 +201,9 @@ body {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-
+.money-bar{
+  display: flex;
+}
 
 .money-type{
   color: #f4a070;
@@ -212,6 +214,14 @@ body {
 }
 
 .money-value{
+  color: #87b5fb;
+}
+
+.percent-minus{
+  color: red!important;
+}
+
+.percent-plus{
   color: #2fda65;
 }
 
@@ -339,19 +349,19 @@ body {
   margin: 2px 0; /* Space above and below the line */
 }
 
-
 .balance-info {
   padding-right: 14px; 
   padding-left: 14px;
   height: 46px !important;
 }
-@font-face {
+
+/* @font-face {
   font-family: 'Wix Madefor Text Variable';
-  /* src: url('path-to-your-font-file.woff2') format('woff2'),
-       url('path-to-your-font-file.woff') format('woff'); */
+  src: url('path-to-your-font-file.woff2') format('woff2'),
+       url('path-to-your-font-file.woff') format('woff');
   font-weight: normal;
   font-style: normal;
-}
+} */
 
 
 .container1 {
@@ -538,7 +548,7 @@ select:focus::after {
 /* Custom Dropdown Container */
 .custom-dropdown {
   position: relative; /* Position options absolutely within container */
-  width: 320px; /* Width of the dropdown */
+  width: 400px; /* Width of the dropdown */
   cursor: pointer;
   margin-left: 10px;
 }
@@ -573,7 +583,7 @@ select:focus::after {
 
 /* Dropdown Options Container */
 .custom-dropdown-options {
-  width: 270px;
+  width: 330px;
   padding: 0 4px;
   display: none; /* Hide by default */
   position: absolute; /* Position below selected box */

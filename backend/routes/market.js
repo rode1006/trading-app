@@ -8,7 +8,28 @@ router.post('/getCurrentPrice', async (req, res) => {
         const price = await fetchCurrentMarketPrices(accountType);
 
         if (price !== null) {
-            res.json({ currentPrices: price, ok: true });
+            res.json({
+                 currentPrices: price,
+                  ok: true 
+                });
+        } else {
+            res.status(500).json({ error: 'Failed to fetch price. Please try again later.' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message || 'Error fetching current price' });
+    }
+});
+
+router.post('/getYesterdayPrice', async (req, res) => {
+    const accountType = req.body.accountType;
+    try {
+        const price = await fetchYesterdayMarketPrices(accountType);
+
+        if (price !== null) {
+            res.json({
+                 yesterdayPrices: price,
+                  ok: true 
+                });
         } else {
             res.status(500).json({ error: 'Failed to fetch price. Please try again later.' });
         }

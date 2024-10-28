@@ -71,15 +71,19 @@ const TradingApp = () => {
 
       futuresCurrentPrices = futuresPriceData.currentPrices;
 
-      let priceText = futuresPriceData.currentPrices
+      let priceText = "<div class='money-bar'>";
+      priceText += futuresPriceData.currentPrices
         .map(
           (price) =>
-            `<span class='money-type'>${price.assetType}:</span>
-             <span class='money-value'>${new Intl.NumberFormat("en-US").format(
-               price.price
-             )}</span>&nbsp;&nbsp;&nbsp;&nbsp;`
+            `<div class='money-div'>
+            <span class='money-type'>${price.assetType}:</span>
+             <span class='money-value'>${new Intl.NumberFormat("en-US").format(price.price)}</span>&nbsp;&nbsp;
+             <span class=${price.percent>=0 ? 'percent-plus' : 'percent-minus'}>${(price.percent * 100).toFixed(2)}%&nbsp;</span>
+             </div>`
         )
         .join("");
+      
+      priceText += "</div>"
       document.getElementById("futures-now-price").innerHTML = priceText;
 
       // console.log('future-price', futuresAssetType);
@@ -95,7 +99,13 @@ const TradingApp = () => {
                         futuresCurrentPrices.find(
                           (item) => item.assetType === asset
                         ).price
-                      )}</span></div>`;
+                      )}</span>&nbsp;&nbsp;
+                      <span class=${futuresCurrentPrices.find(
+                        (item) => item.assetType === asset
+                      ).percent>=0 ? 'percent-plus' : 'percent-minus'}>${(futuresCurrentPrices.find(
+                        (item) => item.assetType === asset
+                      ).percent * 100).toFixed(2)}% </span>
+                      </div>`;
         }
       });
 
@@ -110,7 +120,12 @@ const TradingApp = () => {
                         futuresCurrentPrices.find(
                           (item) => item.assetType === futuresAssetType
                         ).price
-                      )}</span>`;
+                      )}</span>&nbsp;&nbsp;
+                      <span class=${futuresCurrentPrices.find(
+                        (item) => item.assetType === futuresAssetType
+                      ).percent>=0 ? 'percent-plus' : 'percent-minus'}>${(futuresCurrentPrices.find(
+                        (item) => item.assetType === futuresAssetType
+                      ).percent * 100).toFixed(2)}% </span>`;
 
       document
         .getElementById("futures-dropdownSelected")
@@ -829,21 +844,23 @@ const TradingApp = () => {
       if (!spotPriceData.ok) {
         throw new Error("Failed to fetch spot prices");
       }
-      // spotCurrentPrices = spotPriceData.currentPrices;
-      // console.log('spotPriceData: ', spotPriceData)
-      // setSpotCurrentPrices(spotPriceData.currentPrices);
+      
       if (spotPriceData.currentPrices.length)
         spotCurrentPrices = spotPriceData.currentPrices;
 
-      let priceText = spotPriceData.currentPrices
+      let priceText = "<div class='money-bar'>";
+      priceText += spotPriceData.currentPrices
         .map(
           (price) =>
-            `<span class='money-type'>${price.assetType}:</span>
-             <span class='money-value'>${new Intl.NumberFormat("en-US").format(
-               price.price
-             )}</span>&nbsp;&nbsp;&nbsp;&nbsp;`
+            `<div class='money-div'>
+            <span class='money-type'>${price.assetType}:</span>
+             <span class='money-value'>${new Intl.NumberFormat("en-US").format(price.price)}</span>&nbsp;&nbsp;
+             <span class=${price.percent>=0 ? 'percent-plus' : 'percent-minus'}>${(price.percent * 100).toFixed(2)}%&nbsp;</span>
+             </div>`
         )
         .join("");
+
+      priceText += "</div>"
 
       document.getElementById("spot-now-price").innerHTML = priceText;
 
@@ -859,7 +876,13 @@ const TradingApp = () => {
                           spotCurrentPrices.find(
                             (item) => item.assetType === asset
                           ).price
-                        )}</span></div>`;
+                        )}</span>&nbsp;&nbsp;
+                        <span class=${spotCurrentPrices.find(
+                          (item) => item.assetType === asset
+                        ).percent>=0 ? 'percent-plus' : 'percent-minus'}>${(spotCurrentPrices.find(
+                          (item) => item.assetType === asset
+                        ).percent * 100).toFixed(2)}% </span>
+                        </div>`;
         }
       });
 
@@ -874,7 +897,12 @@ const TradingApp = () => {
                           spotCurrentPrices.find(
                             (item) => item.assetType === spotAssetType
                           ).price
-                        )}</span>`;
+                        )}</span>&nbsp;&nbsp;
+                        <span class=${spotCurrentPrices.find(
+                          (item) => item.assetType === spotAssetType
+                        ).percent>=0 ? 'percent-plus' : 'percent-minus'}>${(spotCurrentPrices.find(
+                          (item) => item.assetType === spotAssetType
+                        ).percent * 100).toFixed(2)}% </span>`;
 
       document
         .getElementById("spot-dropdownSelected")

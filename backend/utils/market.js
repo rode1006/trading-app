@@ -1,5 +1,5 @@
 const axios = require('axios');
-const assetTypes = ["BTC", "ETH", "BNB", "NEO", "LTC", "SOL", "XRP", "DOT","ADA"];
+const assetTypes = ["BTC", "ETH", "BNB", "NEO", "LTC", "SOL", "XRP", "DOT", "ADA"];
 
 async function fetchCurrentMarketPrices(accountType) {
     let response;
@@ -17,6 +17,7 @@ async function fetchCurrentMarketPrices(accountType) {
                 .map((item) => ({
                     assetType: item.symbol.split("_")[0],
                     price: parseFloat(item.lastPrice),
+                    percent: parseFloat(item.riseFallRate),
                 }));
             futuresCurrencyPrices = prices;
             return prices;
@@ -37,6 +38,7 @@ async function fetchCurrentMarketPrices(accountType) {
                 .map((item) => ({
                     assetType: item.symbol.split("_")[0],
                     price: parseFloat(item.last),
+                    percent: parseFloat(item.change_rate),
                 }));
 
             spotCurrencyPrices = prices;
