@@ -1,5 +1,5 @@
 const axios = require('axios');
-const assetTypes = ["BTC", "ETH", "BNB", "NEO", "LTC", "SOL", "XRP", "DOT", "ADA"];
+const assetTypes = ["BTC", "ETH", "BNB", "NEO", "LTC", "SOL", "XRP", "DOT", "ADA", "PEOPLE"];
 
 async function fetchCurrentMarketPrices(accountType) {
     let response;

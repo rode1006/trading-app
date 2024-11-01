@@ -11,7 +11,17 @@ import TradingViewWidget from "./TradingViewWidget";
 const TradingApp = () => {
   const navigate = useNavigate();
 
-  const assetTypes = ["BTC", "ETH", "BNB", "NEO", "LTC", "SOL", "XRP", "DOT"];
+  const assetTypes = [
+    "BTC",
+    "ETH",
+    "BNB",
+    "NEO",
+    "LTC",
+    "SOL",
+    "XRP",
+    "DOT",
+    "PEOPLE",
+  ];
 
   const [futuresAssetType, setFuturesAssetType] = useState("BTC");
   const [spotAssetType, setSpotAssetType] = useState("BTC");
@@ -34,6 +44,7 @@ const TradingApp = () => {
   let spotCurrentPrices = [];
   let availableAmount = 0;
   let btnDelay = true;
+  let tradingEnable = true;
 
   const options = [
     { imgSrc: "img/USDT.png", label: "USDT", balance: "0.00" },
@@ -80,13 +91,17 @@ const TradingApp = () => {
           (price) =>
             `<div class='money-div'>
             <span class='money-type'>${price.assetType}:</span>
-             <span class='money-value'>${new Intl.NumberFormat("en-US").format(price.price)}</span>&nbsp;&nbsp;
-             <span class=${price.percent>=0 ? 'percent-plus' : 'percent-minus'}>${(price.percent * 100).toFixed(2)}%&nbsp;</span>
+             <span class='money-value'>${new Intl.NumberFormat("en-US").format(
+               price.price
+             )}</span>&nbsp;&nbsp;
+             <span class=${
+               price.percent >= 0 ? "percent-plus" : "percent-minus"
+             }>${(price.percent * 100).toFixed(2)}%&nbsp;</span>
              </div>`
         )
         .join("");
-      
-      priceText += "</div>"
+
+      priceText += "</div>";
       document.getElementById("futures-now-price").innerHTML = priceText;
 
       // console.log('future-price', futuresAssetType);
@@ -103,11 +118,16 @@ const TradingApp = () => {
                           (item) => item.assetType === asset
                         ).price
                       )}</span>&nbsp;&nbsp;
-                      <span class=${futuresCurrentPrices.find(
-                        (item) => item.assetType === asset
-                      ).percent>=0 ? 'percent-plus' : 'percent-minus'}>${(futuresCurrentPrices.find(
-                        (item) => item.assetType === asset
-                      ).percent * 100).toFixed(2)}% </span>
+                      <span class=${
+                        futuresCurrentPrices.find(
+                          (item) => item.assetType === asset
+                        ).percent >= 0
+                          ? "percent-plus"
+                          : "percent-minus"
+                      }>${(
+            futuresCurrentPrices.find((item) => item.assetType === asset)
+              .percent * 100
+          ).toFixed(2)}% </span>
                       </div>`;
         }
       });
@@ -124,19 +144,24 @@ const TradingApp = () => {
                           (item) => item.assetType === futuresAssetType
                         ).price
                       )}</span>&nbsp;&nbsp;
-                      <span class=${futuresCurrentPrices.find(
-                        (item) => item.assetType === futuresAssetType
-                      ).percent>=0 ? 'percent-plus' : 'percent-minus'}>${(futuresCurrentPrices.find(
-                        (item) => item.assetType === futuresAssetType
-                      ).percent * 100).toFixed(2)}% </span>`;
+                      <span class=${
+                        futuresCurrentPrices.find(
+                          (item) => item.assetType === futuresAssetType
+                        ).percent >= 0
+                          ? "percent-plus"
+                          : "percent-minus"
+                      }>${(
+        futuresCurrentPrices.find((item) => item.assetType === futuresAssetType)
+          .percent * 100
+      ).toFixed(2)}% </span>`;
 
       document
         .getElementById("futures-dropdownSelected")
         .addEventListener("click", function () {
-          if(!btnDelay){
+          if (!btnDelay) {
             const isVisible =
-              document.getElementById("futures-dropdownOptions").style.display ===
-              "block";
+              document.getElementById("futures-dropdownOptions").style
+                .display === "block";
             document.getElementById("futures-dropdownOptions").style.display =
               isVisible ? "none" : "block";
             btnDelay = true;
@@ -159,6 +184,7 @@ const TradingApp = () => {
     setSelectedFuturesChartSymbol(selectedSymbol);
     // selectedFuturesChartSymbol = selectedSymbol
     if (futuresCurrentPrices.length) {
+      alert('here')
       document.getElementById(
         "futures-dropdownSelected"
       ).innerHTML = `<div class="dropdown-option">
@@ -190,12 +216,6 @@ const TradingApp = () => {
         }
         futuresUSDTBalance = balanceData.futuresUSDTBalance;
         spotUSDTBalance = balanceData.spotUSDTBalance;
-
-        spotBalances = [];
-        spotBalances.push(spotUSDTBalance);
-        assetTypes.forEach((asset) => {
-          spotBalances.push(0);
-        });
 
         const positionsResponse = await axios.post(
           "/api/position/getPositions",
@@ -531,6 +551,12 @@ const TradingApp = () => {
         futuresClosedPositionsCount = count;
         // setFuturesClosedPositionsCount(count)
       }
+      
+      spotBalances = [];
+      spotBalances.push(spotUSDTBalance);
+      assetTypes.forEach((asset) => {
+        spotBalances.push(0);
+      });
 
       if (data.spotPositions && spotCurrentPrices.length) {
         count =
@@ -542,9 +568,9 @@ const TradingApp = () => {
           spotClosedPositionsDiv.innerHTML = ""; // Clear previous positions
           spotOpenOrdersDiv.innerHTML = ""; // Clear previous limit orders
         }
-        data.spotPositions.forEach((position) => {
-          spotBalances[assetTypes.indexOf(position.assetType) + 1] = 0;
-        });
+        // data.spotPositions.forEach((position) => {
+        //   spotBalances[assetTypes.indexOf(position.assetType) + 1] = 0;
+        // });
         data.spotPositions.forEach((position) => {
           if (position.positionType == "buy") {
             spotBalances[assetTypes.indexOf(position.assetType) + 1] +=
@@ -634,7 +660,7 @@ const TradingApp = () => {
             }
           }
         });
-        if(spotPositionsCount == count && spotBalances[spotAssetType]==0){
+        if (spotPositionsCount == count && spotBalances[spotAssetType] == 0) {
           spotClosedPositionsDiv.innerHTML = "";
         }
         spotPositionsCount = count;
@@ -680,6 +706,8 @@ const TradingApp = () => {
       // }
 
       if (spotCurrentPrices.length) {
+        spotBalancesUpdate();
+
         //---------------futures statistics--------------------------------
         let statisticsBar = "";
         statisticsBar +=
@@ -815,6 +843,7 @@ const TradingApp = () => {
         statisticsBar += `<span class='money-value'>` + res + `</span>`;
         document.getElementById("total-statistics").innerHTML = statisticsBar;
 
+        tradingEnable = true;
         //---------------------------------------------------------
         fetch("/api/updateValue", {
           method: "POST",
@@ -850,7 +879,7 @@ const TradingApp = () => {
       if (!spotPriceData.ok) {
         throw new Error("Failed to fetch spot prices");
       }
-      
+
       if (spotPriceData.currentPrices.length)
         spotCurrentPrices = spotPriceData.currentPrices;
 
@@ -860,13 +889,17 @@ const TradingApp = () => {
           (price) =>
             `<div class='money-div'>
             <span class='money-type'>${price.assetType}:</span>
-             <span class='money-value'>${new Intl.NumberFormat("en-US").format(price.price)}</span>&nbsp;&nbsp;
-             <span class=${price.percent>=0 ? 'percent-plus' : 'percent-minus'}>${(price.percent * 100).toFixed(2)}%&nbsp;</span>
+             <span class='money-value'>${new Intl.NumberFormat("en-US").format(
+               price.price
+             )}</span>&nbsp;&nbsp;
+             <span class=${
+               price.percent >= 0 ? "percent-plus" : "percent-minus"
+             }>${(price.percent * 100).toFixed(2)}%&nbsp;</span>
              </div>`
         )
         .join("");
 
-      priceText += "</div>"
+      priceText += "</div>";
 
       document.getElementById("spot-now-price").innerHTML = priceText;
 
@@ -883,11 +916,16 @@ const TradingApp = () => {
                             (item) => item.assetType === asset
                           ).price
                         )}</span>&nbsp;&nbsp;
-                        <span class=${spotCurrentPrices.find(
-                          (item) => item.assetType === asset
-                        ).percent>=0 ? 'percent-plus' : 'percent-minus'}>${(spotCurrentPrices.find(
-                          (item) => item.assetType === asset
-                        ).percent * 100).toFixed(2)}% </span>
+                        <span class=${
+                          spotCurrentPrices.find(
+                            (item) => item.assetType === asset
+                          ).percent >= 0
+                            ? "percent-plus"
+                            : "percent-minus"
+                        }>${(
+            spotCurrentPrices.find((item) => item.assetType === asset).percent *
+            100
+          ).toFixed(2)}% </span>
                         </div>`;
         }
       });
@@ -904,11 +942,16 @@ const TradingApp = () => {
                             (item) => item.assetType === spotAssetType
                           ).price
                         )}</span>&nbsp;&nbsp;
-                        <span class=${spotCurrentPrices.find(
-                          (item) => item.assetType === spotAssetType
-                        ).percent>=0 ? 'percent-plus' : 'percent-minus'}>${(spotCurrentPrices.find(
-                          (item) => item.assetType === spotAssetType
-                        ).percent * 100).toFixed(2)}% </span>`;
+                        <span class=${
+                          spotCurrentPrices.find(
+                            (item) => item.assetType === spotAssetType
+                          ).percent >= 0
+                            ? "percent-plus"
+                            : "percent-minus"
+                        }>${(
+        spotCurrentPrices.find((item) => item.assetType === spotAssetType)
+          .percent * 100
+      ).toFixed(2)}% </span>`;
 
       document
         .getElementById("spot-dropdownSelected")
@@ -1002,7 +1045,9 @@ const TradingApp = () => {
         }
       );
       const data = await response.data;
-      const availableAmount = parseFloat(data.balance); // Set available balance to variable
+      const availableAmount = parseFloat(
+        data.futuresUSDTBalance + data.spotUSDTBalance
+      ); // Set available balance to variable
       // setAvailableAmount(availableAmount);
       availableAmount = availableAmount;
       document.getElementById("availableAmount").textContent =
@@ -1056,9 +1101,9 @@ const TradingApp = () => {
       }
     }
     document.getElementById("transfer-modal-futures-USDT").textContent =
-      futuresUSDTBalance;
+      futuresUSDTBalance.toFixed(2);
     document.getElementById("transfer-modal-spot-USDT").textContent =
-      spotUSDTBalance;
+      spotUSDTBalance.toFixed(2);
     fetch("/api/balance/updateBalance", {
       method: "POST",
       headers: {
@@ -1095,6 +1140,122 @@ const TradingApp = () => {
                     )}</span></div>`;
     const spotDropdownOptions = document.getElementById("spot-dropdownOptions");
     spotDropdownOptions.style.display = "none";
+  }
+
+  function spotBalancesUpdate() {
+    const container = document.getElementById("transfer-crypto-assets");
+    container.innerHTML = "";
+
+    const separator = document.createElement("hr");
+    separator.className = "separator2";
+    container.appendChild(separator);
+
+    const optionDiv = document.createElement("div");
+    optionDiv.className = "custom-dropdown-option";
+    optionDiv.style.fontSize = "14px";
+    optionDiv.style.display = "flex";
+    optionDiv.style.alignItems = "center";
+    optionDiv.style.justifyContent = "space-between";
+    optionDiv.style.padding = "10px";
+
+    const innerDiv = document.createElement("div");
+    innerDiv.style.display = "flex";
+    innerDiv.style.alignItems = "center";
+
+    const img = document.createElement("img");
+    img.src = `icon/USDT.png`;
+    img.style.width = "24px";
+    img.style.height = "24px";
+
+    const assetTypeSpan = document.createElement("span");
+    assetTypeSpan.style.marginLeft = "10px";
+    assetTypeSpan.textContent = "USDT ";
+
+    innerDiv.appendChild(img);
+    innerDiv.appendChild(assetTypeSpan);
+
+    const assetAmountSpan = document.createElement("span");
+    assetAmountSpan.style.fontSize = "14px";
+    assetAmountSpan.style.fontWeight = "bold";
+    assetAmountSpan.style.color = "#929292";
+    assetAmountSpan.textContent = `${spotBalances[0]}`;
+
+    optionDiv.appendChild(innerDiv);
+    optionDiv.appendChild(assetAmountSpan);
+
+    container.appendChild(optionDiv);
+
+    spotBalances.forEach((asset, index) => {
+      if (index > 0) {
+        const optionDiv = document.createElement("div");
+        optionDiv.className = "custom-dropdown-option";
+        optionDiv.style.fontSize = "14px";
+        optionDiv.style.display = "flex";
+        optionDiv.style.alignItems = "center";
+        optionDiv.style.justifyContent = "space-between";
+        optionDiv.style.padding = "10px";
+
+        const innerDiv = document.createElement("div");
+        innerDiv.style.display = "flex";
+        innerDiv.style.alignItems = "center";
+
+        const img = document.createElement("img");
+        img.src = `icon/${assetTypes[index-1]}.png`;
+        img.style.width = "24px";
+        img.style.height = "24px";
+
+        const assetTypeSpan = document.createElement("span");
+        assetTypeSpan.style.marginLeft = "10px";
+        assetTypeSpan.textContent = assetTypes[index-1] + "  ";
+
+        innerDiv.appendChild(img);
+        innerDiv.appendChild(assetTypeSpan);
+
+        const assetAmountSpan = document.createElement("span");
+        assetAmountSpan.style.fontSize = "14px";
+        assetAmountSpan.style.fontWeight = "bold";
+        assetAmountSpan.style.color = "#929292";
+        assetAmountSpan.textContent = `${asset}`;
+
+        optionDiv.appendChild(innerDiv);
+        optionDiv.appendChild(assetAmountSpan);
+
+        container.appendChild(optionDiv);
+      }
+    });
+
+    document
+    .querySelectorAll(".custom-dropdown")
+    .forEach((dropdown) => {
+      const selected = dropdown.querySelector(
+        ".custom-dropdown-selected"
+      );
+      const options = dropdown.querySelector(
+        ".custom-dropdown-options"
+      );
+
+      selected.addEventListener("click", () => {
+        dropdown.classList.toggle("open");
+      });
+
+      options
+        .querySelectorAll(".custom-dropdown-option")
+        .forEach((option) => {
+          option.addEventListener("click", () => {
+            selected.querySelector(
+              ".custom-dropdown-selected-text"
+            ).textContent = option.textContent;
+            dropdown.classList.remove("open");
+          });
+        });
+
+      // Close dropdown when clicking outside
+      window.addEventListener("click", (event) => {
+        if (!dropdown.contains(event.target)) {
+          dropdown.classList.remove("open");
+        }
+      });
+    });
   }
 
   function hideSpot() {
@@ -1288,6 +1449,9 @@ const TradingApp = () => {
   }
 
   async function futuresTrading(positionType, orderType) {
+    if(!tradingEnable)return;
+    tradingEnable = false;
+
     let betAmount = 0;
     let leverage = 0;
     let limitPrice = 0;
@@ -1356,6 +1520,10 @@ const TradingApp = () => {
   }
 
   function spotTrading(positionType, orderType) {
+    // console.log('spot-trading-----',positionType, tradingEnable);
+    if(!tradingEnable)return;
+    tradingEnable = false;
+
     let amount = 0;
     let limitPrice = 0;
     if (orderType == "market") {
@@ -1392,7 +1560,7 @@ const TradingApp = () => {
 
     if (positionType == "sell") {
       if (amount > spotBalances[assetTypes.indexOf(spotAssetType) + 1]) {
-        alert("Insufficient " + spotAssetType);
+        alert("Insufficient " + spotAssetType + amount + "/" +spotBalances[assetTypes.indexOf(spotAssetType) + 1]  + "/" +  (assetTypes.indexOf(spotAssetType) + 1) + ":" + spotBalances.length);
         return;
       }
     }
@@ -1499,10 +1667,10 @@ const TradingApp = () => {
                   "block";
                 document.getElementById(
                   "transfer-modal-futures-USDT"
-                ).textContent = futuresUSDTBalance;
+                ).textContent = futuresUSDTBalance.toFixed(2);
                 document.getElementById(
                   "transfer-modal-spot-USDT"
-                ).textContent = spotUSDTBalance;
+                ).textContent = spotUSDTBalance.toFixed(2);
               }}
             >
               <i
@@ -1554,7 +1722,7 @@ const TradingApp = () => {
                         paddingTop: "11px",
                       }}
                       className="toggle-button-custom active"
-                      onClick={() => {
+                      onClick={(event) => {
                         document
                           .getElementById("withdraw-toggle-custom")
                           .classList.remove("active");
@@ -1567,11 +1735,12 @@ const TradingApp = () => {
                         document
                           .getElementById("withdraw-content-custom")
                           .classList.remove("active");
-                        this.classList.add("active");
+                        event.currentTarget.classList.add("active");
                       }}
                     >
                       Deposit
                     </button>
+
                     <button
                       id="withdraw-toggle-custom"
                       style={{
@@ -1580,7 +1749,7 @@ const TradingApp = () => {
                         paddingTop: "11px",
                       }}
                       className="toggle-button-custom"
-                      onClick={() => {
+                      onClick={(event) => {
                         document
                           .getElementById("deposit-toggle-custom")
                           .classList.remove("active");
@@ -1593,7 +1762,7 @@ const TradingApp = () => {
                         document
                           .getElementById("deposit-content-custom")
                           .classList.remove("active");
-                        this.classList.add("active");
+                        event.currentTarget.classList.add("active");
                       }}
                     >
                       Withdraw
@@ -1922,7 +2091,10 @@ const TradingApp = () => {
                             <img width="14px" src="img/arrow-right.png" />
                           </span>
                         </div>
-                        <div className="custom-dropdown-options">
+                        <div
+                          className="custom-dropdown-options"
+                          id="transfer-crypto-assets"
+                        >
                           <hr className="separator2" />
                           <div
                             className="custom-dropdown-option"

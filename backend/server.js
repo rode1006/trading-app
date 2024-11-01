@@ -15,6 +15,8 @@ const path = require('path');
 let futuresCurrencyPrices = [];
 let spotCurrencyPrices = [];
 
+let lastTradingTime = 0;
+
 const app = express();
 connectDB();
 

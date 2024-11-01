@@ -1353,7 +1353,8 @@ button {
 
 .chart-container {
   display: block; /* Hide charts initially */
-  height: calc(100% - 80px);
+  /* height: calc(100% - 80px); */
+  height: 400px; 
   width: 100%;
 }
 
