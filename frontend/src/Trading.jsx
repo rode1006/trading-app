@@ -43,8 +43,8 @@ const TradingApp = () => {
   let spotUSDTBalance = 0;
   let spotCurrentPrices = [];
   let availableAmount = 0;
-  let btnDelay = true;
   let tradingEnable = true;
+  let dropdownEnable = true;
 
   const options = [
     { imgSrc: "img/USDT.png", label: "USDT", balance: "0.00" },
@@ -159,20 +159,6 @@ const TradingApp = () => {
           .percent * 100
       ).toFixed(2)}% </span>`;
 
-      document
-        .getElementById("futures-dropdownSelected")
-        .addEventListener("click", function () {
-          if (!btnDelay) {
-            const isVisible =
-              document.getElementById("futures-dropdownOptions").style
-                .display === "block";
-            document.getElementById("futures-dropdownOptions").style.display =
-              isVisible ? "none" : "block";
-            btnDelay = true;
-          }
-        });
-      // console.log(assetTypes)
-
       assetTypes.forEach((asset, index) => {
         if (asset != futuresAssetType) {
           document
@@ -182,24 +168,6 @@ const TradingApp = () => {
             });
         }
       });
-    }
-
-    let selectedSymbol = `MEXC:${futuresAssetType}USDT`;
-    setSelectedFuturesChartSymbol(selectedSymbol);
-    if (futuresCurrentPrices.length) {
-      alert('here')
-      document.getElementById(
-        "futures-dropdownSelected"
-      ).innerHTML = `<div class="dropdown-option">
-                      <span class="crypto-icon-small"><img src="icon/${futuresAssetType}.png" style="width:48px;height:48px;"></span>
-                      <span class="money-type">${futuresAssetType}_USDT:&nbsp; </span>
-                      <span class="money-value">${Intl.NumberFormat(
-                        "en-US"
-                      ).format(
-                        futuresCurrentPrices.find(
-                          (item) => item.assetType === futuresAssetType
-                        ).price
-                      )}</span></div>`;
     }
 
     async function fetchSpotCurrentPrices() {
@@ -292,16 +260,6 @@ const TradingApp = () => {
           .percent * 100
       ).toFixed(2)}% </span>`;
 
-      document
-        .getElementById("spot-dropdownSelected")
-        .addEventListener("click", function () {
-          const isVisible =
-            document.getElementById("spot-dropdownOptions").style.display ===
-            "block";
-          document.getElementById("spot-dropdownOptions").style.display =
-            isVisible ? "none" : "block";
-        });
-
       assetTypes.forEach((asset, index) => {
         if (asset != spotAssetType) {
           document
@@ -313,8 +271,8 @@ const TradingApp = () => {
       });
     }
 
-    const intervalId1 = setInterval(fetchFuturesCurrentPrices, 500);
-    const intervalId2 = setInterval(fetchSpotCurrentPrices, 500);
+    const intervalId1 = setInterval(fetchFuturesCurrentPrices, 1000);
+    const intervalId2 = setInterval(fetchSpotCurrentPrices, 1000);
 
     return () => {
       clearInterval(intervalId1);
@@ -1065,12 +1023,10 @@ const TradingApp = () => {
 
   function futuresSelectOption(value) {
     setFuturesAssetType(value);
-
+    let selectedSymbol = `MEXC:${value}USDT`;
+    setSelectedFuturesChartSymbol(selectedSymbol);
     futuresPositionsCount = 0;
     futuresClosedPositionsCount = 0;
-    spotPositionsCount = 0;
-    spotClosedPositionsCount = 0;
-
     document.getElementById("futures-dropdownOptions").style.display = "none";
   } 
 
@@ -1126,7 +1082,25 @@ const TradingApp = () => {
     setSpotAssetType(value);
     let selectedSymbol = `MEXC:${value}USDT`;
     setSelectedSpotChartSymbol(selectedSymbol);
+    spotPositionsCount = 0;
+    spotClosedPositionsCount = 0;
     document.getElementById("spot-dropdownOptions").style.display = "none";
+  }
+
+  function showFuturesAssetsList() {
+    const isVisible =
+      document.getElementById("futures-dropdownOptions").style
+        .display === "block";
+    document.getElementById("futures-dropdownOptions").style.display =
+      isVisible ? "none" : "block";
+  }
+
+  function showSpotAssetsList() {
+    const isVisible =
+      document.getElementById("spot-dropdownOptions").style
+        .display === "block";
+    document.getElementById("spot-dropdownOptions").style.display =
+      isVisible ? "none" : "block";
   }
 
   function spotBalancesUpdate() {
@@ -2852,6 +2826,7 @@ const TradingApp = () => {
                 <div
                   className="custom-dropdown-selected"
                   id="futures-dropdownSelected"
+                  onClick={() => {showFuturesAssetsList();}}
                 ></div>
                 <div
                   className="custom-dropdown-options"
@@ -2986,6 +2961,7 @@ const TradingApp = () => {
                 <div
                   className="custom-dropdown-selected"
                   id="spot-dropdownSelected"
+                  onClick={() => {showSpotAssetsList();}}
                 ></div>
                 <div
                   className="custom-dropdown-options"
