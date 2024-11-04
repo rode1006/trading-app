@@ -65,11 +65,15 @@ const TradingApp = () => {
     }
     loadUserData();
     hideSpot();
+    const intervalId3 = setInterval(fetchUserData, 1000);
+    return () => {
+      clearInterval(intervalId3);
+    };
   }, []);
 
   useEffect(() => {
     async function fetchFuturesCurrentPrices() {
-      btnDelay = false;
+      // tradingEnable = true;
 
       const futuresPriceResponse = await axios.post(
         "/api/market/getCurrentPrice",
@@ -182,7 +186,6 @@ const TradingApp = () => {
 
     let selectedSymbol = `MEXC:${futuresAssetType}USDT`;
     setSelectedFuturesChartSymbol(selectedSymbol);
-    // selectedFuturesChartSymbol = selectedSymbol
     if (futuresCurrentPrices.length) {
       alert('here')
       document.getElementById(
@@ -197,670 +200,6 @@ const TradingApp = () => {
                           (item) => item.assetType === futuresAssetType
                         ).price
                       )}</span></div>`;
-    }
-
-    async function fetchUserData() {
-      try {
-        const balanceResponse = await axios.post(
-          "/api/balance/getBalance",
-          {},
-          {
-            headers: {
-              Authorization: "Bearer " + localStorage.getItem("token"),
-            },
-          }
-        );
-        const balanceData = await balanceResponse.data;
-        if (!balanceData.ok) {
-          throw new Error("Failed to fetch balance");
-        }
-        futuresUSDTBalance = balanceData.futuresUSDTBalance;
-        spotUSDTBalance = balanceData.spotUSDTBalance;
-
-        const positionsResponse = await axios.post(
-          "/api/position/getPositions",
-          {},
-          {
-            headers: {
-              Authorization: "Bearer " + localStorage.getItem("token"),
-            },
-          }
-        );
-        const positionsData = await positionsResponse.data;
-        if (!positionsData.ok) {
-          throw new Error("Failed to fetch positions");
-        }
-        processPositionsData(positionsData);
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      }
-    }
-
-    function processPositionsData(data) {
-      // console.log("---getPositions---", data);
-      const futuresPositionsDiv = document.getElementById(
-        "futures-open-positions"
-      );
-      const futuresOpenOrdersDiv = document.getElementById(
-        "futures-open-orders"
-      );
-      const futuresClosedPositionsDiv = document.getElementById(
-        "futures-closed-positions"
-      );
-
-      // const spotPositionsDiv = document.getElementById("spot-open-positions");
-      const spotOpenOrdersDiv = document.getElementById("spot-open-orders");
-      const spotClosedPositionsDiv = document.getElementById(
-        "spot-closed-positions"
-      );
-
-      if (futuresPositionsDiv === null) return;
-
-      let count = 0;
-      let futuresUnrealizedPL = 0;
-      let futuresPositionsAmount = 0;
-      // futuresPositions
-      if (data.futuresPositions && futuresCurrentPrices.length) {
-        count =
-          data.futuresPositions.length +
-          data.futuresPositions.filter((position) => position.orderLimit === 1)
-            .length;
-
-        if (count !== futuresPositionsCount) {
-          futuresPositionsDiv.innerHTML = ""; // Clear previous positions
-          futuresOpenOrdersDiv.innerHTML = ""; // Clear previous limit orders
-        }
-
-        data.futuresPositions.forEach((position) => {
-          // futuresBalances[assetTypes.indexOf(position.assetType) + 1] += position.amount;
-          let currentPrice = futuresCurrentPrices.filter(
-            (item) => item["assetType"] == position.assetType
-          )[0].price;
-          let unrealizedPL = calculateUnrealizedPL(
-            position.entryPrice,
-            currentPrice,
-            position.amount,
-            position.leverage,
-            position.positionType
-          );
-          let positionDiv = document.createElement("div");
-
-          if (position.orderLimit == 1) {
-            let startTrading = 0;
-            if (
-              (position.entryPrice < position.limitPrice &&
-                position.limitPrice < currentPrice) ||
-              (position.entryPrice > position.limitPrice &&
-                position.limitPrice > currentPrice)
-            ) {
-              const response = axios.post(
-                "/api/trade/startTrade",
-                {
-                  positionId: position.id,
-                },
-                {
-                  headers: {
-                    Authorization: "Bearer " + localStorage.getItem("token"),
-                    "Content-Type": "application/json",
-                  },
-                }
-              );
-              const data = response.data;
-              if (!data.ok) {
-                console.error("Error starting Trade:", data);
-              }
-
-              position.orderLimit = 0;
-            } else {
-              unrealizedPL = 0;
-            }
-          }
-          if (
-            unrealizedPL < 0 &&
-            Math.abs(unrealizedPL) >= position.amount * 0.8
-          ) {
-            alert(
-              "unrealizedPL: " +
-                unrealizedPL +
-                "position.amount: " +
-                position.amount
-            );
-            futuresUnrealizedPL -= position.amount;
-            futuresPositionsAmount += position.amount;
-            closeFuturesPosition(position, 3);
-            return;
-          } else {
-            futuresUnrealizedPL += unrealizedPL;
-            // if (!position.orderLimit)
-            futuresPositionsAmount += position.amount;
-            if (
-              (position.positionType == "Long" && currentPrice > position.tp) ||
-              (position.positionType == "Short" && currentPrice < position.tp)
-            ) {
-              closeFuturesPosition(position, 1);
-              return;
-            }
-            if (
-              (position.positionType == "Long" && currentPrice < position.sl) ||
-              (position.positionType == "Short" && currentPrice > position.sl)
-            ) {
-              closeFuturesPosition(position, 2);
-              return;
-            } else {
-              if (count !== futuresPositionsCount) {
-                positionDiv.textContent = `
-                                        ${1 - position.orderLimit}-${
-                  position.orderType
-                }-${position.positionType}- ${position.assetType}- 
-                                        Amount: $${position.amount},
-                                        Leverage: ${position.leverage}X, 
-                                        Entry: $${position.entryPrice},
-                                    `;
-                if (position.orderType == "limit")
-                  positionDiv.textContent += ` Limit Price: $${position.limitPrice},`;
-
-                let liquidationPrice = 0;
-                if (position.positionType == "Short")
-                  liquidationPrice =
-                    (position.entryPrice * (125 + position.leverage / 100)) /
-                    125;
-                if (position.positionType == "Long")
-                  liquidationPrice =
-                    (position.entryPrice * (125 - 100 / position.leverage)) /
-                    125;
-
-                positionDiv.textContent += ` Liquidation: $${liquidationPrice.toFixed(
-                  2
-                )},`;
-
-                const unPLLabel = document.createElement("label");
-                unPLLabel.textContent = `Unrealized P/L: $${unrealizedPL.toFixed(
-                  2
-                )},`;
-                unPLLabel.id = "un" + position.id;
-                positionDiv.appendChild(unPLLabel);
-
-                const tpLabel = document.createElement("label");
-                tpLabel.textContent = "TP: ";
-                positionDiv.appendChild(tpLabel);
-
-                const tpInput = document.createElement("input");
-                tpInput.type = "number";
-                tpInput.id = "tp" + position.id;
-                tpInput.style.width = "80px";
-                if (position.tp > 0 && position.tp < 10000000)
-                  tpInput.value = position.tp;
-                positionDiv.appendChild(tpInput);
-
-                const slLabel = document.createElement("label");
-                slLabel.textContent = "SL: ";
-                positionDiv.appendChild(slLabel);
-
-                const slInput = document.createElement("input");
-                slInput.type = "number";
-                slInput.id = "sl" + position.id;
-                slInput.style.width = "80px";
-                if (position.sl > 0 && position.sl < 10000000)
-                  slInput.value = position.sl;
-                positionDiv.appendChild(slInput);
-
-                const saveButton = document.createElement("button");
-                saveButton.textContent = "Save";
-                saveButton.addEventListener("click", function () {
-                  saveTPSL(position);
-                });
-                saveButton.onClick = () => saveTPSL(position);
-                positionDiv.appendChild(saveButton);
-                positionDiv.append(" ");
-
-                // Create close button
-                const closeButton = document.createElement("button");
-                closeButton.textContent = "Close";
-                closeButton.addEventListener("click", function () {
-                  setClosingPosition(position);
-                  document.getElementById(
-                    "partial-closing-modal"
-                  ).style.display = "block";
-                });
-                positionDiv.appendChild(closeButton); // Add close button to position div
-
-                if (position.orderType == "market") {
-                  if (position.positionType == "Long")
-                    positionDiv.style.backgroundColor = "#232323";
-                  if (position.positionType == "Short")
-                    positionDiv.style.backgroundColor = "#464646";
-                }
-                if (position.orderType == "limit") {
-                  if (position.orderLimit == 0) {
-                    if (position.positionType == "Long")
-                      positionDiv.style.backgroundColor = "#853467";
-                    if (position.positionType == "Short")
-                      positionDiv.style.backgroundColor = "#925743";
-                  } else {
-                    if (position.positionType == "Long")
-                      positionDiv.style.backgroundColor = "#295843";
-                    if (position.positionType == "Short")
-                      positionDiv.style.backgroundColor = "#694456";
-                  }
-                }
-
-                if (position.orderLimit) {
-                  futuresOpenOrdersDiv.appendChild(positionDiv);
-                } else {
-                  futuresPositionsDiv.appendChild(positionDiv);
-                }
-              } else {
-                document.getElementById("un" + position.id).textContent =
-                  "Unrealized P/L: " + unrealizedPL.toFixed(2) + ",";
-              }
-            }
-          }
-        });
-        futuresPositionsCount = count;
-        // setFuturesPositionsCount(count)
-      }
-      if (data.closedFuturesPositions) {
-        count = data.closedFuturesPositions.length;
-        if (count !== futuresClosedPositionsCount)
-          futuresClosedPositionsDiv.innerHTML = ""; // Clear previous closed positions
-
-        data.closedFuturesPositions.forEach((position) => {
-          let positionDiv = document.createElement("div");
-
-          if (count !== futuresClosedPositionsCount) {
-            positionDiv.textContent = `
-                                    ${1 - position.orderLimit}-${
-              position.orderType
-            }-${position.positionType}-${position.assetType}- 
-                                    Amount: $${position.amount},
-                                    Leverage: ${position.leverage}X, 
-                                    Entry: $${position.entryPrice},
-                                    Exit: $${position.exitPrice},
-                                `;
-            if (position.orderType == "limit")
-              positionDiv.textContent += ` Limit Price: $${position.limitPrice},`;
-
-            let liquidationPrice = 0;
-            if (position.positionType == "Short")
-              liquidationPrice =
-                (position.entryPrice * (125 + position.leverage / 100)) / 125;
-            if (position.positionType == "Long")
-              liquidationPrice =
-                (position.entryPrice * (125 - 100 / position.leverage)) / 125;
-
-            positionDiv.textContent += ` Liquidation: $${liquidationPrice.toFixed(
-              2
-            )},`;
-
-            if (position.tp != 0 && position.tp != 100000000) {
-              positionDiv.textContent += ` TP: $${position.tp.toFixed(2)},`;
-            }
-
-            if (position.sl != 0 && position.sl != 100000000) {
-              positionDiv.textContent += ` SL: $${position.sl.toFixed(2)},`;
-            }
-
-            positionDiv.textContent += ` realized P/L: $${position.realizedPL.toFixed(
-              2
-            )},`;
-
-            let closedReason = "";
-            switch (position.closedReason) {
-              case 0:
-                closedReason = "by User";
-                break;
-              case 1:
-                closedReason = "by TP";
-                break;
-              case 2:
-                closedReason = "by SL";
-                break;
-              case 3:
-                closedReason = "by Liquidaion";
-                break;
-              case 4:
-                closedReason = "partially";
-                break;
-            }
-
-            positionDiv.textContent += ` closed ${closedReason},`;
-
-            if (position.orderType == "market") {
-              if (position.positionType == "Long")
-                positionDiv.style.backgroundColor = "#232323";
-              if (position.positionType == "Short")
-                positionDiv.style.backgroundColor = "#464646";
-            }
-            if (position.orderType == "limit") {
-              if (position.orderLimit == 0) {
-                if (position.positionType == "Long")
-                  positionDiv.style.backgroundColor = "#853467";
-                if (position.positionType == "Short")
-                  positionDiv.style.backgroundColor = "#925743";
-              } else {
-                if (position.positionType == "Long")
-                  positionDiv.style.backgroundColor = "#295843";
-                if (position.positionType == "Short")
-                  positionDiv.style.backgroundColor = "#694456";
-              }
-            }
-
-            futuresClosedPositionsDiv.appendChild(positionDiv);
-          }
-        });
-        futuresClosedPositionsCount = count;
-        // setFuturesClosedPositionsCount(count)
-      }
-      
-      spotBalances = [];
-      spotBalances.push(spotUSDTBalance);
-      assetTypes.forEach((asset) => {
-        spotBalances.push(0);
-      });
-
-      if (data.spotPositions && spotCurrentPrices.length) {
-        count =
-          data.spotPositions.length +
-          data.spotPositions.filter((position) => position.orderLimit == 1)
-            .length;
-        if (count !== spotPositionsCount) {
-          // spotPositionsDiv.innerHTML = ""; // Clear previous positions
-          spotClosedPositionsDiv.innerHTML = ""; // Clear previous positions
-          spotOpenOrdersDiv.innerHTML = ""; // Clear previous limit orders
-        }
-        // data.spotPositions.forEach((position) => {
-        //   spotBalances[assetTypes.indexOf(position.assetType) + 1] = 0;
-        // });
-        data.spotPositions.forEach((position) => {
-          if (position.positionType == "buy") {
-            spotBalances[assetTypes.indexOf(position.assetType) + 1] +=
-              parseFloat(position.amount);
-          }
-          if (position.positionType == "sell") {
-            spotBalances[assetTypes.indexOf(position.assetType) + 1] -=
-              parseFloat(position.amount);
-          }
-
-          let currentPrice = spotCurrentPrices.filter(
-            (item) => item.assetType == position.assetType
-          )[0].price;
-
-          if (position.orderLimit == 1) {
-            let startTrading = 0;
-            if (
-              (position.entryPrice < position.limitPrice &&
-                position.limitPrice < currentPrice) ||
-              (position.entryPrice > position.limitPrice &&
-                position.limitPrice > currentPrice)
-            ) {
-              fetch("/api/trade/startTrade", {
-                method: "POST",
-                headers: {
-                  Authorization: "Bearer " + localStorage.getItem("token"),
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  positionId: position.id,
-                }),
-              })
-                .then((response) => response.json())
-                .catch((error) =>
-                  console.error("Error starting spot Trading:", error)
-                );
-              position.orderLimit = 0;
-            }
-          }
-          let positionDiv = document.createElement("div");
-
-          if (count !== spotPositionsCount) {
-            positionDiv.textContent = `
-                                    ${1 - position.orderLimit}-${
-              position.orderType
-            }-${position.positionType}-  
-                                    Amount: ${position.amount} (${
-              position.assetType
-            })-
-                                    Entry Price: ${position.entryPrice}(USDT),
-                                `;
-            if (position.orderType == "limit")
-              positionDiv.textContent += ` Limit Price: $${position.limitPrice},`;
-
-            if (position.orderType == "market") {
-              if (position.positionType == "buy")
-                positionDiv.style.backgroundColor = "#232323";
-              if (position.positionType == "Sell")
-                positionDiv.style.backgroundColor = "#464646";
-            }
-            if (position.orderType == "limit") {
-              if (position.orderLimit == 0) {
-                if (position.positionType == "buy")
-                  positionDiv.style.backgroundColor = "#853467";
-                if (position.positionType == "sell")
-                  positionDiv.style.backgroundColor = "#925743";
-              } else {
-                if (position.positionType == "buy")
-                  positionDiv.style.backgroundColor = "#295843";
-                if (position.positionType == "sell")
-                  positionDiv.style.backgroundColor = "#694456";
-              }
-            }
-
-            if (position.orderLimit) {
-              const closeButton = document.createElement("button");
-              closeButton.textContent = "Close";
-              closeButton.onClick = () => {
-                closeSpotPosition(position);
-              };
-              positionDiv.appendChild(closeButton); // Add close button to position div
-
-              spotOpenOrdersDiv.appendChild(positionDiv);
-            } else {
-              // spotPositionsDiv.appendChild(positionDiv);
-              spotClosedPositionsDiv.appendChild(positionDiv);
-            }
-          }
-        });
-        if (spotPositionsCount == count && spotBalances[spotAssetType] == 0) {
-          spotClosedPositionsDiv.innerHTML = "";
-        }
-        spotPositionsCount = count;
-        // setSpotPositionsCount(count)
-      }
-
-      // if (data.closedSpotPositions) {
-      //   count = data.closedSpotPositions.length;
-      //   if (count !== spotClosedPositionsCount)
-      //     spotClosedPositionsDiv.innerHTML = ""; // Clear previous closed positions
-
-      //   data.closedSpotPositions.forEach((position) => {
-      //     if (position.positionType == "sell" && position.orderLimit == 0) {
-      //       spotBalances[assetTypes.indexOf(position.assetType) + 1] -=
-      //         position.amount;
-      //     }
-      //     let positionDiv = document.createElement("div");
-
-      //     if (count !== spotClosedPositionsCount) {
-      //       positionDiv.textContent = `
-      //                               ${1 - position.orderLimit}-${position.orderType
-      //         }-${position.positionType}-
-      //                               Amount: ${position.amount}(${position.assetType
-      //         }),
-      //                               Entry Price: ${position.entryPrice}(USDT),
-      //                           `;
-      //       if (position.orderType == "limit")
-      //         positionDiv.textContent += ` Limit Price: $${position.limitPrice},`;
-      //       if (position.orderType == "limit") {
-      //         if (position.orderLimit == 1) {
-      //           if (position.positionType == "sell")
-      //             positionDiv.style.backgroundColor = "#295843";
-      //           if (position.positionType == "buy")
-      //             positionDiv.style.backgroundColor = "#694456";
-      //         }
-      //       }
-
-      //       spotClosedPositionsDiv.appendChild(positionDiv);
-      //     }
-      //   });
-      //   spotClosedPositionsCount = count;
-      //   // setSpotClosedPositionsCount(count)
-      // }
-
-      if (spotCurrentPrices.length) {
-        spotBalancesUpdate();
-
-        //---------------futures statistics--------------------------------
-        let statisticsBar = "";
-        statisticsBar +=
-          "<span class='money-type'>Est. Futures Balance (USDT):</span>";
-        statisticsBar +=
-          "<span class='money-value'>" +
-          new Intl.NumberFormat("en-US").format(futuresUSDTBalance.toFixed(2)) +
-          "</span>";
-        statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-        statisticsBar +=
-          "<span class='money-type'>Est. Futures Value (USDT):</span>";
-        statisticsBar +=
-          "<span class='money-value'>" +
-          new Intl.NumberFormat("en-US").format(
-            (
-              futuresUSDTBalance +
-              futuresPositionsAmount +
-              futuresUnrealizedPL
-            ).toFixed(2)
-          ) +
-          "</span>";
-        statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-        statisticsBar +=
-          "<span class='money-type'>Est. Futures Cost (USDT):</span>";
-        statisticsBar +=
-          "<span class='money-value'>" +
-          Intl.NumberFormat("en-US").format(futuresPositionsAmount) +
-          "</span>";
-        statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-        statisticsBar +=
-          "<span class='money-type'>Est. Futures Unrealized PNL (USDT):</span>";
-        statisticsBar +=
-          "<span class='money-value'>" +
-          Intl.NumberFormat("en-US").format(futuresUnrealizedPL.toFixed(2)) +
-          "</span>";
-        document.getElementById("futures-statistics").innerHTML = statisticsBar;
-
-        //----------------spot statistics---------------------------------------
-        statisticsBar = "";
-        statisticsBar +=
-          "<span class='money-type'>Est. Spot Balance (USDT):</span>";
-        statisticsBar +=
-          "<span class='money-value'>" +
-          new Intl.NumberFormat("en-US").format(spotUSDTBalance.toFixed(2)) +
-          "</span>";
-        statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-        statisticsBar +=
-          "<span class='money-type'>Est. Spot Value (USDT):</span>";
-        // console.log('spotUSDTBalance = ', spotUSDTBalance)
-        let spotValue = parseFloat(spotUSDTBalance);
-        // console.log(spotBalances);
-        // console.log("--spot--", spotCurrentPrices, spotBalances);
-        spotBalances.forEach((balance, index) => {
-          if (index > 0) {
-            spotValue +=
-              parseFloat(balance) *
-              spotCurrentPrices.filter(
-                (item) => item.assetType == assetTypes[index - 1]
-              )[0].price;
-          }
-        });
-        // console.log('spotValue = ', spotValue)
-        statisticsBar +=
-          "<span class='money-value'>" +
-          new Intl.NumberFormat("en-US").format(spotValue.toFixed(2)) +
-          "</span>";
-
-        document.getElementById("spot-statistics").innerHTML = statisticsBar;
-        //---------------spot asset statistics-----------------------------------
-        statisticsBar = "<span class='money-type'>Est. Balances: </span>";
-        spotBalances.forEach((balance, index) => {
-          if (!index) {
-            statisticsBar +=
-              "<span class='money-value'>" +
-              new Intl.NumberFormat("en-US").format(balance.toFixed(2)) +
-              "</span>";
-            statisticsBar += "<span class='money-unit'> USDT</span>";
-            statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;";
-          } else {
-            if (assetTypes[index - 1] == spotAssetType) {
-              statisticsBar +=
-                "<span class='money-value'>" +
-                new Intl.NumberFormat("en-US").format(balance.toFixed(2)) +
-                "</span>";
-              statisticsBar +=
-                "<span class='money-unit'> " +
-                assetTypes[index - 1] +
-                "</span>";
-              statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;";
-            }
-          }
-          // if (index % 10 == 9) statisticsBar += "<br>";
-        });
-
-        document.getElementById("spot-assets-statistics").innerHTML =
-          statisticsBar;
-
-        //------------------- total statistics --------------------
-        statisticsBar = "";
-        statisticsBar +=
-          "<span class='money-type'>Est. Total Balance (USDT):</span>";
-        statisticsBar +=
-          "<span class='money-value'>" +
-          new Intl.NumberFormat("en-US").format(
-            (futuresUSDTBalance + spotUSDTBalance).toFixed(2)
-          ) +
-          "</span>";
-        statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-        statisticsBar +=
-          "<span class='money-type'>Est. Total Value (USDT):</span>";
-        // setTotalValue(spotUSDTBalance);
-        totalValue = spotUSDTBalance;
-        // console.log('totalValue = ', totalValue)
-
-        spotBalances.forEach((balance, index) => {
-          if (index > 0) {
-            const newValue =
-              parseFloat(balance) *
-              spotCurrentPrices.filter(
-                (item) => item.assetType == assetTypes[index - 1]
-              ).price;
-            // setTotalValue(prev=>prev+newValue);
-            totalValue += newValue;
-          }
-        });
-        // totalValue += (parseFloat(futuresUSDTBalance) + parseFloat(futuresPositionsAmount) + parseFloat(futuresUnrealizedPL));
-        let sum =
-          spotUSDTBalance +
-          futuresUSDTBalance +
-          futuresPositionsAmount +
-          futuresUnrealizedPL;
-        let res = new Intl.NumberFormat("en-US").format(sum.toFixed(2));
-        statisticsBar += `<span class='money-value'>` + res + `</span>`;
-        document.getElementById("total-statistics").innerHTML = statisticsBar;
-
-        tradingEnable = true;
-        //---------------------------------------------------------
-        fetch("/api/updateValue", {
-          method: "POST",
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            futuresPositionsAmount,
-            futuresUnrealizedPL,
-            spotValue,
-            totalValue,
-          }),
-        })
-          .then((response) => response.json())
-          .catch((error) => console.error());
-      }
     }
 
     async function fetchSpotCurrentPrices() {
@@ -976,12 +315,10 @@ const TradingApp = () => {
 
     const intervalId1 = setInterval(fetchFuturesCurrentPrices, 500);
     const intervalId2 = setInterval(fetchSpotCurrentPrices, 500);
-    const intervalId3 = setInterval(fetchUserData, 1000);
 
     return () => {
       clearInterval(intervalId1);
       clearInterval(intervalId2);
-      clearInterval(intervalId3);
     };
   }, [futuresAssetType, spotAssetType]);
 
@@ -1017,6 +354,669 @@ const TradingApp = () => {
     }
   };
 
+  async function fetchUserData() {
+    try {
+      const balanceResponse = await axios.post(
+        "/api/balance/getBalance",
+        {},
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
+      const balanceData = await balanceResponse.data;
+      if (!balanceData.ok) {
+        throw new Error("Failed to fetch balance");
+      }
+      futuresUSDTBalance = balanceData.futuresUSDTBalance;
+      spotUSDTBalance = balanceData.spotUSDTBalance;
+
+      const positionsResponse = await axios.post(
+        "/api/position/getPositions",
+        {},
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
+      const positionsData = await positionsResponse.data;
+      if (!positionsData.ok) {
+        throw new Error("Failed to fetch positions");
+      }
+      processPositionsData(positionsData);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      localStorage.removeItem("token");
+      navigate("/login");
+    }
+  }
+
+  function processPositionsData(data) {
+    const futuresPositionsDiv = document.getElementById(
+      "futures-open-positions"
+    );
+    const futuresOpenOrdersDiv = document.getElementById(
+      "futures-open-orders"
+    );
+    const futuresClosedPositionsDiv = document.getElementById(
+      "futures-closed-positions"
+    );
+
+    // const spotPositionsDiv = document.getElementById("spot-open-positions");
+    const spotOpenOrdersDiv = document.getElementById("spot-open-orders");
+    const spotClosedPositionsDiv = document.getElementById(
+      "spot-closed-positions"
+    );
+
+    if (futuresPositionsDiv === null) return;
+
+    let count = 0;
+    let futuresUnrealizedPL = 0;
+    let futuresPositionsAmount = 0;
+    // futuresPositions
+    if (data.futuresPositions && futuresCurrentPrices.length) {
+      count =
+        data.futuresPositions.length +
+        data.futuresPositions.filter((position) => position.orderLimit === 1)
+          .length;
+
+      if (count !== futuresPositionsCount) {
+        futuresPositionsDiv.innerHTML = ""; // Clear previous positions
+        futuresOpenOrdersDiv.innerHTML = ""; // Clear previous limit orders
+      }
+
+      data.futuresPositions.forEach((position) => {
+        // futuresBalances[assetTypes.indexOf(position.assetType) + 1] += position.amount;
+        let currentPrice = futuresCurrentPrices.filter(
+          (item) => item["assetType"] == position.assetType
+        )[0].price;
+        let unrealizedPL = calculateUnrealizedPL(
+          position.entryPrice,
+          currentPrice,
+          position.amount,
+          position.leverage,
+          position.positionType
+        );
+        let positionDiv = document.createElement("div");
+
+        if (position.orderLimit == 1) {
+          let startTrading = 0;
+          if (
+            (position.entryPrice < position.limitPrice &&
+              position.limitPrice < currentPrice) ||
+            (position.entryPrice > position.limitPrice &&
+              position.limitPrice > currentPrice)
+          ) {
+            const response = axios.post(
+              "/api/trade/startTrade",
+              {
+                positionId: position.id,
+              },
+              {
+                headers: {
+                  Authorization: "Bearer " + localStorage.getItem("token"),
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+            const data = response.data;
+            if (!data.ok) {
+              console.error("Error starting Trade:", data);
+            }
+
+            position.orderLimit = 0;
+          } else {
+            unrealizedPL = 0;
+          }
+        }
+        if (
+          unrealizedPL < 0 &&
+          Math.abs(unrealizedPL) >= position.amount * 0.8
+        ) {
+          alert(
+            "unrealizedPL: " +
+              unrealizedPL +
+              "position.amount: " +
+              position.amount
+          );
+          futuresUnrealizedPL -= position.amount;
+          futuresPositionsAmount += position.amount;
+          closeFuturesPosition(position, 3);
+          return;
+        } else {
+          futuresUnrealizedPL += unrealizedPL;
+          // if (!position.orderLimit)
+          futuresPositionsAmount += position.amount;
+          if (
+            (position.positionType == "Long" && currentPrice > position.tp) ||
+            (position.positionType == "Short" && currentPrice < position.tp)
+          ) {
+            closeFuturesPosition(position, 1);
+            return;
+          }
+          if (
+            (position.positionType == "Long" && currentPrice < position.sl) ||
+            (position.positionType == "Short" && currentPrice > position.sl)
+          ) {
+            closeFuturesPosition(position, 2);
+            return;
+          } else {
+            if (count !== futuresPositionsCount) {
+              positionDiv.textContent = `
+                                      ${1 - position.orderLimit}-${
+                position.orderType
+              }-${position.positionType}- ${position.assetType}- 
+                                      Amount: $${position.amount},
+                                      Leverage: ${position.leverage}X, 
+                                      Entry: $${position.entryPrice},
+                                  `;
+              if (position.orderType == "limit")
+                positionDiv.textContent += ` Limit Price: $${position.limitPrice},`;
+
+              let liquidationPrice = 0;
+              if (position.positionType == "Short")
+                liquidationPrice =
+                  (position.entryPrice * (125 + position.leverage / 100)) /
+                  125;
+              if (position.positionType == "Long")
+                liquidationPrice =
+                  (position.entryPrice * (125 - 100 / position.leverage)) /
+                  125;
+
+              positionDiv.textContent += ` Liquidation: $${liquidationPrice.toFixed(
+                2
+              )},`;
+
+              const unPLLabel = document.createElement("label");
+              unPLLabel.textContent = `Unrealized P/L: $${unrealizedPL.toFixed(
+                2
+              )},`;
+              unPLLabel.id = "un" + position.id;
+              positionDiv.appendChild(unPLLabel);
+
+              const tpLabel = document.createElement("label");
+              tpLabel.textContent = "TP: ";
+              positionDiv.appendChild(tpLabel);
+
+              const tpInput = document.createElement("input");
+              tpInput.type = "number";
+              tpInput.id = "tp" + position.id;
+              tpInput.style.width = "80px";
+              if (position.tp > 0 && position.tp < 10000000)
+                tpInput.value = position.tp;
+              positionDiv.appendChild(tpInput);
+
+              const slLabel = document.createElement("label");
+              slLabel.textContent = "SL: ";
+              positionDiv.appendChild(slLabel);
+
+              const slInput = document.createElement("input");
+              slInput.type = "number";
+              slInput.id = "sl" + position.id;
+              slInput.style.width = "80px";
+              if (position.sl > 0 && position.sl < 10000000)
+                slInput.value = position.sl;
+              positionDiv.appendChild(slInput);
+
+              const saveButton = document.createElement("button");
+              saveButton.textContent = "Save";
+              saveButton.addEventListener("click", function () {
+                saveTPSL(position);
+              });
+              saveButton.onClick = () => saveTPSL(position);
+              positionDiv.appendChild(saveButton);
+              positionDiv.append(" ");
+
+              // Create close button
+              const closeButton = document.createElement("button");
+              closeButton.textContent = "Close";
+              closeButton.addEventListener("click", function () {
+                setClosingPosition(position);
+                document.getElementById(
+                  "partial-closing-modal"
+                ).style.display = "block";
+              });
+              positionDiv.appendChild(closeButton); // Add close button to position div
+
+              if (position.orderType == "market") {
+                if (position.positionType == "Long")
+                  positionDiv.style.backgroundColor = "#232323";
+                if (position.positionType == "Short")
+                  positionDiv.style.backgroundColor = "#464646";
+              }
+              if (position.orderType == "limit") {
+                if (position.orderLimit == 0) {
+                  if (position.positionType == "Long")
+                    positionDiv.style.backgroundColor = "#853467";
+                  if (position.positionType == "Short")
+                    positionDiv.style.backgroundColor = "#925743";
+                } else {
+                  if (position.positionType == "Long")
+                    positionDiv.style.backgroundColor = "#295843";
+                  if (position.positionType == "Short")
+                    positionDiv.style.backgroundColor = "#694456";
+                }
+              }
+
+              if (position.orderLimit) {
+                futuresOpenOrdersDiv.appendChild(positionDiv);
+              } else {
+                futuresPositionsDiv.appendChild(positionDiv);
+              }
+            } else {
+              document.getElementById("un" + position.id).textContent =
+                "Unrealized P/L: " + unrealizedPL.toFixed(2) + ",";
+            }
+          }
+        }
+      });
+      futuresPositionsCount = count;
+      // setFuturesPositionsCount(count)
+    }
+    if (data.closedFuturesPositions) {
+      count = data.closedFuturesPositions.length;
+      if (count !== futuresClosedPositionsCount)
+        futuresClosedPositionsDiv.innerHTML = ""; // Clear previous closed positions
+
+      data.closedFuturesPositions.forEach((position) => {
+        let positionDiv = document.createElement("div");
+
+        if (count !== futuresClosedPositionsCount) {
+          positionDiv.textContent = `
+                                  ${1 - position.orderLimit}-${
+            position.orderType
+          }-${position.positionType}-${position.assetType}- 
+                                  Amount: $${position.amount},
+                                  Leverage: ${position.leverage}X, 
+                                  Entry: $${position.entryPrice},
+                                  Exit: $${position.exitPrice},
+                              `;
+          if (position.orderType == "limit")
+            positionDiv.textContent += ` Limit Price: $${position.limitPrice},`;
+
+          let liquidationPrice = 0;
+          if (position.positionType == "Short")
+            liquidationPrice =
+              (position.entryPrice * (125 + position.leverage / 100)) / 125;
+          if (position.positionType == "Long")
+            liquidationPrice =
+              (position.entryPrice * (125 - 100 / position.leverage)) / 125;
+
+          positionDiv.textContent += ` Liquidation: $${liquidationPrice.toFixed(
+            2
+          )},`;
+
+          if (position.tp != 0 && position.tp != 100000000) {
+            positionDiv.textContent += ` TP: $${position.tp.toFixed(2)},`;
+          }
+
+          if (position.sl != 0 && position.sl != 100000000) {
+            positionDiv.textContent += ` SL: $${position.sl.toFixed(2)},`;
+          }
+
+          positionDiv.textContent += ` realized P/L: $${position.realizedPL.toFixed(
+            2
+          )},`;
+
+          let closedReason = "";
+          switch (position.closedReason) {
+            case 0:
+              closedReason = "by User";
+              break;
+            case 1:
+              closedReason = "by TP";
+              break;
+            case 2:
+              closedReason = "by SL";
+              break;
+            case 3:
+              closedReason = "by Liquidaion";
+              break;
+            case 4:
+              closedReason = "partially";
+              break;
+          }
+
+          positionDiv.textContent += ` closed ${closedReason},`;
+
+          if (position.orderType == "market") {
+            if (position.positionType == "Long")
+              positionDiv.style.backgroundColor = "#232323";
+            if (position.positionType == "Short")
+              positionDiv.style.backgroundColor = "#464646";
+          }
+          if (position.orderType == "limit") {
+            if (position.orderLimit == 0) {
+              if (position.positionType == "Long")
+                positionDiv.style.backgroundColor = "#853467";
+              if (position.positionType == "Short")
+                positionDiv.style.backgroundColor = "#925743";
+            } else {
+              if (position.positionType == "Long")
+                positionDiv.style.backgroundColor = "#295843";
+              if (position.positionType == "Short")
+                positionDiv.style.backgroundColor = "#694456";
+            }
+          }
+
+          futuresClosedPositionsDiv.appendChild(positionDiv);
+        }
+      });
+      futuresClosedPositionsCount = count;
+      // setFuturesClosedPositionsCount(count)
+    }
+    
+    spotBalances = [];
+    spotBalances.push(spotUSDTBalance);
+    assetTypes.forEach((asset) => {
+      spotBalances.push(0);
+    });
+
+    if (data.spotPositions && spotCurrentPrices.length) {
+      count =
+        data.spotPositions.length +
+        data.spotPositions.filter((position) => position.orderLimit == 1)
+          .length;
+      if (count !== spotPositionsCount) {
+        // spotPositionsDiv.innerHTML = ""; // Clear previous positions
+        spotClosedPositionsDiv.innerHTML = ""; // Clear previous positions
+        spotOpenOrdersDiv.innerHTML = ""; // Clear previous limit orders
+      }
+      // data.spotPositions.forEach((position) => {
+      //   spotBalances[assetTypes.indexOf(position.assetType) + 1] = 0;
+      // });
+      data.spotPositions.forEach((position) => {
+        if (position.positionType == "buy") {
+          spotBalances[assetTypes.indexOf(position.assetType) + 1] +=
+            parseFloat(position.amount);
+        }
+        if (position.positionType == "sell") {
+          spotBalances[assetTypes.indexOf(position.assetType) + 1] -=
+            parseFloat(position.amount);
+        }
+
+        let currentPrice = spotCurrentPrices.filter(
+          (item) => item.assetType == position.assetType
+        )[0].price;
+
+        if (position.orderLimit == 1) {
+          let startTrading = 0;
+          if (
+            (position.entryPrice < position.limitPrice &&
+              position.limitPrice < currentPrice) ||
+            (position.entryPrice > position.limitPrice &&
+              position.limitPrice > currentPrice)
+          ) {
+            fetch("/api/trade/startTrade", {
+              method: "POST",
+              headers: {
+                Authorization: "Bearer " + localStorage.getItem("token"),
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                positionId: position.id,
+              }),
+            })
+              .then((response) => response.json())
+              .catch((error) =>
+                console.error("Error starting spot Trading:", error)
+              );
+            position.orderLimit = 0;
+          }
+        }
+        let positionDiv = document.createElement("div");
+
+        if (count !== spotPositionsCount) {
+          positionDiv.textContent = `
+                                  ${1 - position.orderLimit}-${
+            position.orderType
+          }-${position.positionType}-  
+                                  Amount: ${position.amount} (${
+            position.assetType
+          })-
+                                  Entry Price: ${position.entryPrice}(USDT),
+                              `;
+          if (position.orderType == "limit")
+            positionDiv.textContent += ` Limit Price: $${position.limitPrice},`;
+
+          if (position.orderType == "market") {
+            if (position.positionType == "buy")
+              positionDiv.style.backgroundColor = "#232323";
+            if (position.positionType == "Sell")
+              positionDiv.style.backgroundColor = "#464646";
+          }
+          if (position.orderType == "limit") {
+            if (position.orderLimit == 0) {
+              if (position.positionType == "buy")
+                positionDiv.style.backgroundColor = "#853467";
+              if (position.positionType == "sell")
+                positionDiv.style.backgroundColor = "#925743";
+            } else {
+              if (position.positionType == "buy")
+                positionDiv.style.backgroundColor = "#295843";
+              if (position.positionType == "sell")
+                positionDiv.style.backgroundColor = "#694456";
+            }
+          }
+
+          if (position.orderLimit) {
+            const closeButton = document.createElement("button");
+            closeButton.textContent = "Close";
+            closeButton.onClick = () => {
+              closeSpotPosition(position);
+            };
+            positionDiv.appendChild(closeButton); // Add close button to position div
+
+            spotOpenOrdersDiv.appendChild(positionDiv);
+          } else {
+            // spotPositionsDiv.appendChild(positionDiv);
+            spotClosedPositionsDiv.appendChild(positionDiv);
+          }
+        }
+      });
+      if (spotPositionsCount == count && spotBalances[spotAssetType] == 0) {
+        spotClosedPositionsDiv.innerHTML = "";
+      }
+      spotPositionsCount = count;
+      // setSpotPositionsCount(count)
+    }
+
+    // if (data.closedSpotPositions) {
+    //   count = data.closedSpotPositions.length;
+    //   if (count !== spotClosedPositionsCount)
+    //     spotClosedPositionsDiv.innerHTML = ""; // Clear previous closed positions
+
+    //   data.closedSpotPositions.forEach((position) => {
+    //     if (position.positionType == "sell" && position.orderLimit == 0) {
+    //       spotBalances[assetTypes.indexOf(position.assetType) + 1] -=
+    //         position.amount;
+    //     }
+    //     let positionDiv = document.createElement("div");
+
+    //     if (count !== spotClosedPositionsCount) {
+    //       positionDiv.textContent = `
+    //                               ${1 - position.orderLimit}-${position.orderType
+    //         }-${position.positionType}-
+    //                               Amount: ${position.amount}(${position.assetType
+    //         }),
+    //                               Entry Price: ${position.entryPrice}(USDT),
+    //                           `;
+    //       if (position.orderType == "limit")
+    //         positionDiv.textContent += ` Limit Price: $${position.limitPrice},`;
+    //       if (position.orderType == "limit") {
+    //         if (position.orderLimit == 1) {
+    //           if (position.positionType == "sell")
+    //             positionDiv.style.backgroundColor = "#295843";
+    //           if (position.positionType == "buy")
+    //             positionDiv.style.backgroundColor = "#694456";
+    //         }
+    //       }
+
+    //       spotClosedPositionsDiv.appendChild(positionDiv);
+    //     }
+    //   });
+    //   spotClosedPositionsCount = count;
+    //   // setSpotClosedPositionsCount(count)
+    // }
+
+    if (spotCurrentPrices.length) {
+      spotBalancesUpdate();
+
+      //---------------futures statistics--------------------------------
+      let statisticsBar = "";
+      statisticsBar +=
+        "<span class='money-type'>Est. Futures Balance (USDT):</span>";
+      statisticsBar +=
+        "<span class='money-value'>" +
+        new Intl.NumberFormat("en-US").format(futuresUSDTBalance.toFixed(2)) +
+        "</span>";
+      statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+      statisticsBar +=
+        "<span class='money-type'>Est. Futures Value (USDT):</span>";
+      statisticsBar +=
+        "<span class='money-value'>" +
+        new Intl.NumberFormat("en-US").format(
+          (
+            futuresUSDTBalance +
+            futuresPositionsAmount +
+            futuresUnrealizedPL
+          ).toFixed(2)
+        ) +
+        "</span>";
+      statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+      statisticsBar +=
+        "<span class='money-type'>Est. Futures Cost (USDT):</span>";
+      statisticsBar +=
+        "<span class='money-value'>" +
+        Intl.NumberFormat("en-US").format(futuresPositionsAmount) +
+        "</span>";
+      statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+      statisticsBar +=
+        "<span class='money-type'>Est. Futures Unrealized PNL (USDT):</span>";
+      statisticsBar +=
+        "<span class='money-value'>" +
+        Intl.NumberFormat("en-US").format(futuresUnrealizedPL.toFixed(2)) +
+        "</span>";
+      document.getElementById("futures-statistics").innerHTML = statisticsBar;
+
+      //----------------spot statistics---------------------------------------
+      statisticsBar = "";
+      statisticsBar +=
+        "<span class='money-type'>Est. Spot Balance (USDT):</span>";
+      statisticsBar +=
+        "<span class='money-value'>" +
+        new Intl.NumberFormat("en-US").format(spotUSDTBalance.toFixed(2)) +
+        "</span>";
+      statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+      statisticsBar +=
+        "<span class='money-type'>Est. Spot Value (USDT):</span>";
+      // console.log('spotUSDTBalance = ', spotUSDTBalance)
+      let spotValue = parseFloat(spotUSDTBalance);
+      // console.log(spotBalances);
+      // console.log("--spot--", spotCurrentPrices, spotBalances);
+      spotBalances.forEach((balance, index) => {
+        if (index > 0) {
+          spotValue +=
+            parseFloat(balance) *
+            spotCurrentPrices.filter(
+              (item) => item.assetType == assetTypes[index - 1]
+            )[0].price;
+        }
+      });
+      // console.log('spotValue = ', spotValue)
+      statisticsBar +=
+        "<span class='money-value'>" +
+        new Intl.NumberFormat("en-US").format(spotValue.toFixed(2)) +
+        "</span>";
+
+      document.getElementById("spot-statistics").innerHTML = statisticsBar;
+      //---------------spot asset statistics-----------------------------------
+      statisticsBar = "<span class='money-type'>Est. Balances: </span>";
+      spotBalances.forEach((balance, index) => {
+        if (!index) {
+          statisticsBar +=
+            "<span class='money-value'>" +
+            new Intl.NumberFormat("en-US").format(balance.toFixed(2)) +
+            "</span>";
+          statisticsBar += "<span class='money-unit'> USDT</span>";
+          statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;";
+        } else {
+          if (assetTypes[index - 1] == spotAssetType) {
+            statisticsBar +=
+              "<span class='money-value'>" +
+              new Intl.NumberFormat("en-US").format(balance.toFixed(2)) +
+              "</span>";
+            statisticsBar +=
+              "<span class='money-unit'> " +
+              assetTypes[index - 1] +
+              "</span>";
+            statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;";
+          }
+        }
+        // if (index % 10 == 9) statisticsBar += "<br>";
+      });
+
+      document.getElementById("spot-assets-statistics").innerHTML =
+        statisticsBar;
+
+      //------------------- total statistics --------------------
+      statisticsBar = "";
+      statisticsBar +=
+        "<span class='money-type'>Est. Total Balance (USDT):</span>";
+      statisticsBar +=
+        "<span class='money-value'>" +
+        new Intl.NumberFormat("en-US").format(
+          (futuresUSDTBalance + spotUSDTBalance).toFixed(2)
+        ) +
+        "</span>";
+      statisticsBar += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+      statisticsBar +=
+        "<span class='money-type'>Est. Total Value (USDT):</span>";
+      // setTotalValue(spotUSDTBalance);
+      totalValue = spotUSDTBalance;
+      // console.log('totalValue = ', totalValue)
+
+      spotBalances.forEach((balance, index) => {
+        if (index > 0) {
+          const newValue =
+            parseFloat(balance) *
+            spotCurrentPrices.filter(
+              (item) => item.assetType == assetTypes[index - 1]
+            ).price;
+          // setTotalValue(prev=>prev+newValue);
+          totalValue += newValue;
+        }
+      });
+      // totalValue += (parseFloat(futuresUSDTBalance) + parseFloat(futuresPositionsAmount) + parseFloat(futuresUnrealizedPL));
+      let sum =
+        spotUSDTBalance +
+        futuresUSDTBalance +
+        futuresPositionsAmount +
+        futuresUnrealizedPL;
+      let res = new Intl.NumberFormat("en-US").format(sum.toFixed(2));
+      statisticsBar += `<span class='money-value'>` + res + `</span>`;
+      document.getElementById("total-statistics").innerHTML = statisticsBar;
+      //---------------------------------------------------------
+      fetch("/api/updateValue", {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          futuresPositionsAmount,
+          futuresUnrealizedPL,
+          spotValue,
+          totalValue,
+        }),
+      })
+        .then((response) => response.json())
+        .catch((error) => console.error());
+    }
+  }
+
   function addValidationEventListener() {
     // Adding the validation event listeners to input fields
   }
@@ -1045,11 +1045,11 @@ const TradingApp = () => {
         }
       );
       const data = await response.data;
-      const availableAmount = parseFloat(
+      availableAmount = parseFloat(
         data.futuresUSDTBalance + data.spotUSDTBalance
       ); // Set available balance to variable
       // setAvailableAmount(availableAmount);
-      availableAmount = availableAmount;
+      // availableAmount = availableAmount;
       document.getElementById("availableAmount").textContent =
         availableAmount.toFixed(3); // Display formatted balance
       document.getElementById("welcome-message-duplicate").textContent =
@@ -1072,7 +1072,7 @@ const TradingApp = () => {
     spotClosedPositionsCount = 0;
 
     document.getElementById("futures-dropdownOptions").style.display = "none";
-  }
+  } 
 
   function transferUSDT() {
     const transferUSDTType =
@@ -1178,7 +1178,7 @@ const TradingApp = () => {
     assetAmountSpan.style.fontSize = "14px";
     assetAmountSpan.style.fontWeight = "bold";
     assetAmountSpan.style.color = "#929292";
-    assetAmountSpan.textContent = `${spotBalances[0]}`;
+    assetAmountSpan.textContent = `${spotBalances[0].toFixed(4)}`;
 
     optionDiv.appendChild(innerDiv);
     optionDiv.appendChild(assetAmountSpan);
@@ -1215,7 +1215,7 @@ const TradingApp = () => {
         assetAmountSpan.style.fontSize = "14px";
         assetAmountSpan.style.fontWeight = "bold";
         assetAmountSpan.style.color = "#929292";
-        assetAmountSpan.textContent = `${asset}`;
+        assetAmountSpan.textContent = `${asset.toFixed(6)}`;
 
         optionDiv.appendChild(innerDiv);
         optionDiv.appendChild(assetAmountSpan);
@@ -1465,16 +1465,19 @@ const TradingApp = () => {
       limitPrice = parseFloat(document.getElementById("limit-price").value);
       if (isNaN(limitPrice)) {
         alert("Please enter a valid Limit Price");
+        tradingEnable = true;
         return;
       }
     }
 
     if (isNaN(betAmount) || betAmount <= 0) {
       alert("Please enter a valid bet amount.");
+      tradingEnable = true;
       return;
     }
     if (isNaN(leverage) || leverage < 1 || leverage > 300) {
       alert("Please enter a valid bet amount.");
+      tradingEnable = true;
       return;
     }
 
@@ -1495,15 +1498,19 @@ const TradingApp = () => {
     })
       .then((response) => {
         if (!response.ok) {
+          tradingEnable = true;
           throw new Error("Network response was not ok");
         }
+        tradingEnable = true;
         return response.json();
       })
       .then((data) => {
         //fetchUserData();
+        tradingEnable = true;
         alert(`Placed a ${positionType} bet of $${betAmount}`);
       })
       .catch((error) => {
+        tradingEnable = true;
         console.error("Error placing bet:", error);
         alert("Error placing bet. Please try again.");
       });
@@ -1520,7 +1527,6 @@ const TradingApp = () => {
   }
 
   function spotTrading(positionType, orderType) {
-    // console.log('spot-trading-----',positionType, tradingEnable);
     if(!tradingEnable)return;
     tradingEnable = false;
 
@@ -1536,12 +1542,14 @@ const TradingApp = () => {
       );
       if (isNaN(limitPrice)) {
         alert("Please enter a valid Limit Price");
+        tradingEnable = true;
         return;
       }
     }
 
     if (isNaN(amount) || amount <= 0) {
       alert("Please enter a valid amount.");
+      tradingEnable = true;
       return;
     }
 
@@ -1549,11 +1557,11 @@ const TradingApp = () => {
       if (
         spotUSDTBalance <
         amount *
-          spotCurrentPrices.filter((item) => item.assetType == spotAssetType)[0]
-            .price
+          spotCurrentPrices.filter((item) => item.assetType == spotAssetType)[0].price
       ) {
         console.log(spotUSDTBalance, amount, spotCurrentPrices);
         alert("Insufficient USDT");
+        tradingEnable = true;
         return;
       }
     }
@@ -1561,6 +1569,7 @@ const TradingApp = () => {
     if (positionType == "sell") {
       if (amount > spotBalances[assetTypes.indexOf(spotAssetType) + 1]) {
         alert("Insufficient " + spotAssetType + amount + "/" +spotBalances[assetTypes.indexOf(spotAssetType) + 1]  + "/" +  (assetTypes.indexOf(spotAssetType) + 1) + ":" + spotBalances.length);
+        tradingEnable = true;
         return;
       }
     }
@@ -1581,15 +1590,17 @@ const TradingApp = () => {
     })
       .then((response) => {
         if (!response.ok) {
+          tradingEnable = true;
           throw new Error("Network response was not ok");
         }
         return response.json();
       })
       .then((data) => {
-        //fetchUserData();
         alert(`${positionType} ${amount} ${spotAssetType}`);
+        tradingEnable = true;
       })
       .catch((error) => {
+        tradingEnable = true;
         console.error("Error placing bet:", error);
         alert("Error placing bet. Please try again.");
       });
@@ -2890,7 +2901,7 @@ const TradingApp = () => {
                 id="long-button"
                 className="playbutttton"
                 style={{ marginTop: "15px" }}
-                onClick={() => futuresTrading("long", "market")}
+                onClick={() => tradingEnable && futuresTrading("long", "market")}
               >
                 Long
               </button>
@@ -2899,7 +2910,7 @@ const TradingApp = () => {
                 id="short-button"
                 className="playbutttton"
                 style={{ marginTop: "15px" }}
-                onClick={() => futuresTrading("short", "market")}
+                onClick={() => tradingEnable && futuresTrading("short", "market")}
               >
                 Short
               </button>

@@ -12,10 +12,6 @@ const updateValueRoutes = require('./routes/updateValue');
 const spotPositionRoutes = require('./routes/spotPosition');
 const partialClosePositionRoutes = require('./routes/partialClosePosition');
 const path = require('path');
-let futuresCurrencyPrices = [];
-let spotCurrencyPrices = [];
-
-let lastTradingTime = 0;
 
 const app = express();
 connectDB();

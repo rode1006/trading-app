@@ -21,12 +21,6 @@ router.post('/getPositions', authenticateToken, async (req, res) => {
 });
 
 router.post('/openFuturesPosition', authenticateToken, async (req, res) => {
-    let nowTradingTime = new Date();
-    if(nowTradingTime - lastTradingTime < 1000){
-        return res.status(400).send("Wrong operation!");
-    }
-    lastTradingTime = nowTradingTime;
-    
     const { futuresAssetType, positionType, orderType, amount, leverage, limitPrice } = req.body;
     const username = req.user.username;
     try {
