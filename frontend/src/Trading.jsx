@@ -1126,20 +1126,7 @@ const TradingApp = () => {
     setSpotAssetType(value);
     let selectedSymbol = `MEXC:${value}USDT`;
     setSelectedSpotChartSymbol(selectedSymbol);
-    // selectedSpotChartSymbol = selectedSymbol
-    document.getElementById(
-      "spot-dropdownSelected"
-    ).innerHTML = `<div class="dropdown-option" >
-                    <span class="crypto-icon-small"><img src="icon/${value}.png"></span>
-                    <span class="money-type">${value}_USDT:&nbsp; </span>
-                    <span class="money-value">${Intl.NumberFormat(
-                      "en-US"
-                    ).format(
-                      spotCurrentPrices.find((item) => item.assetType === value)
-                        .price
-                    )}</span></div>`;
-    const spotDropdownOptions = document.getElementById("spot-dropdownOptions");
-    spotDropdownOptions.style.display = "none";
+    document.getElementById("spot-dropdownOptions").style.display = "none";
   }
 
   function spotBalancesUpdate() {
