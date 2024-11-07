@@ -17,24 +17,17 @@ const app = express();
 connectDB();
 
 app.use(bodyParser.json());
-// app.use(express.static('public'));
-// app.use(express.static(path.join(__dirname, 'frontend/build')));
 
-// app.get('/', (req, res) => {
-//   res.sendFile(path.join(__dirname, 'frontend/build', 'index.html'));
-// });
-// // Catch-all route to serve the React app for any route that doesn't match
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname, '/frontend/build', 'index.html'));
-// });
-app.use(express.static(path.join(__dirname, '../build')));
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../build', 'index.html'));
-});
-// Catch-all route to serve the React app for any route that doesn't match
+app.use(express.static(path.join(__dirname, '../frontend/build')));
+
+// Serve static assets like icons and images directly from frontend/build
+app.use('/icon', express.static(path.join(__dirname, '../frontend/build/icon')));
+app.use('/img', express.static(path.join(__dirname, '../frontend/build/img')));
+
+// Route for React app's index.html
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../build', 'index.html'));
+  res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
 });
 
 app.use('/auth', authRoutes);
