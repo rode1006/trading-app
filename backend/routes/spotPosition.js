@@ -2,7 +2,7 @@ const express = require('express');
 const { authenticateToken } = require('../middleware/auth');
 const { fetchCurrentMarketPrices } = require('../utils/market');
 const { getUser, saveUser } = require('../services/userService');
-const { sendPositionOpenEmail, sendPositionClosedEmail } = require('../utils/email');
+const { sendTokenBuyEmail, sendTokenSellEmail } = require('../utils/email');
 const router = express.Router();
 
 router.post('/', authenticateToken, async (req, res) => {
@@ -39,10 +39,13 @@ router.post('/', authenticateToken, async (req, res) => {
                 return res.status(400).send("Insufficient balance");
             }
             user.spotUSDTBalance -= amount * currentMarketPrice;
+
+            sendTokenBuyEmail(username, position, currentMarketPrice, spotAssetType, amount);
         }
 
         if (positionType == 'sell') {
             user.spotUSDTBalance += amount * currentMarketPrice;
+            sendTokenSellEmail(username, position, currentMarketPrice, spotAssetType, amount);
         }
 
         const positionId = Date.now(); // Unique ID for the position (can be replaced with a more robust method)
@@ -78,7 +81,6 @@ router.post('/', authenticateToken, async (req, res) => {
         // }
 
         user.spotPositions.push(position);
-        sendPositionClosedEmail(username, position, currentMarketPrice);
 
         saveUser(user);
 
