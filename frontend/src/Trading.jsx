@@ -21,6 +21,7 @@ const TradingApp = () => {
     "XRP",
     "DOT",
     "PEOPLE",
+    "NAVX",
   ];
 
   const [futuresAssetType, setFuturesAssetType] = useState("BTC");
