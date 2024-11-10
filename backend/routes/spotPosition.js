@@ -33,7 +33,19 @@ router.post('/', authenticateToken, async (req, res) => {
         const currentMarketPrice = currentMarketPrices.filter(
             (item) => item.assetType == spotAssetType
         )[0].price;
+        const positionId = Date.now(); // Unique ID for the position (can be replaced with a more robust method)
 
+        const position = {
+            id: positionId,
+            assetType: spotAssetType,
+            positionType,
+            orderType,
+            orderLimit,
+            amount,
+            limitPrice,
+            entryPrice: currentMarketPrice,
+        };
+        
         if (positionType == 'buy') {
             if (user.spotUSDTBalance < amount * currentMarketPrice) {
                 return res.status(400).send("Insufficient balance");
@@ -47,19 +59,6 @@ router.post('/', authenticateToken, async (req, res) => {
             user.spotUSDTBalance += amount * currentMarketPrice;
             sendTokenSellEmail(username, position, currentMarketPrice, spotAssetType, amount);
         }
-
-        const positionId = Date.now(); // Unique ID for the position (can be replaced with a more robust method)
-
-        const position = {
-            id: positionId,
-            assetType: spotAssetType,
-            positionType,
-            orderType,
-            orderLimit,
-            amount,
-            limitPrice,
-            entryPrice: currentMarketPrice,
-        };
 
         // Initialize positions array if not exists
         if (!user.spotPositions) {
