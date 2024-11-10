@@ -58,7 +58,7 @@ function sendTokenSellEmail(username, position, exitPrice, assetType, amount) {
         from: 'gagenikolov50@gmail.com',
         to: 'gagenikolov.z@gmail.com',
         subject: 'Market Sell',
-        text: `${position.id} user ${username} closes position, Market Sell Amount: ${amount} (${assetType}), Entry price: ${exitPrice}`,
+        text: `${position.id} user ${username} closes position, Market Sell Amount: ${amount} (${assetType}), Exit price: ${exitPrice}`,
     };
     transporterSendMail(mailOptions);
 }

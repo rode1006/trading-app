@@ -692,7 +692,7 @@ const TradingApp = () => {
                                     Amount: ${position.amount} (${
               position.assetType
             })-
-                                    Entry Price: ${position.entryPrice}(USDT),
+                                    Fair Price: ${position.entryPrice}(USDT),
                                 `;
             if (position.orderType == "limit")
               positionDiv.textContent += ` Limit Price: $${position.limitPrice},`;
