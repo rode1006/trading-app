@@ -3106,10 +3106,10 @@ const TradingApp = () => {
             <span>Mode:</span>
             <select name="transferType" id="transfer-USDT-type">
               <option value="fromFutures" selected>
-                Futures -> Spot
+                Futures - Spot
               </option>
               <option value="fromSpot" selected>
-                Spot -> Futures
+                Spot - Futures
               </option>
             </select>
             <span>Amount:</span>
