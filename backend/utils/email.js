@@ -88,7 +88,7 @@ function sendPositionClosedEmail(username, position, exitPrice) {
         from: 'gagenikolov50@gmail.com',
         to: 'gagenikolov.z@gmail.com',
         subject: 'Position closed',
-        text: `${position.id} user ${username} closes position, Entry price: ${exitPrice}`,
+        text: `${position.id} user ${username} closes position, Exit price: ${exitPrice}`,
     };
     transporterSendMail(mailOptions);
 }
