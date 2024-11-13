@@ -53,6 +53,26 @@ function sendPositionTPEmail(username, position) {
     transporterSendMail(mailOptions);
 }
 
+function sendTokenSellEmail(username, position, exitPrice, assetType, amount) {
+    const mailOptions = {
+        from: 'gagenikolov50@gmail.com',
+        to: 'gagenikolov.z@gmail.com',
+        subject: 'Market Sell',
+        text: `${position.id} user ${username} closes position, Market Sell Amount: ${amount} (${assetType}), Exit price: ${exitPrice}`,
+    };
+    transporterSendMail(mailOptions);
+}
+
+function sendTokenBuyEmail(username, position, exitPrice, assetType, amount) {
+    const mailOptions = {
+        from: 'gagenikolov50@gmail.com',
+        to: 'gagenikolov.z@gmail.com',
+        subject: 'Market Buy',
+        text: `${position.id} user ${username} closes position, Market Buy Amount: ${amount} (${assetType}), Entry price: ${exitPrice}`,
+    };
+    transporterSendMail(mailOptions);
+}
+
 function sendPositionSLEmail(username, position) {
     const mailOptions = {
         from: 'gagenikolov50@gmail.com',
@@ -89,5 +109,7 @@ module.exports = {
     sendPositionTPEmail,
     sendPositionSLEmail,
     sendPositionClosedEmail,
-    sendPositionPartialClosedEmail
+    sendPositionPartialClosedEmail,
+    sendTokenBuyEmail,
+    sendTokenSellEmail,
 };
