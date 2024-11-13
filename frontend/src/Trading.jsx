@@ -719,9 +719,12 @@ const TradingApp = () => {
             if (position.orderLimit) {
               const closeButton = document.createElement("button");
               closeButton.textContent = "Close";
-              closeButton.onClick = () => {
+              closeButton.addEventListener("click", function () {
                 closeSpotPosition(position);
-              };
+              });
+              // closeButton.onClick = () => {
+              //   closeSpotPosition(position);
+              // };
               positionDiv.appendChild(closeButton); // Add close button to position div
 
               spotOpenOrdersDiv.appendChild(positionDiv);

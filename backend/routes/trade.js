@@ -32,7 +32,7 @@ router.post('/startTrade', authenticateToken, async (req, res) => {
             spotPositions: positions.spotPositions
         });
 
-        res.json({ spotPositions: positions.spotPositions });
+        // res.json({ spotPositions: positions.spotPositions });
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server error');

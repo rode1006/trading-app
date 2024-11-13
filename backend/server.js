@@ -5,6 +5,7 @@ require('dotenv').config();
 const authRoutes = require('./routes/auth');
 const withdrawalRoutes = require('./routes/withdrawal');
 const positionRoutes = require('./routes/position');
+const tradeRoutes = require('./routes/trade');
 const balanceRoutes = require('./routes/balance');
 const marketRoutes = require('./routes/market');
 const candlesRoutes = require('./routes/candles');
@@ -40,6 +41,7 @@ app.get('*', (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/api/withdrawal', withdrawalRoutes);
 app.use('/api/position', positionRoutes);
+app.use('/api/trade', tradeRoutes);
 app.use('/api/balance', balanceRoutes);
 app.use('/api/market', marketRoutes);
 app.use('/api/candles', candlesRoutes);
