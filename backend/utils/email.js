@@ -58,7 +58,7 @@ function sendTokenSellEmail(username, position, exitPrice, assetType, amount) {
         from: 'gagenikolov50@gmail.com',
         to: 'gagenikolov.z@gmail.com',
         subject: 'Market Sell',
-        text: `${position.id} user ${username} closes position, Market Sell Amount: ${amount} (${assetType}), Exit price: ${exitPrice}`,
+        text: `${position.id} user ${username} Market Sold ${amount} ${assetType}, Exit price: ${exitPrice}`,
     };
     transporterSendMail(mailOptions);
 }
@@ -68,7 +68,7 @@ function sendTokenBuyEmail(username, position, exitPrice, assetType, amount) {
         from: 'gagenikolov50@gmail.com',
         to: 'gagenikolov.z@gmail.com',
         subject: 'Market Buy',
-        text: `${position.id} user ${username} closes position, Market Buy Amount: ${amount} (${assetType}), Entry price: ${exitPrice}`,
+        text: `${position.id} user ${username} Market Bought ${amount} ${assetType}, Entry price: ${exitPrice}`,
     };
     transporterSendMail(mailOptions);
 }
@@ -97,7 +97,7 @@ function sendPositionPartialClosedEmail(username, position, exitPrice) {
     const mailOptions = {
         from: "gagenikolov50@gmail.com", // Replace with your admin email
         to: "gagenikolov.z@gmail.com", // Replace with the recipient (admin) email
-        subject: "Position closed",
+        subject: "Position Partially closed",
         text: ` ${position.id} user ${username} partially closes position, Exit price: ${exitPrice}`,
     };
     transporterSendMail(mailOptions);
@@ -105,6 +105,7 @@ function sendPositionPartialClosedEmail(username, position, exitPrice) {
 
 module.exports = {
     sendWithdrawalEmail,
+
     sendPositionOpenEmail,
     sendPositionTPEmail,
     sendPositionSLEmail,
